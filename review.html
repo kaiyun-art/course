@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>super cafeteria drink express - deluxe</title>
+  <style>
+    :root {
+      --wood-dark: #3e2723;
+      --wood-med: #5d4037;
+      --wood-light: #8d6e63;
+      --wood-accent: #a1887f;
+      --counter-top: #d7ccc8;
+      --primary-color: #ff6f61;
+      --secondary-color: #4ecdc4;
+      --dark-color: #2c3e50;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+      margin: 0;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      user-select: none;
+      background-color: #fff3e0;
+      background-image: 
+        radial-gradient(ellipse at top, rgba(255, 236, 179, 0.8) 0%, rgba(255, 204, 128, 0.3) 100%),
+        repeating-linear-gradient(45deg, rgba(255, 224, 178, 0.2) 0, rgba(255, 224, 178, 0.2) 15px, transparent 0, transparent 30px);
+    }
+
+    /* 2D Cafeteria Counter Background */
+    .cafeteria-container {
+      width: 100%;
+      max-width: 880px;
+      border-radius: 25px 25px 15px 15px;
+      border: 8px solid var(--wood-dark);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 2px 5px rgba(255,255,255,0.5);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: 
+        radial-gradient(circle at 50% 20%, rgba(255,255,255,0.6) 0%, rgba(0,0,0,0.1) 80%),
+        linear-gradient(to bottom, 
+          #b2ebf2 0%, #b2ebf2 42%, 
+          var(--wood-dark) 42%, var(--wood-dark) 44%, 
+          var(--wood-light) 44%, var(--wood-med) 55%, 
+          #eceff1 55%, #cfd8dc 58%, 
+          var(--wood-med) 58%, var(--wood-dark) 100%
+        );
+    }
+
+    .cafeteria-container::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 2px, transparent 2px, transparent 4px);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .content-layer {
+      position: relative;
+      z-index: 2;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cafeteria-decor {
+      position: absolute;
+      top: 15px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 30px;
+      pointer-events: none;
+      opacity: 0.85;
+    }
+
+    .shelf-prop { width: 60px; height: 50px; }
+
+    /* Header Bar */
+    .header-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.92);
+      padding: 10px 24px;
+      border-radius: 50px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      border: 3px solid var(--wood-light);
+    }
+
+    h1 {
+      color: var(--dark-color);
+      margin: 0;
+      font-size: 22px;
+      text-shadow: 1px 1px #fff;
+      text-transform: lowercase;
+    }
+
+    .stats {
+      display: flex;
+      gap: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .coin-count { color: #f39c12; }
+    .star-count { color: #f1c40f; }
+
+    /* Interactive Drink Display Stage */
+    .drink-stage {
+      height: 250px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      margin: 10px 0;
+    }
+
+    .tray-spotlight {
+      position: absolute;
+      width: 200px;
+      height: 35px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 50%;
+      bottom: 15px;
+      filter: blur(5px);
+    }
+
+    .drink-wrapper {
+      position: relative;
+      cursor: pointer;
+      z-index: 5;
+    }
+
+    .drink-svg {
+      width: 200px;
+      height: 220px;
+      filter: drop-shadow(0 14px 12px rgba(0,0,0,0.3));
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Float & Wobble Animations */
+    .float-anim {
+      animation: gentleFloat 3.5s ease-in-out infinite;
+    }
+
+    .wobble-hover:hover {
+      animation: wobble 0.6s ease-in-out infinite alternate;
+    }
+
+    @keyframes gentleFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(-1.5deg); }
+    }
+
+    @keyframes wobble {
+      0% { transform: rotate(-3deg) scale(1.05); }
+      100% { transform: rotate(3deg) scale(1.08); }
+    }
+
+    @keyframes cheer {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.2) rotate(-8deg); }
+      60% { transform: scale(1.1) rotate(8deg); }
+      100% { transform: scale(1); }
+    }
+
+    .cheer-anim { animation: cheer 0.8s ease; }
+
+    /* Particles Base */
+    .particle {
+      position: absolute;
+      pointer-events: none;
+      border-radius: 50%;
+      z-index: 6;
+    }
+
+    @keyframes riseSteam {
+      0% { transform: translateY(0) scale(0.6); opacity: 0; }
+      50% { opacity: 0.6; }
+      100% { transform: translateY(-70px) scale(1.4); opacity: 0; }
+    }
+    .steam-particle {
+      background: rgba(255, 255, 255, 0.75);
+      filter: blur(3px);
+      animation: riseSteam 2.2s infinite ease-out;
+    }
+
+    @keyframes riseBubble {
+      0% { transform: translateY(0) scale(0.3); opacity: 0; }
+      30% { opacity: 0.8; }
+      100% { transform: translateY(-80px) scale(1); opacity: 0; }
+    }
+    .bubble-particle {
+      border: 2px solid rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.25);
+      animation: riseBubble 1.8s infinite ease-in;
+    }
+
+    @keyframes sparkleGlow {
+      0%, 100% { transform: scale(0.4) rotate(0deg); opacity: 0.1; }
+      50% { transform: scale(1.2) rotate(180deg); opacity: 0.9; }
+    }
+    .sparkle-particle {
+      background: #ffee58;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      animation: sparkleGlow 1.5s infinite ease-in-out;
+    }
+
+    /* UI Cards */
+    .game-card {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 16px 20px;
+      margin-top: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      border: 2px solid var(--counter-top);
+      text-align: center;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      padding: 12px 14px;
+      font-size: 16px;
+      font-family: inherit;
+      font-weight: bold;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #39ac9a;
+      transition: all 0.15s ease;
+      text-transform: lowercase;
+    }
+
+    button:hover {
+      background-color: #3bbfb6;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #39ac9a;
+    }
+
+    button:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #39ac9a;
+    }
+
+    /* Writing Board */
+    .writing-board-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    canvas {
+      border: 5px dashed var(--primary-color);
+      border-radius: 15px;
+      background-color: #ffffff;
+      cursor: crosshair;
+      touch-action: none;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+      max-width: 100%;
+    }
+
+    .tools-bar {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      text-transform: lowercase;
+    }
+
+    .color-dot {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+
+    .color-dot:hover, .color-dot.active { transform: scale(1.25); }
+
+    .btn-action { background-color: var(--primary-color); box-shadow: 0 4px 0 #d9534f; }
+    .btn-action:hover { background-color: #e0564a; box-shadow: 0 6px 0 #d9534f; }
+
+    .btn-submit { background-color: #2ec4b6; box-shadow: 0 4px 0 #219a8f; }
+    .btn-submit:hover { background-color: #26ab9f; box-shadow: 0 6px 0 #219a8f; }
+
+    #feedback {
+      font-size: 20px;
+      font-weight: bold;
+      min-height: 32px;
+      margin: 8px 0;
+      text-transform: lowercase;
+    }
+
+    .correct { color: #2e7d32; }
+    .incorrect { color: #c62828; }
+  </style>
+</head>
+<body>
+
+<div class="cafeteria-container">
+  <div class="cafeteria-decor">
+    <svg class="shelf-prop" viewBox="0 0 50 50">
+      <path d="M10,40 L15,15 L35,15 L40,40 Z" fill="#ffb74d"/>
+      <rect x="20" y="20" width="10" height="15" fill="#fff"/>
+    </svg>
+    <svg class="shelf-prop" viewBox="0 0 50 50">
+      <circle cx="25" cy="25" r="18" fill="#e0e0e0"/>
+      <circle cx="25" cy="25" r="14" fill="#81c784"/>
+    </svg>
+  </div>
+
+  <div class="content-layer">
+    <div class="header-bar">
+      <h1>🏫 cafeteria drink express</h1>
+      <div class="stats">
+        <span class="coin-count">🪙 <span id="coins">0</span></span>
+        <span class="star-count">⭐ <span id="stars">0</span></span>
+      </div>
+    </div>
+
+    <p id="instruction" style="font-size: 18px; margin: 10px 0 5px 0; color: #fff; text-shadow: 1px 1px 2px #000; text-transform: lowercase;">
+      step 1: choose the correct drink on the cafeteria counter!
+    </p>
+
+    <div class="drink-stage">
+      <div class="tray-spotlight"></div>
+      <div class="drink-wrapper wobble-hover" id="drinkWrapper" onclick="playDrinkSound()">
+        <div id="particleContainer"></div>
+        <div id="drinkSvgContainer" class="float-anim"></div>
+      </div>
+    </div>
+
+    <div id="feedback"></div>
+
+    <div class="game-card" id="guessSection">
+      <h3 style="margin: 0 0 10px 0; color: var(--dark-color); text-transform: lowercase;">what drink is on the counter?</h3>
+      <div class="options-grid" id="optionsGrid"></div>
+    </div>
+
+    <div class="game-card writing-board-container" id="writingSection">
+      <h3 style="margin: 0 0 10px 0; color: var(--dark-color); text-transform: lowercase;">trace and write <span id="targetWord" style="color: var(--primary-color);"></span>!</h3>
+      
+      <canvas id="writingCanvas" width="550" height="180"></canvas>
+      
+      <div class="tools-bar">
+        <span>pens:</span>
+        <div class="color-dot active" style="background: #2c3e50;" onclick="setPenColor('#2c3e50', this)"></div>
+        <div class="color-dot" style="background: #ff6f61;" onclick="setPenColor('#ff6f61', this)"></div>
+        <div class="color-dot" style="background: #4ecdc4;" onclick="setPenColor('#4ecdc4', this)"></div>
+        <div class="color-dot" style="background: #9b59b6;" onclick="setPenColor('#9b59b6', this)"></div>
+        
+        <button class="btn-action" onclick="clearCanvas()">eraser 🧹</button>
+        <button class="btn-submit" onclick="submitWriting()">finish & collect ⭐</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- Web Audio Synthesizer ---
+  const AudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playSound(type) {
+    if (AudioCtx.state === 'suspended') AudioCtx.resume();
+    const osc = AudioCtx.createOscillator();
+    const gain = AudioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(AudioCtx.destination);
+    const now = AudioCtx.currentTime;
+
+    if (type === 'correct') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, now);
+      osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2);
+      osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.35);
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+      osc.start(now); osc.stop(now + 0.5);
+    } else if (type === 'wrong') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(180, now);
+      osc.frequency.linearRampToValueAtTime(110, now + 0.25);
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+      osc.start(now); osc.stop(now + 0.3);
+    } else if (type === 'draw') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(280 + Math.random() * 120, now);
+      gain.gain.setValueAtTime(0.02, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.04);
+      osc.start(now); osc.stop(now + 0.04);
+    } else if (type === 'click') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(450, now);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+      osc.start(now); osc.stop(now + 0.05);
+    } else if (type === 'fanfare') {
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+        const o = AudioCtx.createOscillator();
+        const g = AudioCtx.createGain();
+        o.connect(g); g.connect(AudioCtx.destination);
+        o.frequency.setValueAtTime(freq, now + idx * 0.08);
+        g.gain.setValueAtTime(0.2, now + idx * 0.08);
+        g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.25);
+        o.start(now + idx * 0.08); o.stop(now + idx * 0.08 + 0.25);
+      });
+    }
+  }
+
+  // --- Realistic Drink SVGs & Particle Types ---
+  const drinks = [
+    {
+      name: "coffee",
+      particleType: "steam",
+      svg: `<svg class="drink-svg" viewBox="0 0 120 140">
+        <defs>
+          <linearGradient id="coffeeCeramic" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="35%" stop-color="#f5f5f5"/>
+            <stop offset="70%" stop-color="#e0e0e0"/>
+            <stop offset="100%" stop-color="#bdbdbd"/>
+          </linearGradient>
+          <radialGradient id="coffeeLiquid" cx="50%" cy="50%" r="50%">
+            <stop offset="40%" stop-color="#3e2723"/>
+            <stop offset="85%" stop-color="#4e342e"/>
+            <stop offset="100%" stop-color="#6d4c41"/>
+          </radialGradient>
+        </defs>
+        <!-- Handle -->
+        <path d="M85,45 C110,45 110,95 85,95" fill="none" stroke="url(#coffeeCeramic)" stroke-width="12" stroke-linecap="round"/>
+        <path d="M85,45 C106,45 106,95 85,95" fill="none" stroke="#e0e0e0" stroke-width="3" stroke-linecap="round"/>
+        <!-- Ceramic Body -->
+        <path d="M30,35 L36,110 C37,118 45,124 60,124 C75,124 83,118 84,110 L90,35 Z" fill="url(#coffeeCeramic)"/>
+        <!-- Specular Highlight Streaks -->
+        <path d="M36,40 L40,110" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+        <!-- Mug Rim Inner Top -->
+        <ellipse cx="60" cy="35" rx="30" ry="10" fill="#e0e0e0"/>
+        <!-- Coffee Surface -->
+        <ellipse cx="60" cy="37" rx="27" ry="8" fill="url(#coffeeLiquid)"/>
+        <!-- Crema Froth Accents -->
+        <ellipse cx="54" cy="37" rx="16" ry="4" fill="#8d6e63" opacity="0.6"/>
+        <ellipse cx="48" cy="36" rx="6" ry="2" fill="#d7ccc8" opacity="0.8"/>
+      </svg>`
+    },
+    {
+      name: "cola",
+      particleType: "bubble",
+      svg: `<svg class="drink-svg" viewBox="0 0 120 140">
+        <defs>
+          <linearGradient id="colaGlass" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
+            <stop offset="25%" stop-color="#ffffff" stop-opacity="0.1"/>
+            <stop offset="75%" stop-color="#ffffff" stop-opacity="0.0"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0.5"/>
+          </linearGradient>
+          <linearGradient id="colaLiquid" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#4e342e"/>
+            <stop offset="30%" stop-color="#211103"/>
+            <stop offset="100%" stop-color="#050201"/>
+          </linearGradient>
+        </defs>
+        <!-- Straw Behind Glass -->
+        <path d="M52,10 L45,125" stroke="#ff5252" stroke-width="6" stroke-linecap="round"/>
+        <path d="M52,10 L45,125" stroke="#ffffff" stroke-width="2" stroke-dasharray="4,4" stroke-linecap="round"/>
+        <!-- Liquid Volume -->
+        <path d="M33,35 L38,120 C38,125 45,128 60,128 C75,128 82,125 82,120 L87,35 Z" fill="url(#colaLiquid)"/>
+        <!-- Floating Ice Cubes -->
+        <rect x="42" y="42" width="18" height="15" rx="3" fill="#ffffff" opacity="0.4" transform="rotate(10 51 49)"/>
+        <rect x="60" y="55" width="16" height="16" rx="3" fill="#ffffff" opacity="0.35" transform="rotate(-15 68 63)"/>
+        <!-- Carbonation Bubbles -->
+        <circle cx="48" cy="85" r="2" fill="#ffffff" opacity="0.6"/>
+        <circle cx="68" cy="95" r="1.5" fill="#ffffff" opacity="0.5"/>
+        <circle cx="55" cy="110" r="2.5" fill="#ffffff" opacity="0.4"/>
+        <!-- Outer Glass Container -->
+        <path d="M30,25 L36,122 C36,128 45,131 60,131 C75,131 84,128 84,122 L90,25 Z" fill="url(#colaGlass)" stroke="#ffffff" stroke-width="1.5"/>
+        <ellipse cx="60" cy="25" rx="30" ry="6" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.8"/>
+        <!-- Specular Highlights -->
+        <path d="M35,32 L39,118" stroke="#ffffff" stroke-width="3" opacity="0.7" stroke-linecap="round"/>
+      </svg>`
+    },
+    {
+      name: "lemonade",
+      particleType: "sparkle",
+      svg: `<svg class="drink-svg" viewBox="0 0 120 140">
+        <defs>
+          <linearGradient id="lemonLiquid" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fff59d"/>
+            <stop offset="60%" stop-color="#ffee58"/>
+            <stop offset="100%" stop-color="#fbc02d"/>
+          </linearGradient>
+          <linearGradient id="masonGlass" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
+            <stop offset="20%" stop-color="#ffffff" stop-opacity="0.1"/>
+            <stop offset="80%" stop-color="#ffffff" stop-opacity="0.0"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0.4"/>
+          </linearGradient>
+        </defs>
+        <!-- Straw -->
+        <path d="M42,8 L65,120" stroke="#ff7043" stroke-width="6" stroke-linecap="round"/>
+        <!-- Liquid Body -->
+        <rect x="34" y="35" width="52" height="85" rx="6" fill="url(#lemonLiquid)"/>
+        <!-- Lemon Slice Inside -->
+        <circle cx="60" cy="65" r="16" fill="#ffee58" stroke="#fbc02d" stroke-width="2"/>
+        <circle cx="60" cy="65" r="12" fill="#fffde7"/>
+        <path d="M60,53 L60,77 M48,65 L72,65" stroke="#fbc02d" stroke-width="1.5"/>
+        <!-- Mint Leaf Accent -->
+        <path d="M68,32 Q80,22 75,38 Z" fill="#66bb6a"/>
+        <!-- Glass Jar Outer -->
+        <rect x="30" y="28" width="60" height="96" rx="10" fill="url(#masonGlass)" stroke="#ffffff" stroke-width="2"/>
+        <rect x="34" y="22" width="52" height="8" rx="3" fill="#ffffff" opacity="0.7" stroke="#b0bec5" stroke-width="1"/>
+        <!-- Specular Reflection Streaks -->
+        <path d="M35,35 L35,115" stroke="#ffffff" stroke-width="3.5" opacity="0.7" stroke-linecap="round"/>
+      </svg>`
+    },
+    {
+      name: "bubble tea",
+      particleType: "bubble",
+      svg: `<svg class="drink-svg" viewBox="0 0 120 140">
+        <defs>
+          <linearGradient id="bobaMilkTea" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f5d6ba"/>
+            <stop offset="50%" stop-color="#e4b388"/>
+            <stop offset="100%" stop-color="#c68a55"/>
+          </linearGradient>
+          <linearGradient id="cupShine" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
+            <stop offset="30%" stop-color="#ffffff" stop-opacity="0.1"/>
+            <stop offset="70%" stop-color="#ffffff" stop-opacity="0.0"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0.4"/>
+          </linearGradient>
+        </defs>
+        <!-- Fat Straw -->
+        <path d="M60,5 L54,125" stroke="#26c6da" stroke-width="9" stroke-linecap="round"/>
+        <path d="M60,5 L54,125" stroke="#0097a7" stroke-width="2" stroke-linecap="round"/>
+        <!-- Liquid Milk Tea -->
+        <path d="M32,32 L37,120 C37,125 44,128 60,128 C76,128 83,125 83,120 L88,32 Z" fill="url(#bobaMilkTea)"/>
+        <!-- Tapioca Pearls (Boba) at Bottom -->
+        <circle cx="45" cy="115" r="6" fill="#211103"/><circle cx="58" cy="118" r="6" fill="#120901"/>
+        <circle cx="71" cy="114" r="6" fill="#211103"/><circle cx="50" cy="106" r="6" fill="#120901"/>
+        <circle cx="64" cy="107" r="6" fill="#211103"/><circle cx="40" cy="108" r="5.5" fill="#3e2723"/>
+        <circle cx="75" cy="106" r="5" fill="#120901"/>
+        <!-- Plastic Cup Body -->
+        <path d="M30,28 L36,122 C36,127 44,130 60,130 C76,130 84,127 84,122 L90,28 Z" fill="url(#cupShine)" stroke="#ffffff" stroke-width="2"/>
+        <!-- Dome Lid -->
+        <path d="M28,28 C28,12 40,6 60,6 C80,6 92,12 92,28 Z" fill="#ffffff" opacity="0.4" stroke="#ffffff" stroke-width="1.5"/>
+        <!-- Specular Highlight -->
+        <path d="M35,35 L39,118" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+      </svg>`
+    },
+    {
+      name: "tea",
+      particleType: "steam",
+      svg: `<svg class="drink-svg" viewBox="0 0 120 140">
+        <defs>
+          <linearGradient id="teaGlass" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7"/>
+            <stop offset="25%" stop-color="#ffffff" stop-opacity="0.15"/>
+            <stop offset="75%" stop-color="#ffffff" stop-opacity="0.0"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0.5"/>
+          </linearGradient>
+          <radialGradient id="teaAmber" cx="50%" cy="50%" r="50%">
+            <stop offset="30%" stop-color="#fb8c00"/>
+            <stop offset="80%" stop-color="#ef6c00"/>
+            <stop offset="100%" stop-color="#e65100"/>
+          </radialGradient>
+        </defs>
+        <!-- Tea Cup Glass Body -->
+        <path d="M32,45 L38,110 C39,118 47,122 60,122 C73,122 81,118 82,110 L88,45 Z" fill="url(#teaAmber)"/>
+        <!-- Teabag Tag Hanging Out -->
+        <path d="M58,45 Q40,40 35,28" stroke="#d7ccc8" stroke-width="1.5" fill="none"/>
+        <rect x="28" y="22" width="10" height="12" rx="2" fill="#ef5350" stroke="#b71c1c" stroke-width="1"/>
+        <!-- Cup Outer & Rim -->
+        <path d="M30,40 L36,112 C37,120 45,124 60,124 C75,124 83,120 84,112 L90,40 Z" fill="url(#teaGlass)" stroke="#ffffff" stroke-width="2"/>
+        <ellipse cx="60" cy="40" rx="30" ry="8" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.9"/>
+        <!-- Glass Saucer Plate -->
+        <ellipse cx="60" cy="126" rx="42" ry="7" fill="#ffffff" opacity="0.5" stroke="#b0bec5" stroke-width="1.5"/>
+        <!-- Specular Highlight -->
+        <path d="M36,48 L40,108" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+      </svg>`
+    },
+    {
+      name: "hot chocolate",
+      particleType: "steam",
+      svg: `<svg class="drink-svg" viewBox="0 0 120 140">
+        <defs>
+          <linearGradient id="chocMug" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ff4081"/>
+            <stop offset="40%" stop-color="#f50057"/>
+            <stop offset="80%" stop-color="#c51162"/>
+            <stop offset="100%" stop-color="#880e4f"/>
+          </linearGradient>
+          <radialGradient id="chocLiquid" cx="50%" cy="50%" r="50%">
+            <stop offset="40%" stop-color="#4e342e"/>
+            <stop offset="85%" stop-color="#3e2723"/>
+            <stop offset="100%" stop-color="#211103"/>
+          </radialGradient>
+        </defs>
+        <!-- Mug Handle -->
+        <path d="M85,45 C110,45 110,95 85,95" fill="none" stroke="url(#chocMug)" stroke-width="12" stroke-linecap="round"/>
+        <path d="M85,45 C106,45 106,95 85,95" fill="none" stroke="#ff80ab" stroke-width="2" stroke-linecap="round"/>
+        <!-- Ceramic Mug Body -->
+        <path d="M30,35 L36,110 C37,118 45,124 60,124 C75,124 83,118 84,110 L90,35 Z" fill="url(#chocMug)"/>
+        <!-- Top Rim & Hot Cocoa -->
+        <ellipse cx="60" cy="35" rx="30" ry="10" fill="#880e4f"/>
+        <ellipse cx="60" cy="37" rx="27" ry="8" fill="url(#chocLiquid)"/>
+        <!-- Fluffy Marshmallows -->
+        <rect x="44" y="32" width="10" height="9" rx="3" fill="#ffffff" stroke="#d7ccc8" transform="rotate(12 49 36)"/>
+        <rect x="58" y="34" width="10" height="9" rx="3" fill="#ffffff" stroke="#d7ccc8" transform="rotate(-8 63 38)"/>
+        <rect x="52" y="28" width="9" height="8" rx="2.5" fill="#ffffff" stroke="#d7ccc8" transform="rotate(25 56 32)"/>
+        <!-- Gloss Reflection -->
+        <path d="M36,42 L40,108" stroke="#ffffff" stroke-width="3.5" opacity="0.6" stroke-linecap="round"/>
+      </svg>`
+    },
+    {
+      name: "soy milk",
+      particleType: "sparkle",
+      svg: `<svg class="drink-svg" viewBox="0 0 120 140">
+        <defs>
+          <linearGradient id="cartonGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#fffde7"/>
+            <stop offset="60%" stop-color="#f0f4c3"/>
+            <stop offset="100%" stop-color="#dce775"/>
+          </linearGradient>
+          <linearGradient id="cartonSide" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#c0ca33"/>
+            <stop offset="100%" stop-color="#9e9d24"/>
+          </linearGradient>
+        </defs>
+        <!-- Straw Behind Carton -->
+        <rect x="70" y="8" width="5" height="45" fill="#ff8a65" rx="2" transform="rotate(12 72 30)"/>
+        <!-- Milk Carton Top Peak -->
+        <polygon points="35,38 60,20 85,38" fill="#e6ee9c" stroke="#afb42b" stroke-width="1.5"/>
+        <polygon points="60,20 85,38 85,44 60,30" fill="#c0ca33"/>
+        <!-- Carton Body Front -->
+        <rect x="35" y="38" width="50" height="82" rx="3" fill="url(#cartonGrad)" stroke="#afb42b" stroke-width="1.5"/>
+        <!-- Label Graphic (Soybean Emblem) -->
+        <circle cx="60" cy="75" r="15" fill="#aed581"/>
+        <path d="M60,65 Q68,75 60,85 Q52,75 60,65 Z" fill="#ffffff"/>
+        <!-- Text Label on Carton -->
+        <text x="60" y="102" font-size="10" font-weight="bold" fill="#33691e" text-anchor="middle" font-family="sans-serif">SOY</text>
+        <!-- Carton Shadow side highlight -->
+        <path d="M37,42 L37,116" stroke="#ffffff" stroke-width="3" opacity="0.8" stroke-linecap="round"/>
+      </svg>`
+    }
+  ];
+
+  // --- Game State Variables ---
+  let currentDrinkIndex = 0;
+  let coins = 0;
+  let stars = 0;
+  let activePenColor = '#2c3e50';
+
+  // --- DOM Elements ---
+  const drinkSvgContainer = document.getElementById('drinkSvgContainer');
+  const particleContainer = document.getElementById('particleContainer');
+  const optionsGrid = document.getElementById('optionsGrid');
+  const feedback = document.getElementById('feedback');
+  const writingSection = document.getElementById('writingSection');
+  const guessSection = document.getElementById('guessSection');
+  const targetWord = document.getElementById('targetWord');
+  const instruction = document.getElementById('instruction');
+
+  // --- Writing Canvas Setup ---
+  const canvas = document.getElementById('writingCanvas');
+  const ctx = canvas.getContext('2d');
+  let isDrawing = false;
+
+  function initCanvas() {
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
+
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const t = e.touches[0];
+      const r = canvas.getBoundingClientRect();
+      startDrawing({ offsetX: t.clientX - r.left, offsetY: t.clientY - r.top });
+    });
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const t = e.touches[0];
+      const r = canvas.getBoundingClientRect();
+      draw({ offsetX: t.clientX - r.left, offsetY: t.clientY - r.top });
+    });
+    canvas.addEventListener('touchend', stopDrawing);
+  }
+
+  function startDrawing(e) {
+    isDrawing = true;
+    ctx.strokeStyle = activePenColor;
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX, e.offsetY);
+  }
+
+  function draw(e) {
+    if (!isDrawing) return;
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+    if (Math.random() < 0.35) playSound('draw');
+  }
+
+  function stopDrawing() { isDrawing = false; }
+
+  function setPenColor(color, element) {
+    playSound('click');
+    activePenColor = color;
+    document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
+    element.classList.add('active');
+  }
+
+  function clearCanvas() {
+    playSound('click');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawGuidelinesAndTraceText();
+  }
+
+  function drawGuidelinesAndTraceText() {
+    ctx.save();
+    
+    // Notebook guidelines
+    ctx.strokeStyle = '#e0e0e0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, 45); ctx.lineTo(canvas.width, 45);
+    ctx.moveTo(0, 135); ctx.lineTo(canvas.width, 135);
+    ctx.stroke();
+
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(0, 90); ctx.lineTo(canvas.width, 90);
+    ctx.stroke();
+
+    // Traceable text guide (Strictly Lowercase)
+    ctx.setLineDash([]);
+    ctx.font = 'bold 54px "Comic Sans MS", cursive';
+    ctx.fillStyle = 'rgba(180, 180, 180, 0.38)';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(drinks[currentDrinkIndex].name.toLowerCase(), canvas.width / 2, 95);
+
+    ctx.restore();
+  }
+
+  // --- Visual Particle Effects System ---
+  function spawnParticles(type) {
+    particleContainer.innerHTML = '';
+    const particleCount = type === 'sparkle' ? 5 : 6;
+
+    for (let i = 0; i < particleCount; i++) {
+      const p = document.createElement('div');
+      p.className = `particle ${type}-particle`;
+      
+      const size = type === 'sparkle' ? 14 : Math.random() * 8 + 8;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      
+      p.style.left = (Math.random() * 80 + 50) + 'px';
+      p.style.top = (Math.random() * 40 + 20) + 'px';
+      p.style.animationDelay = (Math.random() * 1.8) + 's';
+      
+      particleContainer.appendChild(p);
+    }
+  }
+
+  function playDrinkSound() {
+    playSound('click');
+    const wrapper = document.getElementById('drinkWrapper');
+    wrapper.classList.add('cheer-anim');
+    setTimeout(() => wrapper.classList.remove('cheer-anim'), 800);
+  }
+
+  // --- Main Game Loop ---
+  function loadRound() {
+    const currentDrink = drinks[currentDrinkIndex];
+    
+    drinkSvgContainer.innerHTML = currentDrink.svg;
+    spawnParticles(currentDrink.particleType);
+
+    feedback.innerText = "";
+    writingSection.style.display = "none";
+    guessSection.style.display = "block";
+    instruction.innerText = "step 1: choose the correct drink on the cafeteria counter!";
+
+    clearCanvas();
+
+    // Multiple Choice Options (Strictly Lowercase)
+    optionsGrid.innerHTML = "";
+    const shuffled = [...drinks].sort(() => 0.5 - Math.random());
+    shuffled.forEach(drink => {
+      const btn = document.createElement('button');
+      btn.innerText = drink.name.toLowerCase();
+      btn.onclick = () => checkGuess(drink.name.toLowerCase());
+      optionsGrid.appendChild(btn);
+    });
+  }
+
+  function checkGuess(selectedName) {
+    const currentDrinkName = drinks[currentDrinkIndex].name.toLowerCase();
+
+    if (selectedName === currentDrinkName) {
+      playSound('correct');
+      coins += 10;
+      document.getElementById('coins').innerText = coins;
+
+      feedback.innerText = `✨ correct! you picked the right drink! +10 coins 🪙`;
+      feedback.className = "correct";
+
+      const wrapper = document.getElementById('drinkWrapper');
+      wrapper.classList.add('cheer-anim');
+
+      setTimeout(() => {
+        wrapper.classList.remove('cheer-anim');
+        guessSection.style.display = "none";
+        writingSection.style.display = "flex";
+        targetWord.innerText = `"${currentDrinkName}"`;
+        instruction.innerText = "step 2: trace and write the word on the board!";
+      }, 1000);
+
+    } else {
+      playSound('wrong');
+      feedback.innerText = "❌ oops! try another drink on the menu!";
+      feedback.className = "incorrect";
+    }
+  }
+
+  function submitWriting() {
+    playSound('fanfare');
+    stars += 1;
+    document.getElementById('stars').innerText = stars;
+
+    feedback.innerText = "🌟 great handwriting! you earned a star! 🌟";
+    feedback.className = "correct";
+
+    setTimeout(() => {
+      currentDrinkIndex = (currentDrinkIndex + 1) % drinks.length;
+      loadRound();
+    }, 1200);
+  }
+
+  // --- Init ---
+  window.onload = () => {
+    initCanvas();
+    loadRound();
+  };
+</script>
+
+</body>
+</html>
