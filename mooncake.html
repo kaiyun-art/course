@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mooncake Designer for Teachers</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <!-- html2canvas for downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .handwriting {
+            font-family: 'Caveat', cursive;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fdf2f8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f472b6;
+            border-radius: 9999px;
+        }
+        .mooncake-shadow {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04), inset 0 -12px 18px rgba(0, 0, 0, 0.2);
+        }
+        .draggable-item {
+            touch-action: none;
+            cursor: grab;
+        }
+        .draggable-item:active {
+            cursor: grabbing;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-amber-50 via-rose-50 to-orange-100 min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden">
+
+    <header class="w-full bg-white/80 backdrop-blur-md border-b border-rose-100 px-4 py-3 sticky top-0 z-50 flex items-center justify-between shadow-sm">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-white text-xl shadow-md">
+                🥮
+            </div>
+            <div>
+                <h1 class="font-bold text-lg text-rose-900 leading-tight">Mooncake Studio</h1>
+                <p class="text-xs text-slate-500">Mid-Autumn Teacher Appreciation</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <button id="audioToggleBtn" onclick="toggleMusic()" class="flex items-center space-x-2 bg-amber-100 hover:bg-amber-200 text-amber-800 px-3 py-2 rounded-xl text-xs font-semibold transition active:scale-95 shadow-sm">
+                <span id="audioIcon">🎵</span>
+                <span id="audioText" class="hidden sm:inline">Play Festive Song</span>
+            </button>
+            <div id="stepIndicator" class="bg-rose-100 text-rose-800 font-bold text-xs px-3 py-1.5 rounded-xl">
+                Step 1 of 7
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        
+        <!-- Left Column: Interactive Mooncake Preview & Dropping Board -->
+        <div class="lg:col-span-5 flex flex-col items-center justify-center bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-white shadow-xl relative">
+            <div class="absolute top-4 left-4 bg-amber-100 text-amber-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+                <span>✨</span> Interactive Board
+            </div>
+
+            <!-- Drop Zone Mooncake Container -->
+            <div id="mooncakeDropZone" class="relative my-6 w-64 h-64 md:w-72 md:h-72 flex items-center justify-center">
+                <!-- Outer Glow -->
+                <div class="absolute inset-0 rounded-full bg-amber-300/30 blur-2xl transform scale-110 animate-pulse"></div>
+                
+                <!-- SVG Mooncake Object -->
+                <svg id="mooncakeSvg" class="w-full h-full drop-shadow-2xl transition-all duration-300" viewBox="0 0 300 300">
+                    <defs>
+                        <radialGradient id="crustGradient" cx="50%" cy="30%" r="70%">
+                            <stop id="gradStop1" offset="0%" stop-color="#f59e0b" />
+                            <stop id="gradStop2" offset="70%" stop-color="#b45309" />
+                            <stop id="gradStop3" offset="100%" stop-color="#78350f" />
+                        </radialGradient>
+                        <filter id="emboss" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                            <feOffset dx="1" dy="2" result="offset" />
+                            <feSpecularLighting in="blur" surfaceScale="5" specularConstant="1" specularExponent="20" lighting-color="#ffffff" result="specOut">
+                                <fePointLight x="-5000" y="-10000" z="20000" />
+                            </feSpecularLighting>
+                            <feComposite in="specOut" in2="SourceAlpha" operator="in" result="specAdd" />
+                            <feComposite in="SourceGraphic" in2="specAdd" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" />
+                        </filter>
+                    </defs>
+
+                    <!-- Main Crust -->
+                    <circle cx="150" cy="150" r="130" fill="url(#crustGradient)" stroke="#78350f" stroke-width="6" class="mooncake-shadow transition-colors duration-300" />
+                    <circle cx="150" cy="150" r="114" fill="none" stroke="#92400e" stroke-dasharray="8 4" stroke-width="3" opacity="0.8" />
+                    
+                    <!-- Filling Blend Layer -->
+                    <circle id="fillingLayer" cx="150" cy="150" r="98" fill="#ca8a04" opacity="0.3" class="transition-all duration-300" />
+
+                    <!-- Adjustable Mold Pattern Group -->
+                    <g id="moldPatternGroup" class="transition-transform duration-300 origin-center" stroke="#451a03" stroke-width="2.5" fill="none" opacity="0.85" filter="url(#emboss)" transform="scale(1) rotate(0)">
+                        <path d="M150,60 C120,90 100,120 150,150 C200,120 180,90 150,60 Z" fill="#d97706" opacity="0.4" />
+                        <path d="M150,240 C120,210 100,180 150,150 C200,180 180,210 150,240 Z" fill="#d97706" opacity="0.4" />
+                        <path d="M60,150 C90,120 120,100 150,150 C120,200 90,180 60,150 Z" fill="#d97706" opacity="0.4" />
+                        <path d="M240,150 C210,120 180,100 150,150 C180,200 210,180 240,150 Z" fill="#d97706" opacity="0.4" />
+                        <circle cx="150" cy="150" r="22" fill="#b45309" stroke="#fff" stroke-width="2" />
+                        <circle cx="150" cy="150" r="10" fill="#f59e0b" />
+                    </g>
+                </svg>
+
+                <!-- Container where dropped toppings appear -->
+                <div id="placedToppingsContainer" class="absolute inset-0 pointer-events-none overflow-hidden rounded-full"></div>
+            </div>
+
+            <!-- Summary tag -->
+            <div id="selectionSummary" class="text-center bg-amber-50 border border-amber-200 rounded-2xl p-3 w-full text-xs text-amber-900 shadow-inner">
+                <span class="font-bold">Creation:</span> <span id="summaryText">Classic Golden • Lotus Paste • Lotus Mold</span>
+            </div>
+        </div>
+
+        <!-- Right Column: Interactive Multi-Step Wizard Control Panel -->
+        <div class="lg:col-span-7 bg-white/90 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-white shadow-xl flex flex-col justify-between min-h-[520px]">
+            
+            <div id="wizardContainer" class="flex-1">
+                
+                <div id="step1" class="space-y-6">
+                    <div>
+                        <span class="text-rose-600 font-bold text-xs tracking-wider uppercase">Step 1 of 7</span>
+                        <h2 class="text-2xl font-extrabold text-slate-800">Choose Crust Color</h2>
+                        <p class="text-sm text-slate-500 mt-1">Select a festive palette or custom tune the hue to your preference!</p>
+                    </div>
+
+                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                        <button onclick="setCrustColor('#f59e0b', '#b45309', '#78350f', 'Golden Brown')" class="color-preset flex flex-col items-center p-3 rounded-2xl border-2 border-amber-500 bg-amber-50 hover:bg-amber-100 transition active:scale-95 shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-amber-600 shadow-md mb-1.5 border-2 border-white"></div>
+                            <span class="text-xs font-semibold text-amber-900">Classic</span>
+                        </button>
+                        <button onclick="setCrustColor('#059669', '#065f46', '#022c22', 'Matcha Green')" class="color-preset flex flex-col items-center p-3 rounded-2xl border-2 border-transparent bg-emerald-50 hover:bg-emerald-100 transition active:scale-95 shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-emerald-600 shadow-md mb-1.5 border-2 border-white"></div>
+                            <span class="text-xs font-semibold text-emerald-900">Matcha</span>
+                        </button>
+                        <button onclick="setCrustColor('#7c3aed', '#5b21b6', '#2e1065', 'Taro Purple')" class="color-preset flex flex-col items-center p-3 rounded-2xl border-2 border-transparent bg-purple-50 hover:bg-purple-100 transition active:scale-95 shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-purple-600 shadow-md mb-1.5 border-2 border-white"></div>
+                            <span class="text-xs font-semibold text-purple-900">Taro</span>
+                        </button>
+                        <button onclick="setCrustColor('#e11d48', '#9f1239', '#4c0519', 'Rosy Pink')" class="color-preset flex flex-col items-center p-3 rounded-2xl border-2 border-transparent bg-rose-50 hover:bg-rose-100 transition active:scale-95 shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-rose-600 shadow-md mb-1.5 border-2 border-white"></div>
+                            <span class="text-xs font-semibold text-rose-900">Rosy</span>
+                        </button>
+                        <button onclick="setCrustColor('#f8fafc', '#cbd5e1', '#64748b', 'Snowy White')" class="color-preset flex flex-col items-center p-3 rounded-2xl border-2 border-transparent bg-slate-50 hover:bg-slate-100 transition active:scale-95 shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-slate-200 shadow-md mb-1.5 border-2 border-white"></div>
+                            <span class="text-xs font-semibold text-slate-900">Snowy</span>
+                        </button>
+                        <button onclick="setCrustColor('#78350f', '#451a03', '#1c1917', 'Chocolate')" class="color-preset flex flex-col items-center p-3 rounded-2xl border-2 border-transparent bg-amber-950/10 hover:bg-amber-950/20 transition active:scale-95 shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-amber-900 shadow-md mb-1.5 border-2 border-white"></div>
+                            <span class="text-xs font-semibold text-amber-950">Cocoa</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-amber-50/60 p-4 rounded-2xl border border-amber-200/60 space-y-3">
+                        <label class="text-xs font-bold uppercase tracking-wider text-amber-900 flex items-center justify-between">
+                            <span>🎨 Custom Hue Adjuster</span>
+                            <span id="hexCodeDisplay" class="font-mono text-xs text-slate-600">Hue: 35°</span>
+                        </label>
+                        <input type="range" id="hueSlider" min="0" max="360" value="35" oninput="updateCustomColor()" class="w-full accent-amber-600 h-2 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-purple-500 to-red-500 rounded-lg cursor-pointer">
+                    </div>
+                </div>
+
+                <div id="step2" class="space-y-4 hidden">
+                    <div>
+                        <span class="text-rose-600 font-bold text-xs tracking-wider uppercase">Step 2 of 7</span>
+                        <h2 class="text-2xl font-extrabold text-slate-800">Add Fillings</h2>
+                        <p class="text-sm text-slate-500 mt-1">Click or drag fillings onto your mooncake! You can combine multiple fillings.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto pr-1">
+                        <div draggable="true" ondragstart="dragFilling(event, 'Lotus Seed Paste', '#ca8a04', '🥮')" onclick="clickFilling('Lotus Seed Paste', '#ca8a04', '🥮')" class="draggable-item cursor-pointer p-3 rounded-2xl border-2 border-amber-500 bg-amber-50 hover:bg-amber-100 transition flex flex-col items-center text-center shadow-sm">
+                            <span class="text-3xl mb-1">🥮</span>
+                            <h4 class="font-bold text-xs text-amber-900">Lotus Seed</h4>
+                            <span class="text-[10px] text-slate-500">Classic Paste</span>
+                        </div>
+                        <div draggable="true" ondragstart="dragFilling(event, 'Red Bean Paste', '#991b1b', '🫘')" onclick="clickFilling('Red Bean Paste', '#991b1b', '🫘')" class="draggable-item cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-rose-50 transition flex flex-col items-center text-center shadow-sm">
+                            <span class="text-3xl mb-1">🫘</span>
+                            <h4 class="font-bold text-xs text-slate-700">Red Bean</h4>
+                            <span class="text-[10px] text-slate-500">Sweet & Smooth</span>
+                        </div>
+                        <div draggable="true" ondragstart="dragFilling(event, 'Mixed Nuts', '#78350f', '🥜')" onclick="clickFilling('Mixed Nuts', '#78350f', '🥜')" class="draggable-item cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-amber-50 transition flex flex-col items-center text-center shadow-sm">
+                            <span class="text-3xl mb-1">🥜</span>
+                            <h4 class="font-bold text-xs text-slate-700">Mixed Nuts</h4>
+                            <span class="text-[10px] text-slate-500">Crunchy mix</span>
+                        </div>
+                        <div draggable="true" ondragstart="dragFilling(event, 'Salted Duck Egg Yolk', '#f59e0b', '🥚')" onclick="clickFilling('Salted Duck Egg Yolk', '#f59e0b', '🥚')" class="draggable-item cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-amber-50 transition flex flex-col items-center text-center shadow-sm">
+                            <span class="text-3xl mb-1">🥚</span>
+                            <h4 class="font-bold text-xs text-slate-700">Egg Yolk</h4>
+                            <span class="text-[10px] text-slate-500">Golden core</span>
+                        </div>
+                        <div draggable="true" ondragstart="dragFilling(event, 'Taro Paste', '#7c3aed', '🍠')" onclick="clickFilling('Taro Paste', '#7c3aed', '🍠')" class="draggable-item cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-purple-50 transition flex flex-col items-center text-center shadow-sm">
+                            <span class="text-3xl mb-1">🍠</span>
+                            <h4 class="font-bold text-xs text-slate-700">Taro Paste</h4>
+                            <span class="text-[10px] text-slate-500">Rich & purple</span>
+                        </div>
+                        <div draggable="true" ondragstart="dragFilling(event, 'Matcha Tea', '#059669', '🍵')" onclick="clickFilling('Matcha Tea', '#059669', '🍵')" class="draggable-item cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-emerald-50 transition flex flex-col items-center text-center shadow-sm">
+                            <span class="text-3xl mb-1">🍵</span>
+                            <h4 class="font-bold text-xs text-slate-700">Matcha Tea</h4>
+                            <span class="text-[10px] text-slate-500">Green infusion</span>
+                        </div>
+                        <div draggable="true" ondragstart="dragFilling(event, 'Fruit Jam', '#ea580c', '🥭')" onclick="clickFilling('Fruit Jam', '#ea580c', '🥭')" class="draggable-item cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-orange-50 transition flex flex-col items-center text-center shadow-sm">
+                            <span class="text-3xl mb-1">🥭</span>
+                            <h4 class="font-bold text-xs text-slate-700">Fruit Jam</h4>
+                            <span class="text-[10px] text-slate-500">Sweet fruit</span>
+                        </div>
+                        <div draggable="true" ondragstart="dragFilling(event, 'Creamy Cheese', '#fbbf24', '🧀')" onclick="clickFilling('Creamy Cheese', '#fbbf24', '🧀')" class="draggable-item cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-amber-50 transition flex flex-col items-center text-center shadow-sm">
+                            <span class="text-3xl mb-1">🧀</span>
+                            <h4 class="font-bold text-xs text-slate-700">Cheese</h4>
+                            <span class="text-[10px] text-slate-500">Melty delight</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step3" class="space-y-4 hidden">
+                    <div>
+                        <span class="text-rose-600 font-bold text-xs tracking-wider uppercase">Step 3 of 7</span>
+                        <h2 class="text-2xl font-extrabold text-slate-800">Outer Mold Stamp & Adjuster</h2>
+                        <p class="text-sm text-slate-500 mt-1">Select a mold pattern and adjust its scale or rotation!</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div onclick="selectMold('lotus')" class="mold-card cursor-pointer p-3 rounded-2xl border-2 border-amber-500 bg-amber-50 hover:bg-amber-100 transition flex flex-col items-center text-center shadow-sm">
+                            <div class="w-12 h-12 rounded-xl bg-amber-200/70 flex items-center justify-center text-2xl mb-1 shadow-inner">🌸</div>
+                            <h4 class="font-bold text-xs text-amber-900">Lotus Flower</h4>
+                        </div>
+                        <div onclick="selectMold('rabbit')" class="mold-card cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-amber-50 transition flex flex-col items-center text-center shadow-sm">
+                            <div class="w-12 h-12 rounded-xl bg-amber-100/70 flex items-center justify-center text-2xl mb-1 shadow-inner">🐇</div>
+                            <h4 class="font-bold text-xs text-slate-700">Moon Rabbit</h4>
+                        </div>
+                        <div onclick="selectMold('peony')" class="mold-card cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-rose-50 transition flex flex-col items-center text-center shadow-sm">
+                            <div class="w-12 h-12 rounded-xl bg-rose-100/70 flex items-center justify-center text-2xl mb-1 shadow-inner">🌺</div>
+                            <h4 class="font-bold text-xs text-slate-700">Scroll Peony</h4>
+                        </div>
+                        <div onclick="selectMold('blessing')" class="mold-card cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-amber-50 transition flex flex-col items-center text-center shadow-sm">
+                            <div class="w-12 h-12 rounded-xl bg-amber-100/70 flex items-center justify-center text-xl font-bold text-amber-800 mb-1 shadow-inner">福</div>
+                            <h4 class="font-bold text-xs text-slate-700">Lucky Blessing</h4>
+                        </div>
+                        <div onclick="selectMold('starry')" class="mold-card cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-indigo-50 transition flex flex-col items-center text-center shadow-sm">
+                            <div class="w-12 h-12 rounded-xl bg-indigo-100/70 flex items-center justify-center text-2xl mb-1 shadow-inner">✨</div>
+                            <h4 class="font-bold text-xs text-slate-700">Starry Sky</h4>
+                        </div>
+                        <div onclick="selectMold('geometric')" class="mold-card cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-emerald-50 transition flex flex-col items-center text-center shadow-sm">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-100/70 flex items-center justify-center text-2xl mb-1 shadow-inner">🔷</div>
+                            <h4 class="font-bold text-xs text-slate-700">Geometric</h4>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-50/60 p-4 rounded-2xl border border-amber-200/60 space-y-3">
+                        <div class="flex justify-between items-center text-xs font-bold text-amber-900">
+                            <span>🔍 Stamp Scale / Size</span>
+                            <span id="scaleValueDisplay">100%</span>
+                        </div>
+                        <input type="range" id="moldScaleSlider" min="0.6" max="1.4" step="0.05" value="1" oninput="updateMoldTransform()" class="w-full accent-amber-600 h-2 bg-amber-200 rounded-lg cursor-pointer">
+                        
+                        <div class="flex justify-between items-center text-xs font-bold text-amber-900 pt-2">
+                            <span>🔄 Stamp Rotation</span>
+                            <span id="rotationValueDisplay">0°</span>
+                        </div>
+                        <input type="range" id="moldRotationSlider" min="0" max="360" value="0" oninput="updateMoldTransform()" class="w-full accent-amber-600 h-2 bg-amber-200 rounded-lg cursor-pointer">
+                    </div>
+                </div>
+
+                <div id="step4" class="space-y-4 hidden">
+                    <div>
+                        <span class="text-rose-600 font-bold text-xs tracking-wider uppercase">Step 4 of 7</span>
+                        <h2 class="text-2xl font-extrabold text-slate-800">Add Toppings & Decorations</h2>
+                        <p class="text-sm text-slate-500 mt-1">Click or drag toppings onto your mooncake to decorate the surface!</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-1">
+                        <div draggable="true" ondragstart="dragTopping(event, '⚫', 'Black Sesame')" onclick="addTopping('⚫', 'Black Sesame')" class="draggable-item cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-amber-50 transition flex flex-col items-center text-center shadow-sm">
+                            <span class="text-3xl mb-1">⚫</span>
+                            <h4 class="font-bold text-xs text-slate-700">Black Sesame</h4>
+                        </div>
+                        <div draggable="true" ondragstart="dragTopping(event, '⚪', 'White Sesame')" onclick="addTopping('⚪', 'White Sesame')" class="draggable-item cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-amber-50 transition flex flex-col items-center text-center shadow-sm">
+                            <span class="text-3xl mb-1">⚪</span>
+                            <h4 class="font-bold text-xs text-slate-700">White Sesame</h4>
+                        </div>
+                        <div draggable="true" ondragstart="dragTopping(event, '✨', 'Gold Flakes')" onclick="addTopping('✨', 'Gold Flakes')" class="draggable-item cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-amber-50 transition flex flex-col items-center text-center shadow-sm">
+                            <span class="text-3xl mb-1">✨</span>
+                            <h4 class="font-bold text-xs text-slate-700">Gold Flakes</h4>
+                        </div>
+                        <div draggable="true" ondragstart="dragTopping(event, '🌼', 'Osmanthus Flowers')" onclick="addTopping('🌼', 'Osmanthus')" class="draggable-item cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-amber-50 transition flex flex-col items-center text-center shadow-sm">
+                            <span class="text-3xl mb-1">🌼</span>
+                            <h4 class="font-bold text-xs text-slate-700">Osmanthus</h4>
+                        </div>
+                        <div draggable="true" ondragstart="dragTopping(event, '🥜', 'Pumpkin Seeds')" onclick="addTopping('🥜', 'Pumpkin Seeds')" class="draggable-item cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-amber-50 transition flex flex-col items-center text-center shadow-sm">
+                            <span class="text-3xl mb-1">🥜</span>
+                            <h4 class="font-bold text-xs text-slate-700">Pumpkin Seeds</h4>
+                        </div>
+                        <div draggable="true" ondragstart="dragTopping(event, '🍒', 'Cranberry Pieces')" onclick="addTopping('🍒', 'Cranberry')" class="draggable-item cursor-pointer p-3 rounded-2xl border-2 border-slate-200 bg-white hover:bg-rose-50 transition flex flex-col items-center text-center shadow-sm">
+                            <span class="text-3xl mb-1">🍒</span>
+                            <h4 class="font-bold text-xs text-slate-700">Cranberry</h4>
+                        </div>
+                    </div>
+                    <button onclick="clearToppings()" class="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl transition">Clear All Toppings</button>
+                </div>
+
+                <div id="step5" class="space-y-6 hidden text-center">
+                    <div>
+                        <span class="text-rose-600 font-bold text-xs tracking-wider uppercase">Step 5 of 7</span>
+                        <h2 class="text-2xl font-extrabold text-slate-800">Bake in the Oven</h2>
+                        <p class="text-sm text-slate-500 mt-1">Slide your mooncake into the warm bakery oven to bake until golden brown!</p>
+                    </div>
+
+                    <div id="ovenContainer" class="bg-amber-950 p-6 rounded-3xl border-4 border-amber-800 shadow-2xl relative overflow-hidden max-w-sm mx-auto flex flex-col items-center justify-center h-56">
+                        <div id="ovenGlow" class="absolute inset-0 bg-orange-500/20 animate-pulse transition-opacity duration-1000 opacity-0"></div>
+                        
+                        <!-- Oven Window -->
+                        <div id="ovenWindow" class="w-40 h-32 bg-amber-900 rounded-2xl border-4 border-amber-900 flex items-center justify-center relative shadow-inner overflow-hidden">
+                            <div class="absolute inset-0 bg-amber-500/10 backdrop-blur-[1px]"></div>
+                            <!-- Mooncake inside oven -->
+                            <div id="mooncakeInOven" class="w-20 h-20 rounded-full bg-amber-600 flex items-center justify-center shadow-2xl transition-all duration-1000 transform scale-75 opacity-50">
+                                <span class="text-2xl">🥮</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 flex items-center space-x-2">
+                            <span id="ovenStatusText" class="text-xs font-bold text-amber-200">Ready to Bake</span>
+                        </div>
+                    </div>
+
+                    <button id="bakeBtn" onclick="startBaking()" class="px-6 py-3 rounded-2xl bg-amber-600 hover:bg-amber-700 font-bold text-xs text-white shadow-md transition active:scale-95">
+                        🔥 Put in Oven & Bake!
+                    </button>
+                </div>
+
+                <div id="step6" class="space-y-4 hidden">
+                    <div>
+                        <span class="text-rose-600 font-bold text-xs tracking-wider uppercase">Step 6 of 7</span>
+                        <h2 class="text-2xl font-extrabold text-slate-800">Write Letter & Decorate Stickers</h2>
+                        <p class="text-sm text-slate-500 mt-1">Choose a postage stamp, write your letter on realistic paper, and drop cute stickers around!</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
+                        <!-- Stamps & Stickers Selection Sidebar -->
+                        <div class="md:col-span-5 bg-amber-50/80 p-3 rounded-2xl border border-amber-200 space-y-3 max-h-[300px] overflow-y-auto">
+                            <div>
+                                <label class="text-[11px] font-bold uppercase tracking-wider text-amber-900 block mb-1">Postage Stamp</label>
+                                <div class="grid grid-cols-4 gap-2">
+                                    <div onclick="selectStamp('🏮', 'Lantern')" class="stamp-option cursor-pointer p-1.5 rounded-xl bg-white border-2 border-rose-500 text-center shadow-sm hover:bg-rose-50 transition">
+                                        <span class="text-xl">🏮</span>
+                                    </div>
+                                    <div onclick="selectStamp('🌕', 'Full Moon')" class="stamp-option cursor-pointer p-1.5 rounded-xl bg-white border-2 border-slate-200 text-center shadow-sm hover:bg-rose-50 transition">
+                                        <span class="text-xl">🌕</span>
+                                    </div>
+                                    <div onclick="selectStamp('🌸', 'Blossom')" class="stamp-option cursor-pointer p-1.5 rounded-xl bg-white border-2 border-slate-200 text-center shadow-sm hover:bg-rose-50 transition">
+                                        <span class="text-xl">🌸</span>
+                                    </div>
+                                    <div onclick="selectStamp('⭐', 'Star')" class="stamp-option cursor-pointer p-1.5 rounded-xl bg-white border-2 border-slate-200 text-center shadow-sm hover:bg-rose-50 transition">
+                                        <span class="text-xl">⭐</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-bold uppercase tracking-wider text-amber-900 block mb-1">Decorate Stickers (Click to Add)</label>
+                                <div class="grid grid-cols-4 gap-2">
+                                    <button onclick="addLetterSticker('❤️')" class="p-2 rounded-xl bg-white border border-rose-200 hover:bg-rose-50 text-xl shadow-sm transition">❤️</button>
+                                    <button onclick="addLetterSticker('⭐')" class="p-2 rounded-xl bg-white border border-amber-200 hover:bg-amber-50 text-xl shadow-sm transition">⭐</button>
+                                    <button onclick="addLetterSticker('🌸')" class="p-2 rounded-xl bg-white border border-pink-200 hover:bg-pink-50 text-xl shadow-sm transition">🌸</button>
+                                    <button onclick="addLetterSticker('🍎')" class="p-2 rounded-xl bg-white border border-red-200 hover:bg-red-50 text-xl shadow-sm transition">🍎</button>
+                                    <button onclick="addLetterSticker('✏️')" class="p-2 rounded-xl bg-white border border-blue-200 hover:bg-blue-50 text-xl shadow-sm transition">✏️</button>
+                                    <button onclick="addLetterSticker('📚')" class="p-2 rounded-xl bg-white border border-indigo-200 hover:bg-indigo-50 text-xl shadow-sm transition">📚</button>
+                                    <button onclick="addLetterSticker('🏆')" class="p-2 rounded-xl bg-white border border-yellow-200 hover:bg-yellow-50 text-xl shadow-sm transition">🏆</button>
+                                    <button onclick="clearLetterStickers()" class="p-2 rounded-xl bg-rose-50 text-rose-700 text-[10px] font-bold border border-rose-200 hover:bg-rose-100 transition">Clear</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Realistic Paper Letter Pad -->
+                        <div id="letterPaperContainer" class="md:col-span-7 bg-[#fffbeb] p-5 rounded-2xl border-2 border-amber-300 shadow-md relative space-y-3 overflow-hidden min-h-[260px]">
+                            <!-- Stamp -->
+                            <div class="absolute top-3 right-4 w-11 h-13 bg-rose-100 border-2 border-dashed border-rose-400 flex flex-col items-center justify-center shadow-sm rounded z-10">
+                                <span id="selectedStampDisplay" class="text-xl">🏮</span>
+                                <span class="text-[7px] text-rose-800 font-bold">AIR MAIL</span>
+                            </div>
+
+                            <!-- Placed stickers container inside letter -->
+                            <div id="placedStickersContainer" class="absolute inset-0 pointer-events-none z-0"></div>
+
+                            <div class="grid grid-cols-2 gap-2 pr-16 relative z-10">
+                                <div>
+                                    <label class="text-[10px] font-bold uppercase tracking-wider text-amber-900 block">Teacher's Name</label>
+                                    <input type="text" id="teacherNameInput" placeholder="e.g., Mrs. Davis" class="w-full px-3 py-1.5 rounded-lg border border-amber-300 bg-white/80 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-rose-500">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold uppercase tracking-wider text-amber-900 block">Your Name</label>
+                                    <input type="text" id="studentNameInput" placeholder="e.g., Alex" class="w-full px-3 py-1.5 rounded-lg border border-amber-300 bg-white/80 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-rose-500">
+                                </div>
+                            </div>
+
+                            <div class="relative z-10">
+                                <label class="text-[10px] font-bold uppercase tracking-wider text-amber-900 block">Message</label>
+                                <textarea id="letterMessageInput" rows="3" placeholder="Write your heartfelt appreciation message here..." class="w-full px-3 py-2 rounded-lg border border-amber-300 bg-white/80 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-rose-500 resize-none">Thank you for being such an inspiring teacher! Happy Mid-Autumn Festival!</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step7" class="space-y-5 hidden">
+                    <div class="text-center">
+                        <span class="bg-rose-100 text-rose-800 font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">🎉 Masterpiece Complete!</span>
+                        <h2 class="text-2xl font-extrabold text-slate-800 mt-2">Happy Mid-Autumn Festival!</h2>
+                        <p class="text-sm text-slate-500">Download your custom mooncake and teacher appreciation letter below.</p>
+                    </div>
+
+                    <!-- Printable Exportable Gift Box Card -->
+                    <div id="exportableGiftCard" class="bg-gradient-to-br from-amber-50 via-orange-100 to-rose-100 p-6 rounded-3xl border-2 border-amber-300 shadow-xl space-y-4 relative overflow-hidden">
+                        <div class="flex items-center justify-between border-b border-amber-200 pb-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-2xl">🏮</span>
+                                <span class="font-bold text-amber-900 text-sm">Mid-Autumn Teacher Gift Studio</span>
+                            </div>
+                            <span class="text-xs font-bold text-rose-700 bg-white/80 px-2.5 py-1 rounded-lg shadow-sm">Special Delivery</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                            <div class="flex flex-col items-center justify-center bg-white/70 p-4 rounded-2xl border border-white shadow-sm">
+                                <div id="showcaseMooncakeContainer" class="w-32 h-32 flex items-center justify-center relative"></div>
+                                <div class="mt-2 text-center">
+                                    <h4 id="showcaseRecipeTitle" class="font-bold text-xs text-amber-900">Custom Mooncake</h4>
+                                    <p id="showcaseRecipeDesc" class="text-[11px] text-slate-600">Freshly Baked</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-[#fffbeb] p-4 rounded-2xl border border-amber-200 shadow-sm space-y-2 relative">
+                                <div class="absolute top-3 right-3 text-2xl" id="showcaseStampEmoji">🏮</div>
+                                <h3 id="showcaseSalutation" class="font-bold text-rose-900 text-sm">Dear Teacher,</h3>
+                                <p id="showcaseMessage" class="text-xs text-slate-700 italic leading-relaxed handwriting text-sm">"Thank you for being such an inspiring teacher!"</p>
+                                <div class="pt-2 border-t border-amber-100 flex justify-between items-center text-xs">
+                                    <span id="showcaseTeacherName" class="font-bold text-slate-800">To: Teacher</span>
+                                    <span id="showcaseStudentName" class="font-bold text-rose-700">From: Student</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Download Buttons -->
+                    <div class="flex flex-wrap gap-3 justify-center pt-2">
+                        <button onclick="downloadMooncakeImage()" class="px-5 py-2.5 rounded-2xl bg-amber-600 hover:bg-amber-700 font-bold text-xs text-white shadow-md transition active:scale-95 flex items-center space-x-2">
+                            <span>📥 Download Mooncake</span>
+                        </button>
+                        <button onclick="downloadGiftCardImage()" class="px-5 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 font-bold text-xs text-white shadow-md transition active:scale-95 flex items-center space-x-2">
+                            <span>💌 Download Gift Card & Letter</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Wizard Navigation Buttons -->
+            <div class="flex items-center justify-between pt-6 border-t border-slate-100 mt-6">
+                <button id="prevBtn" onclick="prevStep()" class="hidden px-5 py-2.5 rounded-2xl border border-slate-200 font-bold text-xs text-slate-600 hover:bg-slate-100 transition active:scale-95 shadow-sm">
+                    ← Back
+                </button>
+                <div class="ml-auto flex space-x-3">
+                    <button id="nextBtn" onclick="nextStep()" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 font-bold text-xs text-white shadow-md transition active:scale-95 flex items-center space-x-2">
+                        <span>Next Step</span>
+                        <span>→</span>
+                    </button>
+                    <button id="restartBtn" onclick="restartStudio()" class="hidden px-6 py-3 rounded-2xl bg-amber-800 hover:bg-amber-900 font-bold text-xs text-white shadow-md transition active:scale-95">
+                        🔄 Design Another
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="text-center py-4 text-xs text-slate-500 border-t border-slate-200/60 bg-white/50">
+        Made with ❤️ for students and teachers everywhere. Happy Mid-Autumn Moon Festival! 🌕
+    </footer>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 7;
+
+        let mooncakeState = {
+            c1: '#f59e0b',
+            c2: '#b45309',
+            c3: '#78350f',
+            colorName: 'Classic Golden',
+            fillings: [{name: 'Lotus Seed Paste', color: '#ca8a04', emoji: '🥮'}],
+            toppings: [],
+            moldType: 'lotus',
+            moldName: 'Lotus Flower',
+            moldScale: 1,
+            moldRotation: 0,
+            stampEmoji: '🏮',
+            stampName: 'Lantern',
+            letterStickers: [],
+            teacherName: '',
+            studentName: '',
+            message: 'Thank you for being such an inspiring teacher! Happy Mid-Autumn Festival!'
+        };
+
+        // Web Audio API Festive Melody Synthesizer
+        let audioCtx = null;
+        let isPlayingMusic = false;
+        let musicTimer = null;
+        const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
+        const melodySeq = [0, 2, 4, 3, 2, 1, 0, 4, 5, 4, 3, 2, 0, 1, 2, 3, 4, 2, 0];
+        let noteIndex = 0;
+
+        function toggleMusic() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            isPlayingMusic = !isPlayingMusic;
+            const icon = document.getElementById('audioIcon');
+            const text = document.getElementById('audioText');
+            const btn = document.getElementById('audioToggleBtn');
+
+            if (isPlayingMusic) {
+                icon.textContent = '🔊';
+                text.textContent = 'Playing Music...';
+                btn.classList.add('bg-rose-200', 'text-rose-900');
+                startFestiveMelody();
+            } else {
+                icon.textContent = '🎵';
+                text.textContent = 'Play Festive Song';
+                btn.classList.remove('bg-rose-200', 'text-rose-900');
+                stopFestiveMelody();
+            }
+        }
+
+        function startFestiveMelody() {
+            if (musicTimer) clearInterval(musicTimer);
+            musicTimer = setInterval(() => {
+                if (!isPlayingMusic || !audioCtx) return;
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(notes[melodySeq[noteIndex % melodySeq.length]], audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.8);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.85);
+                    noteIndex++;
+                } catch(e) {}
+            }, 500);
+        }
+
+        function stopFestiveMelody() {
+            if (musicTimer) {
+                clearInterval(musicTimer);
+                musicTimer = null;
+            }
+        }
+
+        // Crust & Color
+        function setCrustColor(c1, c2, c3, name) {
+            mooncakeState.c1 = c1;
+            mooncakeState.c2 = c2;
+            mooncakeState.c3 = c3;
+            mooncakeState.colorName = name;
+
+            document.getElementById('gradStop1').setAttribute('stop-color', c1);
+            document.getElementById('gradStop2').setAttribute('stop-color', c2);
+            document.getElementById('gradStop3').setAttribute('stop-color', c3);
+
+            document.querySelectorAll('.color-preset').forEach(btn => btn.classList.remove('border-amber-500', 'bg-amber-50'));
+            event.currentTarget.classList.add('border-amber-500', 'bg-amber-50');
+            updateSummary();
+        }
+
+        function updateCustomColor() {
+            const hue = document.getElementById('hueSlider').value;
+            const c1 = `hsl(${hue}, 85%, 55%)`;
+            const c2 = `hsl(${hue}, 90%, 38%)`;
+            const c3 = `hsl(${hue}, 95%, 22%)`;
+
+            mooncakeState.c1 = c1;
+            mooncakeState.c2 = c2;
+            mooncakeState.c3 = c3;
+            mooncakeState.colorName = `Custom Hue (${hue}°)`;
+
+            document.getElementById('hexCodeDisplay').textContent = `Hue: ${hue}°`;
+            document.getElementById('gradStop1').setAttribute('stop-color', c1);
+            document.getElementById('gradStop2').setAttribute('stop-color', c2);
+            document.getElementById('gradStop3').setAttribute('stop-color', c3);
+            updateSummary();
+        }
+
+        // Fillings
+        function clickFilling(name, color, emoji) {
+            mooncakeState.fillings.push({name, color, emoji});
+            document.getElementById('fillingLayer').setAttribute('fill', color);
+            updateSummary();
+        }
+
+        function dragFilling(event, name, color, emoji) {
+            event.dataTransfer.setData('text/plain', JSON.stringify({name, color, emoji, type: 'filling'}));
+        }
+
+        // Toppings
+        function addTopping(emoji, name) {
+            mooncakeState.toppings.push({emoji, name});
+            renderToppingsOnMooncake();
+            updateSummary();
+        }
+
+        function dragTopping(event, emoji, name) {
+            event.dataTransfer.setData('text/plain', JSON.stringify({emoji, name, type: 'topping'}));
+        }
+
+        function clearToppings() {
+            mooncakeState.toppings = [];
+            renderToppingsOnMooncake();
+            updateSummary();
+        }
+
+        function renderToppingsOnMooncake() {
+            const container = document.getElementById('placedToppingsContainer');
+            container.innerHTML = '';
+            mooncakeState.toppings.forEach((t, index) => {
+                const span = document.createElement('span');
+                span.textContent = t.emoji;
+                span.className = 'absolute text-xl transform -translate-x-1/2 -translate-y-1/2 drop-shadow-md';
+                const angle = (index / mooncakeState.toppings.length) * 2 * Math.PI;
+                const radius = 35 + (index % 3) * 18;
+                const x = 128 + radius * Math.cos(angle);
+                const y = 128 + radius * Math.sin(angle);
+                span.style.left = `${x}px`;
+                span.style.top = `${y}px`;
+                container.appendChild(span);
+            });
+        }
+
+        // Drag and drop handler for drop zone
+        const dropZone = document.getElementById('mooncakeDropZone');
+        dropZone.addEventListener('dragover', (e) => e.preventDefault());
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            try {
+                const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                if (data.type === 'filling') {
+                    clickFilling(data.name, data.color, data.emoji);
+                } else if (data.type === 'topping') {
+                    addTopping(data.emoji, data.name);
+                }
+            } catch(err) {}
+        });
+
+        // Mold Stamps & Adjusters
+        function selectMold(type) {
+            mooncakeState.moldType = type;
+            const group = document.getElementById('moldPatternGroup');
+            let pathsHtml = '';
+
+            if (type === 'lotus') {
+                mooncakeState.moldName = 'Lotus Flower';
+                pathsHtml = `<path d="M150,55 C115,85 95,120 150,155 C205,120 185,85 150,55 Z" fill="#d97706" opacity="0.35" /><path d="M150,245 C115,215 95,180 150,145 C205,180 185,215 150,245 Z" fill="#d97706" opacity="0.35" /><path d="M55,150 C85,115 120,95 155,150 C120,205 85,185 55,150 Z" fill="#d97706" opacity="0.35" /><path d="M245,150 C215,115 180,95 145,150 C180,205 215,185 245,150 Z" fill="#d97706" opacity="0.35" /><circle cx="150" cy="150" r="26" fill="#b45309" stroke="#fff" stroke-width="2.5" /><circle cx="150" cy="150" r="12" fill="#f59e0b" />`;
+            } else if (type === 'rabbit') {
+                mooncakeState.moldName = 'Moon Rabbit';
+                pathsHtml = `<circle cx="150" cy="155" r="45" fill="#d97706" opacity="0.3" /><ellipse cx="138" cy="95" rx="10" ry="25" fill="#b45309" stroke="#fff" stroke-width="2" /><ellipse cx="162" cy="95" rx="10" ry="25" fill="#b45309" stroke="#fff" stroke-width="2" /><circle cx="150" cy="140" r="28" fill="#b45309" stroke="#fff" stroke-width="2" />`;
+            } else if (type === 'peony') {
+                mooncakeState.moldName = 'Scroll Peony';
+                pathsHtml = `<circle cx="150" cy="150" r="60" fill="none" stroke="#b45309" stroke-width="3" stroke-dasharray="10 5" /><path d="M150,80 Q190,120 150,150 Q110,180 150,220 Q180,180 150,150 Q120,120 150,80 Z" fill="#d97706" opacity="0.4" />`;
+            } else if (type === 'blessing') {
+                mooncakeState.moldName = 'Lucky Blessing (福)';
+                pathsHtml = `<rect x="110" y="110" width="80" height="80" rx="16" fill="#d97706" opacity="0.3" stroke="#b45309" stroke-width="3" /><text x="150" y="168" font-size="52" font-weight="bold" text-anchor="middle" fill="#78350f" font-family="serif">福</text>`;
+            } else if (type === 'starry') {
+                mooncakeState.moldName = 'Starry Sky';
+                pathsHtml = `<polygon points="150,85 162,120 200,120 170,142 182,178 150,155 118,178 130,142 100,120 138,120" fill="#d97706" opacity="0.5" stroke="#b45309" stroke-width="2" />`;
+            } else if (type === 'geometric') {
+                mooncakeState.moldName = 'Geometric Grid';
+                pathsHtml = `<polygon points="150,75 225,150 150,225 75,150" fill="none" stroke="#b45309" stroke-width="3" /><circle cx="150" cy="150" r="45" fill="#d97706" opacity="0.3" stroke="#b45309" stroke-width="2" />`;
+            }
+
+            group.innerHTML = pathsHtml;
+            document.querySelectorAll('.mold-card').forEach(c => c.classList.remove('border-amber-500', 'bg-amber-50'));
+            event.currentTarget.classList.add('border-amber-500', 'bg-amber-50');
+            updateMoldTransform();
+            updateSummary();
+        }
+
+        function updateMoldTransform() {
+            const scale = document.getElementById('moldScaleSlider').value;
+            const rotation = document.getElementById('moldRotationSlider').value;
+
+            mooncakeState.moldScale = scale;
+            mooncakeState.moldRotation = rotation;
+
+            document.getElementById('scaleValueDisplay').textContent = `${Math.round(scale * 100)}%`;
+            document.getElementById('rotationValueDisplay').textContent = `${rotation}°`;
+
+            const group = document.getElementById('moldPatternGroup');
+            group.setAttribute('transform', `scale(${scale}) rotate(${rotation} 150 150)`);
+        }
+
+        // Oven Baking
+        function startBaking() {
+            const glow = document.getElementById('ovenGlow');
+            const mooncake = document.getElementById('mooncakeInOven');
+            const status = document.getElementById('ovenStatusText');
+            const btn = document.getElementById('bakeBtn');
+
+            btn.disabled = true;
+            status.textContent = 'Baking in progress... 🌡️';
+            glow.style.opacity = '1';
+            mooncake.style.transform = 'scale(1)';
+            mooncake.style.opacity = '1';
+
+            setTimeout(() => {
+                status.textContent = '✨ Perfectly Baked & Golden!';
+                glow.style.opacity = '0.3';
+                btn.disabled = false;
+                btn.textContent = 'Bake Complete! Proceed →';
+                btn.onclick = () => nextStep();
+            }, 2500);
+        }
+
+        // Letter & Stickers
+        function selectStamp(emoji, name) {
+            mooncakeState.stampEmoji = emoji;
+            mooncakeState.stampName = name;
+            document.getElementById('selectedStampDisplay').textContent = emoji;
+            document.querySelectorAll('.stamp-option').forEach(s => s.classList.remove('border-rose-500', 'bg-rose-50'));
+            event.currentTarget.classList.add('border-rose-500', 'bg-rose-50');
+        }
+
+        function addLetterSticker(emoji) {
+            mooncakeState.letterStickers.push({
+                emoji,
+                x: 20 + Math.random() * 220,
+                y: 20 + Math.random() * 160
+            });
+            renderLetterStickers();
+        }
+
+        function clearLetterStickers() {
+            mooncakeState.letterStickers = [];
+            renderLetterStickers();
+        }
+
+        function renderLetterStickers() {
+            const container = document.getElementById('placedStickersContainer');
+            container.innerHTML = '';
+            mooncakeState.letterStickers.forEach(st => {
+                const span = document.createElement('span');
+                span.textContent = st.emoji;
+                span.className = 'absolute text-2xl drop-shadow-sm select-none';
+                span.style.left = `${st.x}px`;
+                span.style.top = `${st.y}px`;
+                container.appendChild(span);
+            });
+        }
+
+        function updateSummary() {
+            const fillingsStr = mooncakeState.fillings.map(f => f.name).join(', ');
+            const toppingsStr = mooncakeState.toppings.length > 0 ? ` + ${mooncakeState.toppings.length} Toppings` : '';
+            document.getElementById('summaryText').textContent = `${mooncakeState.colorName} • ${fillingsStr}${toppingsStr} • ${mooncakeState.moldName}`;
+        }
+
+        // Wizard Steps
+        function nextStep() {
+            if (currentStep === 6) {
+                mooncakeState.teacherName = document.getElementById('teacherNameInput').value.trim() || 'My Teacher';
+                mooncakeState.studentName = document.getElementById('studentNameInput').value.trim() || 'A Student';
+                mooncakeState.message = document.getElementById('letterMessageInput').value.trim() || mooncakeState.message;
+
+                // Populate showcase
+                document.getElementById('showcaseRecipeTitle').textContent = `${mooncakeState.colorName} Mooncake`;
+                document.getElementById('showcaseRecipeDesc').textContent = `Fillings: ${mooncakeState.fillings.map(f=>f.emoji).join('')} | Mold: ${mooncakeState.moldName}`;
+                document.getElementById('showcaseSalutation').textContent = `Dear ${mooncakeState.teacherName},`;
+                document.getElementById('showcaseMessage').textContent = `"${mooncakeState.message}"`;
+                document.getElementById('showcaseTeacherName').textContent = `To: ${mooncakeState.teacherName}`;
+                document.getElementById('showcaseStudentName').textContent = `From: ${mooncakeState.studentName}`;
+                document.getElementById('showcaseStampEmoji').textContent = mooncakeState.stampEmoji;
+
+                const showcaseMooncakeContainer = document.getElementById('showcaseMooncakeContainer');
+                showcaseMooncakeContainer.innerHTML = '';
+                const svgClone = document.getElementById('mooncakeDropZone').cloneNode(true);
+                svgClone.className = 'w-32 h-32 flex items-center justify-center relative scale-90';
+                showcaseMooncakeContainer.appendChild(svgClone);
+
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+                }
+            }
+
+            if (currentStep < totalSteps) {
+                document.getElementById(`step${currentStep}`).classList.add('hidden');
+                currentStep++;
+                document.getElementById(`step${currentStep}`).classList.remove('hidden');
+                updateWizardNav();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`step${currentStep}`).classList.add('hidden');
+                currentStep--;
+                document.getElementById(`step${currentStep}`).classList.remove('hidden');
+                updateWizardNav();
+            }
+        }
+
+        function updateWizardNav() {
+            document.getElementById('stepIndicator').textContent = `Step ${currentStep} of ${totalSteps}`;
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const restartBtn = document.getElementById('restartBtn');
+
+            if (currentStep === 1) {
+                prevBtn.classList.add('hidden');
+            } else {
+                prevBtn.classList.remove('hidden');
+            }
+
+            if (currentStep === totalSteps) {
+                nextBtn.classList.add('hidden');
+                restartBtn.classList.remove('hidden');
+                document.getElementById('stepIndicator').textContent = 'Gift Box Ready!';
+            } else {
+                nextBtn.classList.remove('hidden');
+                restartBtn.classList.add('hidden');
+            }
+        }
+
+        function restartStudio() {
+            currentStep = 1;
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById(`step${i}`).classList.add('hidden');
+            }
+            document.getElementById('step1').classList.remove('hidden');
+            updateWizardNav();
+        }
+
+        // Downloads using html2canvas
+        function downloadMooncakeImage() {
+            const target = document.getElementById('mooncakeDropZone');
+            html2canvas(target, { backgroundColor: null }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'my-custom-mooncake.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        function downloadGiftCardImage() {
+            const target = document.getElementById('exportableGiftCard');
+            html2canvas(target, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'teacher-mooncake-gift-card.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        updateSummary();
+    </script>
+</body>
+</html>
