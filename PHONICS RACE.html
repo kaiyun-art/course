@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digraph Word Race & Teacher Dashboard</title>
+  <style>
+    :root {
+      --primary: #4A90E2;
+      --secondary: #8E44AD;
+      --success: #2ECC71;
+      --danger: #E74C3C;
+      --card-bg: #FFFFFF;
+      --text: #2C3E50;
+    }
+
+    * { 
+      box-sizing: border-box; 
+      font-family: 'Comic Sans MS', 'Fredoka', 'Chalkboard SE', 'Segoe UI', sans-serif; 
+    }
+
+    /* Animated Cartoon Background */
+    body {
+      background: linear-gradient(180deg, #70c5ce 0%, #a8e6cf 100%);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Cartoon Cloud 1 */
+    body::before {
+      content: "☁️";
+      font-size: 5rem;
+      position: absolute;
+      top: 10%;
+      left: -100px;
+      opacity: 0.8;
+      animation: floatCloud 18s linear infinite;
+    }
+
+    /* Cartoon Cloud 2 & Stars */
+    body::after {
+      content: "☁️";
+      font-size: 7rem;
+      position: absolute;
+      top: 60%;
+      left: -150px;
+      opacity: 0.6;
+      animation: floatCloud 25s linear infinite 5s;
+    }
+
+    .bg-elements {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .star {
+      position: absolute;
+      font-size: 2rem;
+      animation: pulseStar 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatCloud {
+      0% { transform: translateX(-100px); }
+      100% { transform: translateX(calc(100vw + 200px)); }
+    }
+
+    @keyframes pulseStar {
+      0% { transform: scale(0.8) rotate(0deg); opacity: 0.5; }
+      100% { transform: scale(1.2) rotate(15deg); opacity: 1; }
+    }
+
+    .game-container {
+      background-color: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      width: 100%;
+      max-width: 650px;
+      border-radius: 28px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      padding: 30px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      border: 4px solid #FFF;
+    }
+
+    h1 { margin-top: 0; color: var(--primary); font-size: 2.2rem; text-shadow: 1px 1px 0px #FFF; }
+
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      border: 2px solid var(--primary);
+      background: white;
+      color: var(--primary);
+      font-weight: bold;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding: 12px 24px;
+      background-color: #EBF3FA;
+      border-radius: 16px;
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+
+    /* Flashcard Design */
+    .flashcard {
+      background: #FFFFFF;
+      border: 3px solid #E2E8F0;
+      border-radius: 24px;
+      padding: 30px 20px;
+      margin: 15px 0;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      box-shadow: 0 12px 0px #CBD5E1, 0 15px 20px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    /* Top-left corner accent for physical card feel */
+    .flashcard::before {
+      content: "";
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #CBD5E1;
+    }
+
+    .word-image {
+      max-width: 160px;
+      max-height: 130px;
+      object-fit: contain;
+      border-radius: 12px;
+    }
+
+    /* Extra Large Word Text */
+    .word-text { 
+      font-size: 5rem; 
+      font-weight: 800; 
+      letter-spacing: 3px;
+      color: #1E293B;
+    }
+    
+    .highlight { 
+      color: #E67E22; 
+      text-decoration: underline;
+      text-underline-offset: 8px;
+    }
+
+    .warning-msg {
+      color: var(--danger);
+      font-weight: bold;
+      font-size: 1.4rem;
+      height: 30px;
+      visibility: hidden;
+    }
+
+    .warning-msg.active {
+      visibility: visible;
+      animation: shake 0.3s ease-in-out;
+    }
+
+    .btn-group { display: flex; justify-content: center; gap: 35px; margin-top: 15px; }
+
+    .action-btn {
+      width: 85px;
+      height: 85px;
+      border-radius: 50%;
+      border: none;
+      font-size: 2.5rem;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+      transition: transform 0.1s;
+    }
+
+    .action-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+    }
+
+    .btn-check { background-color: var(--success); }
+    .btn-x { background-color: var(--danger); }
+
+    .start-btn {
+      background-color: var(--primary);
+      color: white;
+      font-size: 1.4rem;
+      padding: 14px 40px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 5px 0 #2980B9;
+    }
+
+    .start-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #2980B9;
+    }
+
+    /* Dashboard Styles */
+    .dashboard-panel {
+      text-align: left;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-weight: bold; margin-bottom: 5px; }
+    .form-group input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #CCC;
+      border-radius: 8px;
+    }
+
+    .word-manager-item {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: center;
+      background: #F8FAFC;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 1px solid #E2E8F0;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Star Background Elements -->
+  <div class="bg-elements">
+    <div class="star" style="top: 15%; left: 10%;">⭐</div>
+    <div class="star" style="top: 25%; right: 12%; animation-delay: 0.5s;">🌟</div>
+    <div class="star" style="bottom: 15%; left: 15%; animation-delay: 1s;">✨</div>
+    <div class="star" style="bottom: 20%; right: 8%; animation-delay: 1.5s;">⭐</div>
+  </div>
+
+  <div class="game-container">
+    
+    <div class="nav-tabs">
+      <button class="tab-btn active" id="tab-game" onclick="switchTab('game')">🎮 Play Game</button>
+      <button class="tab-btn" id="tab-dash" onclick="switchTab('dash')">⚙️ Teacher Dashboard</button>
+    </div>
+
+    <!-- PLAY TAB -->
+    <div id="play-tab" class="tab-content">
+      <div id="start-screen" class="screen active">
+        <h1>Digraph Flashcard Race! ⏱️</h1>
+        <p style="font-size: 1.1rem; color: #475569;">Read as many <strong>a_e</strong>, <strong>ai</strong>, and <strong>ay</strong> words before time runs out!</p>
+        <button class="start-btn" onclick="startGame()">START GAME</button>
+      </div>
+
+      <div id="game-screen" class="screen">
+        <div class="header-bar">
+          <div>Score: <span id="score">0</span> / <span id="total-words">14</span></div>
+          <div style="color: var(--danger)">Time: <span id="timer">60</span>s</div>
+        </div>
+
+        <div class="warning-msg" id="warning">Try again!</div>
+
+        <!-- FLASHCARD CONTAINER -->
+        <div class="flashcard">
+          <img id="display-media" class="word-image" style="display:none;" alt="Word visual">
+          <div id="word-container" class="word-text">---</div>
+          <button id="audio-btn" style="display:none; background:none; border:none; font-size:1.8rem; cursor:pointer;" onclick="playCurrentAudio()">🔊</button>
+        </div>
+
+        <div class="btn-group">
+          <button class="action-btn btn-x" onclick="handleWrong()" aria-label="Incorrect">✖</button>
+          <button class="action-btn btn-check" onclick="handleCorrect()" aria-label="Correct">✔</button>
+        </div>
+      </div>
+
+      <div id="end-screen" class="screen">
+        <h1 id="end-title">Time's Up!</h1>
+        <p style="font-size: 1.2rem;">You read <strong id="final-score" style="color: var(--primary); font-size: 2rem;">0</strong> words!</p>
+        <button class="start-btn" onclick="startGame()">Play Again</button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD TAB -->
+    <div id="dash-tab" class="tab-content" style="display:none;">
+      <h2>Teacher Setup Dashboard</h2>
+      <div class="dashboard-panel">
+        
+        <div class="form-group">
+          <label for="timer-setting">Game Timer (Seconds):</label>
+          <input type="number" id="timer-setting" value="60" min="10" max="300" onchange="updateTimerConfig(this.value)">
+        </div>
+
+        <hr>
+        <h3>Customize Word Flashcards</h3>
+        <p style="font-size: 0.85rem; color: #64748B;">Upload an image/GIF or audio file to attach to each flashcard.</p>
+
+        <div id="word-list-manager"></div>
+
+        <button class="start-btn" style="font-size:1rem; padding:8px 20px; margin-top:10px;" onclick="addCustomWord()">+ Add Custom Word</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let wordList = [
+      { text: 'cake', display: 'c<span class="highlight">a</span>k<span class="highlight">e</span>', media: null, audio: null },
+      { text: 'rain', display: 'r<span class="highlight">ai</span>n', media: null, audio: null },
+      { text: 'day', display: 'd<span class="highlight">ay</span>', media: null, audio: null },
+      { text: 'game', display: 'g<span class="highlight">a</span>m<span class="highlight">e</span>', media: null, audio: null },
+      { text: 'tail', display: 't<span class="highlight">ai</span>l', media: null, audio: null },
+      { text: 'pay', display: 'p<span class="highlight">ay</span>', media: null, audio: null },
+      { text: 'name', display: 'n<span class="highlight">a</span>m<span class="highlight">e</span>', media: null, audio: null },
+      { text: 'mail', display: 'm<span class="highlight">ai</span>l', media: null, audio: null },
+      { text: 'say', display: 's<span class="highlight">ay</span>', media: null, audio: null },
+      { text: 'lake', display: 'l<span class="highlight">a</span>k<span class="highlight">e</span>', media: null, audio: null },
+      { text: 'wait', display: 'w<span class="highlight">ai</span>t', media: null, audio: null },
+      { text: 'play', display: 'p<span class="highlight">la</span>y', media: null, audio: null },
+      { text: 'made', display: 'm<span class="highlight">a</span>d<span class="highlight">e</span>', media: null, audio: null },
+      { text: 'train', display: 'tr<span class="highlight">ai</span>n', media: null, audio: null }
+    ];
+
+    let gameDuration = 60;
+    let currentIdx = 0;
+    let score = 0;
+    let timeLeft = 60;
+    let timerInterval = null;
+    let shuffledWords = [];
+    let audioPlayer = new Audio();
+
+    function switchTab(tab) {
+      document.getElementById('tab-game').classList.toggle('active', tab === 'game');
+      document.getElementById('tab-dash').classList.toggle('active', tab === 'dash');
+      document.getElementById('play-tab').style.display = tab === 'game' ? 'block' : 'none';
+      document.getElementById('dash-tab').style.display = tab === 'dash' ? 'block' : 'none';
+      if (tab === 'dash') renderDashboard();
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function startGame() {
+      shuffledWords = [...wordList].sort(() => Math.random() - 0.5);
+      currentIdx = 0;
+      score = 0;
+      timeLeft = gameDuration;
+
+      document.getElementById('score').textContent = score;
+      document.getElementById('total-words').textContent = shuffledWords.length;
+      document.getElementById('timer').textContent = timeLeft;
+      document.getElementById('warning').classList.remove('active');
+
+      showScreen('game-screen');
+      renderWord();
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = timeLeft;
+        if (timeLeft <= 0) endGame(false);
+      }, 1000);
+    }
+
+    function renderWord() {
+      if (currentIdx >= shuffledWords.length) {
+        endGame(true);
+        return;
+      }
+      const item = shuffledWords[currentIdx];
+      document.getElementById('word-container').innerHTML = item.display;
+
+      const imgEl = document.getElementById('display-media');
+      if (item.media) {
+        imgEl.src = item.media;
+        imgEl.style.display = 'block';
+      } else {
+        imgEl.style.display = 'none';
+      }
+
+      const audioBtn = document.getElementById('audio-btn');
+      audioBtn.style.display = item.audio ? 'inline-block' : 'none';
+      if (item.audio) playCurrentAudio();
+    }
+
+    function playCurrentAudio() {
+      const item = shuffledWords[currentIdx];
+      if (item && item.audio) {
+        audioPlayer.src = item.audio;
+        audioPlayer.play();
+      }
+    }
+
+    function handleCorrect() {
+      document.getElementById('warning').classList.remove('active');
+      score++;
+      currentIdx++;
+      document.getElementById('score').textContent = score;
+      renderWord();
+    }
+
+    function handleWrong() {
+      const warningEl = document.getElementById('warning');
+      warningEl.classList.remove('active');
+      void warningEl.offsetWidth; 
+      warningEl.classList.add('active');
+    }
+
+    function endGame(completedAll) {
+      clearInterval(timerInterval);
+      document.getElementById('final-score').textContent = score;
+      document.getElementById('end-title').textContent = (completedAll && timeLeft > 0) ? "Super Star! 🌟" : "Time's Up! ⏰";
+      showScreen('end-screen');
+    }
+
+    function updateTimerConfig(val) { gameDuration = parseInt(val) || 60; }
+
+    function renderDashboard() {
+      const container = document.getElementById('word-list-manager');
+      container.innerHTML = '';
+
+      wordList.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'word-manager-item';
+        row.innerHTML = `
+          <div><strong>${item.text}</strong></div>
+          <div>
+            <label style="font-size:0.75rem;">Picture/GIF:</label>
+            <input type="file" accept="image/*" onchange="uploadFile(${idx}, 'media', this)">
+          </div>
+          <div>
+            <label style="font-size:0.75rem;">Audio Sound:</label>
+            <input type="file" accept="audio/*" onchange="uploadFile(${idx}, 'audio', this)">
+          </div>
+          <button style="color:red; cursor:pointer;" onclick="deleteWord(${idx})">🗑️</button>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function uploadFile(index, type, input) {
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          wordList[index][type] = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function addCustomWord() {
+      const word = prompt("Enter a new word:");
+      if (word) {
+        wordList.push({
+          text: word,
+          display: word,
+          media: null,
+          audio: null
+        });
+        renderDashboard();
+      }
+    }
+
+    function deleteWord(idx) {
+      wordList.splice(idx, 1);
+      renderDashboard();
+    }
+  </script>
+</body>
+</html>
