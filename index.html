@@ -1,11 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hant">
 <head>
-<title>我的網頁</title>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>我的首頁</title>
+ <style>
+ body {
+ font-family: Arial, sans-serif;
+ background-color: #f0f2f5;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ height: 100vh;
+ margin: 0;
+ }
+ .container {
+ text-align: center;
+ background: white;
+ padding: 2rem;
+ border-radius: 8px;
+ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+ }
+ h1 {
+ color: #333;
+ margin-bottom: 2rem;
+ }
+ a {
+ display: inline-block;
+ padding: 1rem 2rem;
+ background-color: #007bff;
+ color: white;
+ text-decoration: none;
+ border-radius: 4px;
+ font-weight: bold;
+ transition: background-color 0.3s;
+ }
+ a:hover {
+ background-color: #0056b3;
+ }
+ </style>
 </head>
 <body>
-<h1>Hello World!</h1>
-<a href="moon.html">moon</a>
+ <div class="container">
+ <h1>Hello World!</h1>
+ <a href="moon.html">moon</a>
+ </div>
 </body>
 </html>
-
