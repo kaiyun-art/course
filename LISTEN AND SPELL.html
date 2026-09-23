@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Long 'e' Sound Spell Game - iPad Ready</title>
+    <style>
+        :root {
+            --bg-wall: #e2d9cc;
+            --wood-light: #e9c46a;
+            --green-mat: #2a9d8f;
+            --btn-green: #52b788;
+            --btn-orange: #f4a261;
+            --btn-blue: #457b9d;
+            --text-dark: #2b2d42;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+            background-color: #2b2d42;
+            margin: 0;
+            padding: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow: hidden;
+        }
+
+        .game-board {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--bg-wall);
+            border: 6px solid #6c584c;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        #confetti-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 40;
+        }
+
+        .start-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(43, 45, 66, 0.96);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            color: white;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .start-screen h1 {
+            font-size: 2.2rem;
+            color: #f4a261;
+            margin: 0 0 10px 0;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        .start-screen p {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            max-width: 90%;
+            line-height: 1.4;
+        }
+
+        .qr-box {
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .qr-box img {
+            width: 130px;
+            height: 130px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .qr-box span {
+            display: block;
+            color: var(--text-dark);
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .btn-start {
+            background-color: var(--btn-green);
+            font-size: 1.5rem;
+            padding: 14px 40px;
+            border-radius: 50px;
+            box-shadow: 0 5px 0 #388e3c;
+            cursor: pointer;
+            border: none;
+            color: white;
+            font-weight: bold;
+            transition: transform 0.1s;
+            z-index: 60;
+        }
+
+        .btn-start:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #388e3c;
+        }
+
+        .top-ui {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #f4f1de;
+            border-bottom: 4px solid #d4a373;
+        }
+
+        .stats-box {
+            background: #fff;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-weight: bold;
+            color: #d90429;
+            font-size: 1.1rem;
+        }
+
+        .audio-btn {
+            background: #dda15e;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .conveyor-area {
+            background: #1a1a2e;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 8px 0;
+            border-top: 3px solid #000;
+            border-bottom: 3px solid #000;
+        }
+
+        .belt-row {
+            height: 85px;
+            position: relative;
+            overflow: hidden;
+            background: #2b2d42;
+            display: flex;
+            align-items: center;
+        }
+
+        .belt-track {
+            position: absolute;
+            width: 100%;
+            height: 35px;
+            background: linear-gradient(90deg, #5c677d 50%, #7d8597 50%);
+            background-size: 30px 100%;
+            bottom: 5px;
+        }
+
+        .track-1 { animation: moveTrack 1.2s linear infinite; }
+        .track-2 { animation: moveTrackRev 1.2s linear infinite; }
+        .track-3 { animation: moveTrack 1.2s linear infinite; }
+
+        @keyframes moveTrack { 0% { background-position: 0 0; } 100% { background-position: 60px 0; } }
+        @keyframes moveTrackRev { 0% { background-position: 60px 0; } 100% { background-position: 0 0; } }
+
+        .cups-stream {
+            display: flex;
+            position: absolute;
+            white-space: nowrap;
+        }
+
+        .stream-left { animation: flowLeft 10s linear infinite; }
+        .stream-right { animation: flowRight 10s linear infinite; }
+
+        .fast-stream .stream-left { animation-duration: 6s; }
+        .fast-stream .stream-right { animation-duration: 6s; }
+
+        @keyframes flowLeft { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        @keyframes flowRight { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        /* Dinner Plate Style */
+        .plate-card {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 68px;
+            height: 68px;
+            margin: 0 5px;
+            border-radius: 50%;
+            border: 5px solid #ffffff;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.4), 0 4px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.1s ease;
+        }
+
+        .plate-card::before {
+            content: '';
+            position: absolute;
+            width: 78%;
+            height: 78%;
+            border-radius: 50%;
+            border: 2px dashed rgba(255,255,255,0.6);
+            pointer-events: none;
+        }
+
+        .plate-card:active {
+            transform: scale(0.9);
+        }
+
+        .plate-card-text {
+            font-family: 'Comic Sans MS', sans-serif;
+            font-weight: 900;
+            font-size: 1.8rem;
+            color: #ffffff;
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
+            z-index: 2;
+        }
+
+        .bottom-ui {
+            background-color: var(--wood-light);
+            padding: 10px;
+            display: grid;
+            grid-template-columns: 110px 1fr 100px;
+            gap: 10px;
+            align-items: center;
+            border-top: 4px solid #d4a373;
+        }
+
+        .guide-box-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .guide-box {
+            background: white;
+            border: 3px solid #dda15e;
+            border-radius: 10px;
+            padding: 2px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 75px;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .guide-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .btn-tts {
+            background: var(--btn-blue);
+            color: white;
+            border: none;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #1d3557;
+            width: 100%;
+        }
+
+        .mat-area {
+            background: var(--green-mat);
+            border: 3px solid #1d7063;
+            border-radius: 10px;
+            padding: 8px;
+            min-height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .answer-slot {
+            width: 42px;
+            height: 42px;
+            background: rgba(255, 255, 255, 0.25);
+            border: 2px dashed #fff;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+            transition: all 0.15s ease;
+        }
+
+        .answer-slot.filled {
+            background: #ffffff;
+            border: 3px solid var(--btn-orange);
+            color: var(--text-dark);
+            text-shadow: none;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        .action-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .btn {
+            border: none;
+            padding: 10px 5px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+        }
+
+        .btn-submit { background-color: var(--btn-green); }
+        .btn-clear { background-color: var(--btn-orange); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 320px;
+        }
+
+        @media (max-width: 600px) {
+            .start-screen h1 { font-size: 1.8rem; }
+            .start-screen p { font-size: 0.85rem; }
+            .bottom-ui { grid-template-columns: 85px 1fr 75px; gap: 6px; }
+            .answer-slot { width: 34px; height: 34px; font-size: 1.2rem; }
+            .plate-card { width: 54px; height: 54px; }
+            .plate-card-text { font-size: 1.4rem; }
+            .belt-row { height: 70px; }
+            .btn { font-size: 0.8rem; padding: 8px 3px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-board">
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="start-screen" id="start-screen">
+        <h1>Long 'e' Words 🍽️✨</h1>
+        <p>Scan to play on iPad, or tap Start below!</p>
+        
+        <div class="qr-box">
+            <img id="qr-code-img" src="" alt="Scan QR to Play" />
+            <span>Scan with iPad Camera</span>
+        </div>
+
+        <button class="btn-start" id="start-btn">START GAME</button>
+    </div>
+
+    <div class="top-ui">
+        <div class="stats-box">
+            Time: <span id="timer">3:00</span>
+        </div>
+        <div class="stats-box" style="color: #2a9d8f;">
+            Item: <span id="item-count">1/15</span>
+        </div>
+        <button class="audio-btn" id="audio-toggle" onclick="toggleAudio()">🔊 Music On</button>
+    </div>
+
+    <div class="conveyor-area" id="conveyor-container">
+        <div class="belt-row">
+            <div class="belt-track track-1"></div>
+            <div class="cups-stream stream-left" id="belt-0"></div>
+        </div>
+        <div class="belt-row">
+            <div class="belt-track track-2"></div>
+            <div class="cups-stream stream-right" id="belt-1"></div>
+        </div>
+        <div class="belt-row">
+            <div class="belt-track track-3"></div>
+            <div class="cups-stream stream-left" id="belt-2"></div>
+        </div>
+    </div>
+
+    <div class="bottom-ui">
+        <div class="guide-box-wrapper">
+            <div class="guide-box" id="guide-image"></div>
+            <button class="btn-tts" onclick="speakCurrentWord()">🔊 Pronounce</button>
+        </div>
+
+        <div class="mat-area" id="answer-slots-container"></div>
+
+        <div class="action-btns">
+            <button class="btn btn-submit" onclick="checkAnswer()">Submit</button>
+            <button class="btn btn-clear" onclick="clearAnswer()">Clear</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="game-modal">
+    <div class="modal-content">
+        <h2 id="modal-title">Great Job! 🎉</h2>
+        <p id="modal-msg">You spelled all Long 'e' words correctly!</p>
+        <button class="btn btn-submit" onclick="restartGame()">Play Again</button>
+    </div>
+</div>
+
+<audio id="bg-music" loop preload="auto">
+    <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    // Color combinations for plates
+    const plateThemes = [
+        "radial-gradient(circle, #e76f51 30%, #d62828 80%)",
+        "radial-gradient(circle, #2a9d8f 30%, #1d7063 80%)",
+        "radial-gradient(circle, #f4a261 30%, #e85d04 80%)",
+        "radial-gradient(circle, #457b9d 30%, #1d3557 80%)",
+        "radial-gradient(circle, #a855f7 30%, #6b21a8 80%)",
+        "radial-gradient(circle, #3b82f6 30%, #1d4ed8 80%)",
+        "radial-gradient(circle, #10b981 30%, #047857 80%)"
+    ];
+
+    // Long e vocabulary set (15 Words)
+    const baseWords = [
+        { name: "beef", imgUrl: "https://images.unsplash.com/photo-1588168333986-5078d3ae3976?auto=format&fit=crop&w=400&q=80" },
+        { name: "beach", imgUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80" },
+        { name: "scene", imgUrl: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=400&q=80" },
+        { name: "bleed", imgUrl: "https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=400&q=80" },
+        { name: "cream", imgUrl: "https://images.unsplash.com/photo-1557142046-c704a3adf364?auto=format&fit=crop&w=400&q=80" },
+        { name: "theme", imgUrl: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=400&q=80" },
+        { name: "street", imgUrl: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=400&q=80" },
+        { name: "weak", imgUrl: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=400&q=80" },
+        { name: "delete", imgUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=400&q=80" },
+        { name: "flee", imgUrl: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=400&q=80" },
+        { name: "deal", imgUrl: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=400&q=80" },
+        { name: "eve", imgUrl: "https://images.unsplash.com/photo-1513297887119-d46091b24bfa?auto=format&fit=crop&w=400&q=80" },
+        { name: "these", imgUrl: "https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?auto=format&fit=crop&w=400&q=80" },
+        { name: "steal", imgUrl: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=400&q=80" },
+        { name: "knee", imgUrl: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=400&q=80" }
+    ];
+
+    let wordData = [];
+    let currentItemIdx = 0;
+    let selectedLetters = [];
+    let shuffledPool = [];
+    let timeLeft = 180;
+    let timerInterval = null;
+    let musicPlaying = true;
+    let audioCtx = null;
+    let gameStarted = false;
+
+    window.addEventListener('DOMContentLoaded', () => {
+        let currentUrl = window.location.href;
+        if (!currentUrl || currentUrl.startsWith('about:') || currentUrl.startsWith('file:')) {
+            // REPLACE THIS URL WITH YOUR LIVE GITHUB PAGES LINK:
+            currentUrl = 'https://username.github.io/repository-name/';
+        }
+        
+        const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(currentUrl)}`;
+        document.getElementById('qr-code-img').src = qrApi;
+
+        const startBtn = document.getElementById('start-btn');
+        startBtn.addEventListener('touchend', handleStartTrigger);
+        startBtn.addEventListener('click', handleStartTrigger);
+    });
+
+    function handleStartTrigger(e) {
+        if (e) e.preventDefault();
+        if (gameStarted) return;
+        gameStarted = true;
+
+        initAudioContext();
+
+        const music = document.getElementById('bg-music');
+        if (music) {
+            music.play().catch(() => {});
+        }
+
+        document.getElementById('start-screen').style.display = 'none';
+        wordData = shuffleArray(baseWords);
+        initItem();
+    }
+
+    function initAudioContext() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    function shuffleArray(arr) {
+        const shuffled = [...arr];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    function playAscendingPitchSound(step) {
+        try {
+            initAudioContext();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            const baseFreq = 500 + (step * 90);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(baseFreq + 150, audioCtx.currentTime + 0.12);
+
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        } catch(e) {}
+    }
+
+    // Slow and clear speech synthesis tailored for ESL learners
+    function speakCurrentWord() {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const word = wordData[currentItemIdx].name;
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.rate = 0.65; // Slow rate for clear ESL comprehension
+            utterance.pitch = 1.0;
+            utterance.lang = 'en-US';
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    function createPlateCard(theme, letter, index) {
+        const card = document.createElement('div');
+        card.className = 'plate-card';
+        card.style.background = theme;
+        card.innerHTML = `<span class="plate-card-text">${letter}</span>`;
+        
+        const triggerSelect = (e) => {
+            e.preventDefault();
+            selectLetter(index);
+        };
+        
+        card.addEventListener('touchend', triggerSelect);
+        card.addEventListener('click', triggerSelect);
+        return card;
+    }
+
+    function initItem() {
+        clearInterval(timerInterval);
+        timeLeft = 180;
+        updateTimerDisplay();
+        timerInterval = setInterval(updateTimer, 1000);
+
+        const item = wordData[currentItemIdx];
+        selectedLetters = [];
+
+        document.getElementById('item-count').innerText = `${currentItemIdx + 1}/${wordData.length}`;
+        document.getElementById('guide-image').innerHTML = `<img src="${item.imgUrl}" alt="${item.name}" />`;
+        document.getElementById('conveyor-container').classList.remove('fast-stream');
+
+        setTimeout(() => {
+            speakCurrentWord();
+        }, 300);
+
+        const rawLetters = item.name.replace(/\s/g, '').split('');
+        const distractorAlpha = "abcdefghijklmnopqrstuvwxyz";
+        
+        while(rawLetters.length < 18) {
+            rawLetters.push(distractorAlpha[Math.floor(Math.random() * distractorAlpha.length)]);
+        }
+
+        shuffledPool = rawLetters.map((char, index) => ({ char, id: index, used: false }));
+        shuffledPool = shuffleArray(shuffledPool);
+
+        renderBelts();
+        renderAnswerSlots();
+    }
+
+    function renderBelts() {
+        const belts = [document.getElementById('belt-0'), document.getElementById('belt-1'), document.getElementById('belt-2')];
+        belts.forEach(b => b.innerHTML = '');
+
+        shuffledPool.forEach((itemObj, index) => {
+            if (!itemObj.used) {
+                const theme = plateThemes[index % plateThemes.length];
+                const cardDiv = createPlateCard(theme, itemObj.char, index);
+
+                const beltIdx = index % 3;
+                belts[beltIdx].appendChild(cardDiv);
+            }
+        });
+    }
+
+    function renderAnswerSlots() {
+        const container = document.getElementById('answer-slots-container');
+        container.innerHTML = '';
+        const targetWord = wordData[currentItemIdx].name;
+
+        let letterCounter = 0;
+        for (let char of targetWord) {
+            if (char === ' ') {
+                const space = document.createElement('div');
+                space.style.width = '12px';
+                container.appendChild(space);
+            } else {
+                const slot = document.createElement('div');
+                slot.className = 'answer-slot';
+                
+                if (selectedLetters[letterCounter]) {
+                    slot.classList.add('filled');
+                    slot.innerText = selectedLetters[letterCounter].char;
+                    const currentSlotIdx = letterCounter;
+                    
+                    const triggerDeselect = (e) => {
+                        e.preventDefault();
+                        deselectLetter(currentSlotIdx);
+                    };
+                    slot.addEventListener('touchend', triggerDeselect);
+                    slot.addEventListener('click', triggerDeselect);
+                }
+                
+                container.appendChild(slot);
+                letterCounter++;
+            }
+        }
+    }
+
+    function selectLetter(poolIndex) {
+        playAscendingPitchSound(selectedLetters.length);
+        const letterObj = shuffledPool[poolIndex];
+        letterObj.used = true;
+        selectedLetters.push(letterObj);
+        renderBelts();
+        renderAnswerSlots();
+    }
+
+    function deselectLetter(selectedIndex) {
+        playAscendingPitchSound(Math.max(0, selectedLetters.length - 2));
+        const removed = selectedLetters.splice(selectedIndex, 1)[0];
+        removed.used = false;
+        renderBelts();
+        renderAnswerSlots();
+    }
+
+    function clearAnswer() {
+        playAscendingPitchSound(0);
+        selectedLetters = [];
+        shuffledPool.forEach(obj => obj.used = false);
+        renderBelts();
+        renderAnswerSlots();
+    }
+
+    function checkAnswer() {
+        const targetWord = wordData[currentItemIdx].name.replace(/\s/g, '');
+        const currentAnswer = selectedLetters.map(l => l.char).join('');
+
+        if (currentAnswer === targetWord) {
+            triggerConfetti();
+            speakCurrentWord();
+            
+            setTimeout(() => {
+                if (currentItemIdx < wordData.length - 1) {
+                    currentItemIdx++;
+                    initItem();
+                } else {
+                    clearInterval(timerInterval);
+                    showModal("Great Job! 🎉", "You completed all Long 'e' words!");
+                }
+            }, 1000);
+        } else {
+            alert("Try again! Listen to the word carefully.");
+        }
+    }
+
+    function updateTimer() {
+        timeLeft--;
+        updateTimerDisplay();
+
+        if (timeLeft === 60) {
+            document.getElementById('conveyor-container').classList.add('fast-stream');
+        }
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            if (currentItemIdx < wordData.length - 1) {
+                alert("Time's up for this word!");
+                currentItemIdx++;
+                initItem();
+            } else {
+                showModal("Game Over ⏰", "Time ran out!");
+            }
+        }
+    }
+
+    function updateTimerDisplay() {
+        const mins = Math.floor(timeLeft / 60);
+        const secs = (timeLeft % 60).toString().padStart(2, '0');
+        document.getElementById('timer').innerText = `${mins}:${secs}`;
+    }
+
+    function toggleAudio() {
+        const music = document.getElementById('bg-music');
+        const btn = document.getElementById('audio-toggle');
+        if (musicPlaying) {
+            music.pause();
+            btn.innerText = "🔇 Music Off";
+        } else {
+            music.play().catch(() => {});
+            btn.innerText = "🔊 Music On";
+        }
+        musicPlaying = !musicPlaying;
+    }
+
+    function showModal(title, msg) {
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-msg').innerText = msg;
+        document.getElementById('game-modal').style.display = 'flex';
+    }
+
+    function restartGame() {
+        document.getElementById('game-modal').style.display = 'none';
+        currentItemIdx = 0;
+        wordData = shuffleArray(baseWords);
+        initItem();
+    }
+
+    function triggerConfetti() {
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+
+        const particles = [];
+        const colors = ['#f4a261', '#e76f51', '#2a9d8f', '#e9c46a', '#457b9d'];
+
+        for (let i = 0; i < 50; i++) {
+            particles.push({
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                vx: (Math.random() - 0.5) * 10,
+                vy: (Math.random() - 0.8) * 10,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                size: Math.random() * 6 + 3
+            });
+        }
+
+        let frames = 0;
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.3;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            frames++;
+            if (frames < 45) requestAnimationFrame(render);
+            else ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        render();
+    }
+</script>
+</body>
+</html>
