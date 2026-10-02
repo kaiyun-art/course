@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Word Spelling Challenge - 90s Timer</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,400;0,700;1,700&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Fredoka', 'Comic Sans MS', 'Comic Neue', cursive, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            overflow: hidden;
+            background: #090d16;
+        }
+
+        /* Prominent Comic Sans style for Timer */
+        .comic-timer {
+            font-family: 'Comic Sans MS', 'Comic Neue', cursive, sans-serif;
+            font-weight: 900;
+            text-shadow: 0 0 12px rgba(251, 191, 36, 0.6), 2px 2px 0px #000;
+        }
+
+        .game-show-title {
+            text-shadow: 3px 4px 0px #000, 0 0 25px #f59e0b;
+        }
+
+        /* Floating Bubble Letter Styles */
+        .bubble-letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #ffffff;
+            text-shadow: 2px 2px 0px #000, -1px -1px 0 #000, 1px -1px 0 #000;
+            border-radius: 9999px;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.5), inset 0 4px 6px rgba(255,255,255,0.7), inset 0 -4px 6px rgba(0,0,0,0.4);
+            cursor: pointer;
+            position: absolute;
+            will-change: transform;
+            border: 3.5px solid #ffffff;
+            transition: transform 0.08s ease, filter 0.1s ease;
+        }
+
+        .bubble-letter:hover {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+
+        .bubble-letter:active {
+            transform: scale(0.85) !important;
+            filter: brightness(1.4);
+        }
+
+        .solo-arena {
+            background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #090d16 100%);
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 2px, transparent 2px);
+            background-size: 32px 32px;
+        }
+
+        /* Letter Boxes for Multi-Word Line Display */
+        .word-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .letter-slot {
+            width: 3rem;
+            height: 3.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.1rem;
+            font-weight: 800;
+            background: #1e293b;
+            color: #f8fafc;
+            border-radius: 12px;
+            border: 3px solid #475569;
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.4);
+            transition: all 0.15s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .letter-slot.filled {
+            background: #f59e0b;
+            color: #0f172a;
+            border-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.6);
+            animation: slotPop 0.15s ease-out;
+        }
+
+        .letter-slot.filled:hover {
+            border-color: #ef4444;
+            transform: scale(1.08);
+        }
+
+        .letter-slot.filled::after {
+            content: '✕';
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ef4444;
+            color: #ffffff;
+            font-size: 11px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .letter-slot.filled:hover::after {
+            opacity: 1;
+        }
+
+        @keyframes slotPop {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(14px);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+        .shake-error {
+            animation: shakeError 0.35s ease-in-out;
+            border-color: #ef4444 !important;
+        }
+
+        @keyframes winGlow {
+            0%, 100% { box-shadow: 0 0 25px #22c55e; }
+            50% { box-shadow: 0 0 45px #eab308; }
+        }
+        .win-glow {
+            animation: winGlow 0.8s infinite alternate;
+            border-color: #22c55e !important;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col justify-between text-white select-none">
+
+    <header class="h-20 bg-slate-900 border-b-4 border-amber-400 px-4 py-2 flex items-center justify-between z-30 shadow-2xl relative gap-2">
+        
+        <!-- Active Group Info (Left) -->
+        <div class="flex items-center gap-3 bg-indigo-950/90 border-2 border-indigo-500 rounded-2xl px-3 py-1.5 shadow-lg shrink-0">
+            <div class="w-10 h-10 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-xl shadow">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-[10px] uppercase tracking-wider text-indigo-300 font-extrabold">CURRENT GROUP</span>
+                <span id="header-student-name" class="text-sm md:text-base text-yellow-300 font-black truncate max-w-[150px]">
+                    [Select Group]
+                </span>
+            </div>
+        </div>
+
+        <!-- Center Controls: 90s Countdown Timer & Round Counter -->
+        <div class="flex flex-col items-center justify-center flex-1 mx-2">
+            <div class="flex items-center gap-2 mb-0.5">
+                <span class="text-[10px] md:text-xs font-black uppercase bg-amber-400 text-slate-950 px-3 py-0.5 rounded-full shadow">
+                    QUESTION <span id="current-round-num">1</span> / 15
+                </span>
+                <span id="score-counter" class="text-xs text-emerald-400 font-black hidden sm:inline">Score: 0 pts</span>
+            </div>
+
+            <!-- Highly Visible 90-Second Countdown Timer with Comic Sans Font -->
+            <div class="flex items-center gap-2 bg-slate-950/90 px-4 py-1 rounded-xl border-2 border-amber-400 shadow-xl">
+                <i id="stopwatch-icon" class="fa-solid fa-hourglass-half text-amber-400 text-lg animate-pulse"></i>
+                <div id="stopwatch-display" class="text-2xl md:text-3xl comic-timer text-amber-300 tracking-wider">
+                    90.0s
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Leaderboard, Pause, Audio Buttons -->
+        <div class="flex items-center gap-2 shrink-0">
+            <button onclick="openLeaderboardModal()" class="px-3 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs md:text-sm rounded-xl shadow-lg border border-amber-200 flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-trophy"></i> LEADERBOARD
+            </button>
+
+            <button id="pause-btn" onclick="togglePauseGame()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white font-black text-xs md:text-sm rounded-xl shadow border border-slate-600 flex items-center gap-1 transition">
+                <i class="fa-solid fa-pause"></i>
+            </button>
+
+            <div class="flex items-center gap-1 bg-slate-800 p-1 rounded-xl border border-slate-700">
+                <button id="bgm-toggle-btn" onclick="toggleAudioBGM()" title="Music" class="w-8 h-8 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center text-xs shadow">
+                    <i id="bgm-icon" class="fa-solid fa-music"></i>
+                </button>
+                <button id="sfx-toggle-btn" onclick="toggleAudioSFX()" title="SFX" class="w-8 h-8 rounded-lg bg-teal-600 hover:bg-teal-500 text-white flex items-center justify-center text-xs shadow">
+                    <i id="sfx-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full relative overflow-hidden solo-arena flex flex-col justify-between">
+        
+        <!-- Target Word Construction Container -->
+        <div class="z-20 p-3 max-w-2xl w-full mx-auto glass-panel mt-2 rounded-2xl shadow-2xl border border-indigo-400/30 flex flex-col items-center">
+            
+            <div class="flex items-center justify-between w-full px-2 mb-1.5">
+                <span class="font-extrabold text-amber-300 text-xs md:text-sm tracking-wide uppercase flex items-center gap-1.5">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> SPELL THE ACTION:
+                </span>
+                <span id="solo-status-badge" class="text-xs px-3 py-0.5 rounded-full bg-indigo-900/80 text-indigo-200 font-black border border-indigo-500/50">
+                    Spelling...
+                </span>
+            </div>
+
+            <!-- Multi-Line Word Slot Container (Clickable slots) -->
+            <div id="solo-multi-word-container" class="w-full min-h-[6rem] bg-slate-950/90 rounded-xl p-3 border-2 border-indigo-500/60 flex flex-col items-center justify-center shadow-inner transition-all overflow-x-auto">
+                <!-- Dynamic word slots generated here -->
+            </div>
+
+            <span class="text-[11px] text-slate-300 italic mt-1">💡 Click floating letters to spell or click filled boxes to remove!</span>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-3 mt-2 w-full justify-center">
+                <button onclick="handleBackspace()" class="px-4 py-2 bg-amber-700 hover:bg-amber-600 active:scale-95 text-xs md:text-sm font-black rounded-xl border border-amber-500 shadow flex items-center gap-1 cursor-pointer">
+                    <i class="fa-solid fa-delete-left"></i> BACK
+                </button>
+                <button onclick="handleClear()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 active:scale-95 text-xs md:text-sm font-black rounded-xl border border-slate-500 shadow flex items-center gap-1 cursor-pointer">
+                    <i class="fa-solid fa-rotate-left"></i> CLEAR
+                </button>
+                <button id="solo-submit-btn" onclick="submitWord()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-xs md:text-sm font-black text-white rounded-xl border-2 border-emerald-300 shadow-lg flex items-center gap-1.5 transition cursor-pointer">
+                    <i class="fa-solid fa-paper-plane"></i> SUBMIT
+                </button>
+            </div>
+        </div>
+
+        <!-- Flying Bubble Letter Arena Canvas -->
+        <div id="solo-arena" class="flex-1 relative overflow-hidden w-full h-full"></div>
+    </main>
+
+    
+    <!-- LANDING OVERLAY -->
+    <div id="landing-page-overlay" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="max-w-2xl w-full bg-slate-900 border-4 border-amber-400 rounded-3xl p-8 flex flex-col items-center shadow-2xl text-center relative overflow-hidden">
+            <div class="w-24 h-24 bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 text-slate-950 rounded-full flex items-center justify-center text-5xl shadow-2xl mb-4 animate-bounce">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            
+            <h1 class="text-4xl md:text-5xl font-black text-amber-400 tracking-wide uppercase mb-2 game-show-title">
+                GROUP SPELLING CHALLENGE
+            </h1>
+            <p class="text-slate-300 font-bold text-base md:text-lg mb-6 max-w-lg leading-relaxed">
+                Select Group 1 to 6! You have <span class="text-amber-300 font-black">90 seconds</span> to click floating letters and spell each action phrase!
+            </p>
+
+            <div class="flex items-center gap-4 flex-wrap justify-center">
+                <button onclick="goToGroupSelectStage()" class="px-10 py-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 active:scale-95 text-white font-black text-2xl rounded-2xl shadow-2xl transition border-4 border-emerald-200 flex items-center justify-center gap-3 cursor-pointer">
+                    <i class="fa-solid fa-users text-2xl"></i> SELECT GROUP & PLAY
+                </button>
+                <button onclick="openLeaderboardModal()" class="px-6 py-4 bg-slate-800 hover:bg-slate-700 text-amber-400 font-black text-lg rounded-2xl shadow-xl border-2 border-slate-600 flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-trophy"></i> VIEW LEADERBOARD
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GROUP SELECTION OVERLAY (Groups 1 - 6) -->
+    <div id="student-select-overlay" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4 backdrop-blur-md hidden">
+        <div class="max-w-xl w-full bg-slate-900 border-4 border-amber-400 rounded-3xl p-6 flex flex-col items-center shadow-2xl text-center">
+            
+            <h2 class="text-3xl font-black text-amber-400 uppercase tracking-wide mb-1 game-show-title flex items-center gap-2">
+                <i class="fa-solid fa-users text-amber-300"></i> SELECT GROUP (QUESTION <span id="select-round-num">1</span>/15)
+            </h2>
+            <p class="text-slate-300 font-bold text-sm mb-4">
+                Choose Group 1 - 6 to answer this question!
+            </p>
+
+            <!-- Selected Group Box -->
+            <div class="w-full bg-indigo-950/80 border-3 border-indigo-500/80 rounded-2xl p-4 flex flex-col items-center shadow-inner mb-4">
+                <span class="text-xs font-black text-indigo-300 uppercase tracking-wider mb-1">
+                    CURRENT SELECTION
+                </span>
+                <div id="student-reel-box" class="w-full h-16 bg-slate-950 rounded-xl border-2 border-amber-400 flex items-center justify-center text-3xl font-black text-yellow-300 px-4 text-center shadow-md">
+                    👥 SELECT A GROUP
+                </div>
+            </div>
+
+            <!-- Group 1 to 6 Grid Quick Selection -->
+            <div class="w-full grid grid-cols-3 gap-3 mb-6">
+                <button onclick="selectGroup('Group 1')" class="py-3 bg-slate-800 hover:bg-indigo-600 border-2 border-slate-600 hover:border-amber-400 text-amber-300 font-black text-lg rounded-xl transition shadow active:scale-95">Group 1</button>
+                <button onclick="selectGroup('Group 2')" class="py-3 bg-slate-800 hover:bg-indigo-600 border-2 border-slate-600 hover:border-amber-400 text-amber-300 font-black text-lg rounded-xl transition shadow active:scale-95">Group 2</button>
+                <button onclick="selectGroup('Group 3')" class="py-3 bg-slate-800 hover:bg-indigo-600 border-2 border-slate-600 hover:border-amber-400 text-amber-300 font-black text-lg rounded-xl transition shadow active:scale-95">Group 3</button>
+                <button onclick="selectGroup('Group 4')" class="py-3 bg-slate-800 hover:bg-indigo-600 border-2 border-slate-600 hover:border-amber-400 text-amber-300 font-black text-lg rounded-xl transition shadow active:scale-95">Group 4</button>
+                <button onclick="selectGroup('Group 5')" class="py-3 bg-slate-800 hover:bg-indigo-600 border-2 border-slate-600 hover:border-amber-400 text-amber-300 font-black text-lg rounded-xl transition shadow active:scale-95">Group 5</button>
+                <button onclick="selectGroup('Group 6')" class="py-3 bg-slate-800 hover:bg-indigo-600 border-2 border-slate-600 hover:border-amber-400 text-amber-300 font-black text-lg rounded-xl transition shadow active:scale-95">Group 6</button>
+            </div>
+
+            <!-- Spin / Start Controls -->
+            <div class="flex items-center gap-3 w-full">
+                <button id="spin-reel-btn" onclick="randomizeGroup()" class="flex-1 py-3.5 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 active:scale-95 text-slate-950 font-black text-lg rounded-2xl shadow-xl border-2 border-amber-100 flex items-center justify-center gap-2 transition cursor-pointer">
+                    <i class="fa-solid fa-dice"></i> RANDOM GROUP
+                </button>
+                <button id="start-solo-btn" onclick="confirmGroupAndStartGame()" disabled class="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-lg rounded-2xl shadow-xl border-2 border-emerald-300 flex items-center justify-center gap-2 transition opacity-50 cursor-not-allowed">
+                    <i class="fa-solid fa-play"></i> START QUESTION
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHOTO FLASH OVERLAY -->
+    <div id="picture-flash-overlay" class="fixed inset-0 bg-slate-950/95 z-50 flex flex-col items-center justify-center p-4 backdrop-blur-md hidden">
+        <div class="max-w-xl w-full bg-slate-900 border-4 border-amber-400 rounded-3xl p-5 flex flex-col items-center shadow-2xl text-center">
+            
+            <span class="text-amber-400 text-lg font-black tracking-widest uppercase mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-eye animate-bounce"></i> MEMORIZE THE ACTION PHOTO!
+            </span>
+
+            <div class="relative w-full h-64 md:h-80 rounded-2xl overflow-hidden border-4 border-slate-700 bg-slate-800 shadow-2xl flex items-center justify-center">
+                <img id="flash-picture-img" src="" alt="Action Photo" class="w-full h-full object-cover transition-transform duration-700 transform scale-105" onerror="this.src='https://placehold.co/800x600/1e293b/ffffff?text=Action+Photo'">
+                
+                <div class="absolute bottom-4 right-4 bg-amber-400 text-slate-950 font-black text-4xl w-16 h-16 rounded-full flex items-center justify-center shadow-2xl border-4 border-slate-900 animate-pulse" id="picture-countdown-num">
+                    3
+                </div>
+            </div>
+
+            <p class="text-slate-300 font-bold text-sm md:text-base mt-3">
+                Spelling begins in <span id="countdown-subtext" class="text-amber-300 font-black">3 seconds</span>!
+            </p>
+        </div>
+    </div>
+
+    <!-- PAUSE MODAL -->
+    <div id="pause-modal-overlay" class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center p-4 backdrop-blur-md hidden">
+        <div class="max-w-md w-full bg-slate-900 border-4 border-amber-400 rounded-3xl p-6 flex flex-col items-center shadow-2xl text-center">
+            <h2 class="text-3xl font-black text-amber-400 uppercase mb-2">GAME PAUSED</h2>
+            <p class="text-slate-300 font-bold mb-6">Take a breath! Click below to resume spelling.</p>
+            <button onclick="togglePauseGame()" class="px-8 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xl rounded-2xl shadow-xl flex items-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-play"></i> RESUME GAME
+            </button>
+        </div>
+    </div>
+
+    <!-- POST-ROUND RESULTS MODAL (Shows Score, Time Finish & "Go to Next Question") -->
+    <div id="item-complete-modal-overlay" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4 backdrop-blur-md hidden">
+        <div class="max-w-lg w-full bg-slate-900 border-4 border-amber-400 rounded-3xl p-6 flex flex-col items-center shadow-2xl text-center relative overflow-hidden">
+            <div id="round-result-icon-box" class="w-20 h-20 bg-gradient-to-tr from-emerald-400 to-teal-500 text-slate-950 rounded-full flex items-center justify-center text-4xl shadow-2xl mb-3 animate-bounce">
+                <i id="round-result-icon" class="fa-solid fa-circle-check"></i>
+            </div>
+            
+            <span id="round-result-status-title" class="text-xs font-black text-emerald-400 tracking-widest uppercase mb-1">ROUND COMPLETED!</span>
+            <h2 id="item-complete-student" class="text-2xl font-black text-amber-300 mb-1">[Group Name]</h2>
+            <p class="text-slate-300 text-sm font-bold mb-3">Target Phrase: <span id="item-complete-word-text" class="text-white font-extrabold uppercase">"PLAY VIDEO GAMES"</span></p>
+
+            <!-- Displays Score and Exact Completion Time for the Round -->
+            <div class="w-full bg-indigo-950/80 border-2 border-indigo-500/80 rounded-2xl p-4 mb-5 flex flex-col gap-2 items-center shadow-inner">
+                <div class="flex items-center justify-between w-full border-b border-indigo-800/80 pb-2">
+                    <span class="text-xs text-indigo-300 font-extrabold uppercase">⏱️ TIME FINISH:</span>
+                    <span id="item-complete-time" class="text-2xl comic-timer font-black text-yellow-300 tracking-widest">25.4s</span>
+                </div>
+                <div class="flex items-center justify-between w-full pt-1">
+                    <span class="text-xs text-indigo-300 font-extrabold uppercase">⭐ TOTAL SCORE:</span>
+                    <span id="item-complete-score" class="text-2xl font-black text-emerald-400">10 pts</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3 w-full">
+                <!-- Direct Option: Proceed to Next Question -->
+                <button onclick="proceedToNextQuestionDirectly()" class="w-full py-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 active:scale-95 text-white font-black text-xl rounded-2xl shadow-xl border-2 border-emerald-200 flex items-center justify-center gap-2 transition cursor-pointer">
+                    <i class="fa-solid fa-circle-arrow-right text-2xl"></i> GO TO NEXT QUESTION
+                </button>
+                
+                <button onclick="proceedToGroupSelectForNext()" class="w-full py-2.5 bg-indigo-900 hover:bg-indigo-800 text-yellow-300 font-extrabold text-sm rounded-xl border border-indigo-500 flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-users"></i> CHANGE GROUP FIRST
+                </button>
+
+                <button onclick="openLeaderboardModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 font-extrabold text-xs rounded-xl border border-slate-600 flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-trophy"></i> VIEW LEADERBOARD
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEADERBOARD MODAL -->
+    <div id="leaderboard-modal-overlay" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4 backdrop-blur-md hidden">
+        <div class="max-w-2xl w-full bg-slate-900 border-4 border-amber-400 rounded-3xl p-6 flex flex-col items-center shadow-2xl relative max-h-[90vh] overflow-hidden">
+            
+            <button onclick="closeLeaderboardModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center font-bold text-lg cursor-pointer">
+                ✕
+            </button>
+
+            <div class="flex items-center gap-3 mb-2">
+                <i class="fa-solid fa-trophy text-amber-400 text-3xl"></i>
+                <h2 class="text-3xl font-black text-amber-400 uppercase tracking-wide game-show-title">
+                    GROUP LEADERBOARD
+                </h2>
+            </div>
+            <p class="text-slate-300 text-xs md:text-sm font-bold mb-4 text-center">
+                Fastest completion time for each question!
+            </p>
+
+            <!-- Leaderboard Table -->
+            <div class="w-full bg-slate-950/90 rounded-2xl border-2 border-slate-700 overflow-y-auto flex-1 max-h-[50vh] p-2">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-amber-300 text-xs uppercase tracking-wider">
+                            <th class="p-3 text-center">Rank</th>
+                            <th class="p-3">Group</th>
+                            <th class="p-3 text-center">Question #</th>
+                            <th class="p-3 text-center">Time Taken</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body-table" class="text-sm font-bold divide-y divide-slate-800">
+                        <!-- Dynamic rows inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-5 flex items-center gap-3 w-full justify-center">
+                <button onclick="clearLeaderboardData()" class="px-4 py-2 bg-rose-900/80 hover:bg-rose-800 text-rose-200 font-bold text-xs rounded-xl border border-rose-600 cursor-pointer">
+                    <i class="fa-solid fa-trash"></i> Clear Leaderboard
+                </button>
+                <button onclick="closeLeaderboardModal()" class="px-8 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-base rounded-xl border border-amber-200 shadow cursor-pointer">
+                    CLOSE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHALLENGE COMPLETED OVERLAY -->
+    <div id="solo-finish-overlay" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4 backdrop-blur-md hidden">
+        <div class="max-w-lg w-full bg-slate-900 border-4 border-amber-400 rounded-3xl p-6 flex flex-col items-center shadow-2xl text-center relative overflow-hidden">
+            
+            <div class="w-24 h-24 bg-gradient-to-tr from-amber-400 to-yellow-500 text-slate-950 rounded-full flex items-center justify-center text-5xl shadow-2xl mb-3 animate-bounce">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            
+            <h1 class="text-3xl font-black text-amber-400 tracking-wider uppercase mb-1">
+                ALL QUESTIONS COMPLETED!
+            </h1>
+
+            <div class="w-full bg-indigo-950/80 border-2 border-indigo-500/80 rounded-2xl p-4 my-4 flex flex-col items-center">
+                <span class="text-xs text-indigo-300 font-bold uppercase tracking-wider mb-1">TOTAL FINAL SCORE</span>
+                <span id="final-finish-time" class="text-4xl font-black text-yellow-300 tracking-widest drop-shadow">
+                    0 pts
+                </span>
+            </div>
+
+            <div class="flex flex-col gap-3 w-full mt-2">
+                <button onclick="openLeaderboardModal()" class="w-full py-3.5 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-lg rounded-2xl shadow-xl border-2 border-amber-200 flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-trophy"></i> VIEW LEADERBOARD
+                </button>
+                <button onclick="resetGameToStart()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-base rounded-2xl shadow border border-indigo-300 flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-rotate-right"></i> PLAY AGAIN
+                </button>
+            </div>
+
+            <!-- Confetti Canvas -->
+            <canvas id="confetti-canvas" class="absolute inset-0 pointer-events-none w-full h-full z-10"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Set of Groups 1-6
+        const GROUPS_LIST = ['Group 1', 'Group 2', 'Group 3', 'Group 4', 'Group 5', 'Group 6'];
+
+        // Same set of 15 Action Vocabulary Questions
+        const QUESTIONS = [
+            { id: 1, word: "play video games", img: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=800&q=80" },
+            { id: 2, word: "go shopping", img: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80" },
+            { id: 3, word: "watch TV", img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&w=800&q=80" },
+            { id: 4, word: "play basketball", img: "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=800&q=80" },
+            { id: 5, word: "go camping", img: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80" },
+            { id: 6, word: "visit my friend", img: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80" },
+            { id: 7, word: "ride a bike", img: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=80" },
+            { id: 8, word: "watch TV", img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&w=800&q=80" },
+            { id: 9, word: "play video games", img: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=800&q=80" },
+            { id: 10, word: "play basketball", img: "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=800&q=80" },
+            { id: 11, word: "visit my friend", img: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80" },
+            { id: 12, word: "ride a bike", img: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=80" },
+            { id: 13, word: "watch TV", img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&w=800&q=80" },
+            { id: 14, word: "go camping", img: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80" },
+            { id: 15, word: "visit my friend", img: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80" }
+        ];
+
+        let audioCtx = null;
+        let isBgmMuted = false;
+        let isSfxMuted = false;
+        let bgmTimer = null;
+
+        let isGamePaused = false;
+        let activeStudent = "Group 1";
+        let currentRound = 0;
+        let soloScore = 0;
+
+        // 90 Seconds Countdown Timer Variables
+        const TOTAL_ROUND_TIME = 90; // 90 seconds timer
+        let timeRemaining = TOTAL_ROUND_TIME;
+        let timerInterval = null;
+        let isRoundActive = false;
+
+        let userInputs = [];
+        let activeLetters = [];
+        let pictureTimerInterval = null;
+        let animationFrameId = null;
+
+        const BUBBLE_COLORS = [
+            '#ef4444', '#f97316', '#f59e0b', '#10b981', 
+            '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899'
+        ];
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playPopSound() {
+            if (isSfxMuted) return;
+            initAudio();
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const now = audioCtx.currentTime;
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(320, now);
+                osc.frequency.exponentialRampToValueAtTime(950, now + 0.07);
+
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.07);
+            } catch(e){}
+        }
+
+        function playWheelTickSound() {
+            if (isSfxMuted) return;
+            initAudio();
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const now = audioCtx.currentTime;
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(650 + Math.random() * 250, now);
+
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.035);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.035);
+            } catch(e){}
+        }
+
+        function playGameShowFanfare() {
+            if (isSfxMuted) return;
+            initAudio();
+            try {
+                const now = audioCtx.currentTime;
+                const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    const startTime = now + idx * 0.1;
+                    
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, startTime);
+                    gain.gain.setValueAtTime(0.3, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.35);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(startTime);
+                    osc.stop(startTime + 0.35);
+                });
+            } catch(e){}
+        }
+
+        function playBuzzerSound() {
+            if (isSfxMuted) return;
+            initAudio();
+            try {
+                const now = audioCtx.currentTime;
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc1.type = 'sawtooth';
+                osc2.type = 'sawtooth';
+                osc1.frequency.setValueAtTime(160, now);
+                osc2.frequency.setValueAtTime(168, now);
+
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
+
+                osc1.connect(gain);
+                osc2.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc1.start(now);
+                osc2.start(now);
+                osc1.stop(now + 0.28);
+                osc2.stop(now + 0.28);
+            } catch(e){}
+        }
+
+        function startBgmLoop() {
+            if (bgmTimer) clearInterval(bgmTimer);
+            let noteIdx = 0;
+            const bgmNotes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 293.66, 349.23, 440.00, 587.33, 440.00, 349.23];
+            
+            bgmTimer = setInterval(() => {
+                if (isBgmMuted || isGamePaused) return;
+                initAudio();
+                try {
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(bgmNotes[noteIdx % bgmNotes.length], now);
+
+                    gain.gain.setValueAtTime(0.03, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.22);
+
+                    noteIdx++;
+                } catch(e){}
+            }, 280);
+        }
+
+        function toggleAudioBGM() {
+            isBgmMuted = !isBgmMuted;
+            const btnIcon = document.getElementById('bgm-icon');
+            btnIcon.className = isBgmMuted ? "fa-solid fa-music-slash text-slate-400" : "fa-solid fa-music text-white";
+            if (!isBgmMuted) initAudio();
+        }
+
+        function toggleAudioSFX() {
+            isSfxMuted = !isSfxMuted;
+            const btnIcon = document.getElementById('sfx-icon');
+            btnIcon.className = isSfxMuted ? "fa-solid fa-volume-xmark text-slate-400" : "fa-solid fa-volume-high text-white";
+            if (!isSfxMuted) initAudio();
+        }
+
+        class FlyingLetter {
+            constructor(char, arenaWidth, arenaHeight) {
+                this.char = char;
+                this.radius = Math.floor(Math.random() * 6) + 42;
+                
+                this.x = Math.random() * (arenaWidth - this.radius * 2) + this.radius;
+                this.y = Math.random() * (arenaHeight - this.radius * 2) + this.radius;
+
+                const speed = 0.5 + Math.random() * 0.5;
+                const angle = Math.random() * Math.PI * 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+
+                this.color = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
+
+                this.element = document.createElement('div');
+                this.element.className = 'bubble-letter';
+                this.element.style.width = (this.radius * 2) + 'px';
+                this.element.style.height = (this.radius * 2) + 'px';
+                this.element.style.backgroundColor = this.color;
+                this.element.style.fontSize = (this.radius * 1.1) + 'px';
+                this.element.innerText = this.char;
+
+                // Clickable letter handler
+                this.element.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (isGamePaused || !isRoundActive) return;
+                    onLetterClick(this.char, this);
+                });
+
+                const arenaElem = document.getElementById('solo-arena');
+                arenaElem.appendChild(this.element);
+
+                this.updatePosition();
+            }
+
+            update(arenaWidth, arenaHeight) {
+                if (isGamePaused) return;
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x - this.radius <= 0) {
+                    this.x = this.radius;
+                    this.vx *= -1;
+                } else if (this.x + this.radius >= arenaWidth) {
+                    this.x = arenaWidth - this.radius;
+                    this.vx *= -1;
+                }
+
+                if (this.y - this.radius <= 0) {
+                    this.y = this.radius;
+                    this.vy *= -1;
+                } else if (this.y + this.radius >= arenaHeight) {
+                    this.y = arenaHeight - this.radius;
+                    this.vy *= -1;
+                }
+
+                this.updatePosition();
+            }
+
+            updatePosition() {
+                this.element.style.transform = `translate3d(${this.x - this.radius}px, ${this.y - this.radius}px, 0)`;
+            }
+
+            destroy() {
+                if (this.element && this.element.parentNode) {
+                    this.element.parentNode.removeChild(this.element);
+                }
+            }
+        }
+
+        // 90-Second Countdown Timer Logic
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimerUI, 100);
+        }
+
+        function pauseTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+        }
+
+        function resetTimer() {
+            timeRemaining = TOTAL_ROUND_TIME;
+            if (timerInterval) clearInterval(timerInterval);
+            updateTimerDisplayUI();
+        }
+
+        function updateTimerUI() {
+            if (isRoundActive && !isGamePaused) {
+                timeRemaining -= 0.1;
+                if (timeRemaining <= 0) {
+                    timeRemaining = 0;
+                    updateTimerDisplayUI();
+                    handleTimeOut();
+                    return;
+                }
+                updateTimerDisplayUI();
+            }
+        }
+
+        function updateTimerDisplayUI() {
+            const display = document.getElementById('stopwatch-display');
+            if (display) {
+                display.innerText = `${timeRemaining.toFixed(1)}s`;
+                if (timeRemaining <= 15) {
+                    display.classList.add('text-rose-400');
+                    display.classList.remove('text-amber-300');
+                } else {
+                    display.classList.remove('text-rose-400');
+                    display.classList.add('text-amber-300');
+                }
+            }
+        }
+
+        function handleTimeOut() {
+            isRoundActive = false;
+            pauseTimer();
+            playBuzzerSound();
+
+            const container = document.getElementById('solo-multi-word-container');
+            const badge = document.getElementById('solo-status-badge');
+            container.classList.add('shake-error');
+            badge.className = "text-xs px-3 py-0.5 rounded-full bg-rose-900 text-rose-200 font-black border border-rose-500";
+            badge.innerText = "⏰ TIME EXPIRED!";
+
+            showPostRoundResults(false, "90.0s (Time Out)");
+        }
+
+        function togglePauseGame() {
+            isGamePaused = !isGamePaused;
+            const pauseOverlay = document.getElementById('pause-modal-overlay');
+            const pauseBtn = document.getElementById('pause-btn');
+
+            if (isGamePaused) {
+                pauseOverlay.classList.remove('hidden');
+                pauseBtn.innerHTML = `<i class="fa-solid fa-play"></i>`;
+                pauseTimer();
+            } else {
+                pauseOverlay.classList.add('hidden');
+                pauseBtn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+                if (isRoundActive) startTimer();
+            }
+        }
+
+        function goToGroupSelectStage() {
+            initAudio();
+            startBgmLoop();
+            currentRound = 0;
+            soloScore = 0;
+            document.getElementById('select-round-num').innerText = currentRound + 1;
+            document.getElementById('landing-page-overlay').classList.add('hidden');
+            document.getElementById('student-select-overlay').classList.remove('hidden');
+        }
+
+        function selectGroup(groupName) {
+            activeStudent = groupName;
+            document.getElementById('student-reel-box').innerText = groupName;
+            const startBtn = document.getElementById('start-solo-btn');
+            startBtn.disabled = false;
+            startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        function randomizeGroup() {
+            initAudio();
+            const reelBox = document.getElementById('student-reel-box');
+            let ticks = 0;
+            const spinInterval = setInterval(() => {
+                ticks++;
+                playWheelTickSound();
+                const randG = GROUPS_LIST[Math.floor(Math.random() * GROUPS_LIST.length)];
+                reelBox.innerText = randG;
+                if (ticks >= 15) {
+                    clearInterval(spinInterval);
+                    selectGroup(randG);
+                }
+            }, 70);
+        }
+
+        function confirmGroupAndStartGame() {
+            if (!activeStudent) return;
+            
+            document.getElementById('student-select-overlay').classList.add('hidden');
+            document.getElementById('header-student-name').innerText = activeStudent;
+
+            resetTimer();
+            startPictureFlashPhase();
+        }
+
+        function startPictureFlashPhase() {
+            userInputs = [];
+            setupMultiWordSlots();
+
+            const container = document.getElementById('solo-multi-word-container');
+            const badge = document.getElementById('solo-status-badge');
+            container.classList.remove('win-glow', 'shake-error');
+            badge.className = "text-xs px-3 py-0.5 rounded-full bg-indigo-900/80 text-indigo-200 font-black border border-indigo-500/50";
+            badge.innerText = "Spelling...";
+
+            document.getElementById('current-round-num').innerText = currentRound + 1;
+
+            const overlay = document.getElementById('picture-flash-overlay');
+            const img = document.getElementById('flash-picture-img');
+            const cdNum = document.getElementById('picture-countdown-num');
+            const cdSub = document.getElementById('countdown-subtext');
+
+            img.src = QUESTIONS[currentRound].img;
+            overlay.classList.remove('hidden');
+
+            let countdown = 3;
+            cdNum.innerText = countdown;
+            cdSub.innerText = `${countdown} seconds`;
+
+            if (pictureTimerInterval) clearInterval(pictureTimerInterval);
+
+            pictureTimerInterval = setInterval(() => {
+                if (isGamePaused) return;
+
+                countdown--;
+                if (countdown > 0) {
+                    cdNum.innerText = countdown;
+                    cdSub.innerText = `${countdown} seconds`;
+                } else {
+                    clearInterval(pictureTimerInterval);
+                    overlay.classList.add('hidden');
+                    startSpellingPhase();
+                }
+            }, 1000);
+        }
+
+        function getTargetWordsArray() {
+            const rawPhrase = QUESTIONS[currentRound].word.trim();
+            return rawPhrase.split(/\s+/);
+        }
+
+        function setupMultiWordSlots() {
+            const container = document.getElementById('solo-multi-word-container');
+            container.innerHTML = '';
+
+            const words = getTargetWordsArray();
+
+            words.forEach((wordStr, wordIdx) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'word-row';
+                rowDiv.dataset.wordIndex = wordIdx;
+
+                for (let cIdx = 0; cIdx < wordStr.length; cIdx++) {
+                    const slotSpan = document.createElement('span');
+                    slotSpan.className = 'letter-slot';
+                    slotSpan.id = `w${wordIdx}-c${cIdx}`;
+                    slotSpan.innerText = '';
+                    rowDiv.appendChild(slotSpan);
+                }
+                container.appendChild(rowDiv);
+            });
+        }
+
+        function generateLetterPool(targetPhrase) {
+            const cleanTarget = targetPhrase.replace(/\s+/g, '');
+            const requiredChars = cleanTarget.split('');
+
+            const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+            const distractors = [];
+            for (let i = 0; i < 7; i++) {
+                distractors.push(alphabet[Math.floor(Math.random() * alphabet.length)]);
+            }
+
+            const pool = [...requiredChars, ...distractors];
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            return pool;
+        }
+
+        function populateArena() {
+            clearArena();
+
+            const targetWord = QUESTIONS[currentRound].word;
+            const letterPool = generateLetterPool(targetWord);
+            const arenaElem = document.getElementById('solo-arena');
+            const rect = arenaElem.getBoundingClientRect();
+            
+            const width = rect.width || 700;
+            const height = rect.height || 450;
+
+            letterPool.forEach(char => {
+                const flyingObj = new FlyingLetter(char, width, height);
+                activeLetters.push(flyingObj);
+            });
+        }
+
+        function clearArena() {
+            activeLetters.forEach(l => l.destroy());
+            activeLetters = [];
+        }
+
+        function animateLetters() {
+            const arena = document.getElementById('solo-arena').getBoundingClientRect();
+            activeLetters.forEach(l => l.update(arena.width, arena.height));
+            animationFrameId = requestAnimationFrame(animateLetters);
+        }
+
+        function startSpellingPhase() {
+            isRoundActive = true;
+            resetTimer();
+            populateArena();
+
+            if (!animationFrameId) {
+                animateLetters();
+            }
+
+            startTimer();
+        }
+
+        function onLetterClick(char, flyingLetterObj) {
+            if (!isRoundActive || isGamePaused) return;
+
+            playPopSound();
+
+            const targetWords = getTargetWordsArray();
+            const totalMaxLetters = targetWords.join('').length;
+
+            if (userInputs.length < totalMaxLetters) {
+                userInputs.push(char);
+                renderFilledSlots();
+                
+                if (userInputs.length === totalMaxLetters) {
+                    checkWordAndProceed();
+                }
+            }
+
+            // Re-spawn bubble position upon click
+            const arenaElem = document.getElementById('solo-arena');
+            const rect = arenaElem.getBoundingClientRect();
+            flyingLetterObj.x = Math.random() * (rect.width - 80) + 40;
+            flyingLetterObj.y = Math.random() * (rect.height - 80) + 40;
+        }
+
+        function handleBackspace() {
+            if (!isRoundActive || isGamePaused) return;
+            playPopSound();
+
+            if (userInputs.length > 0) {
+                userInputs.pop();
+                renderFilledSlots();
+            }
+        }
+
+        function handleClear() {
+            if (!isRoundActive || isGamePaused) return;
+            playPopSound();
+
+            userInputs = [];
+            renderFilledSlots();
+        }
+
+        function renderFilledSlots() {
+            const words = getTargetWordsArray();
+            let inputIdx = 0;
+
+            words.forEach((wordStr, wIdx) => {
+                for (let cIdx = 0; cIdx < wordStr.length; cIdx++) {
+                    const slot = document.getElementById(`w${wIdx}-c${cIdx}`);
+                    if (slot) {
+                        const currentPos = inputIdx;
+                        
+                        if (currentPos < userInputs.length) {
+                            slot.innerText = userInputs[currentPos];
+                            slot.classList.add('filled');
+                            
+                            slot.onclick = (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (!isRoundActive || isGamePaused) return;
+                                removeLetterAtIndex(currentPos);
+                            };
+                        } else {
+                            slot.innerText = '';
+                            slot.classList.remove('filled');
+                            slot.onclick = null;
+                        }
+                    }
+                    inputIdx++;
+                }
+            });
+        }
+
+        function removeLetterAtIndex(index) {
+            playPopSound();
+            if (index >= 0 && index < userInputs.length) {
+                userInputs.splice(index, 1);
+                renderFilledSlots();
+            }
+        }
+
+        function submitWord() {
+            if (!isRoundActive || isGamePaused) return;
+            checkWordAndProceed();
+        }
+
+        function checkWordAndProceed() {
+            const targetWords = getTargetWordsArray();
+            const targetFullString = targetWords.join('');
+            const userFullString = userInputs.join('');
+
+            const container = document.getElementById('solo-multi-word-container');
+            const badge = document.getElementById('solo-status-badge');
+
+            if (userFullString.toLowerCase() === targetFullString.toLowerCase()) {
+                playGameShowFanfare();
+                isRoundActive = false;
+                pauseTimer();
+
+                const timeSpent = (TOTAL_ROUND_TIME - timeRemaining).toFixed(1);
+
+                container.classList.remove('shake-error');
+                container.classList.add('win-glow');
+                badge.className = "text-xs px-3 py-0.5 rounded-full bg-emerald-800 text-emerald-200 font-black border border-emerald-400";
+                badge.innerText = "✓ CORRECT!";
+
+                soloScore += 10;
+                document.getElementById('score-counter').innerText = `Score: ${soloScore} pts`;
+
+                // Save to Leaderboard
+                saveLeaderboardScore(activeStudent, currentRound + 1, QUESTIONS[currentRound].word, parseFloat(timeSpent), `${timeSpent}s`);
+
+                setTimeout(() => {
+                    showPostRoundResults(true, `${timeSpent}s`);
+                }, 600);
+
+            } else {
+                playBuzzerSound();
+                container.classList.remove('shake-error');
+                void container.offsetWidth;
+                container.classList.add('shake-error');
+                badge.className = "text-xs px-3 py-0.5 rounded-full bg-rose-900 text-rose-200 font-black border border-rose-500";
+                badge.innerText = "X TRY AGAIN!";
+            }
+        }
+
+        function showPostRoundResults(isWin, formattedTimeStr) {
+            document.getElementById('item-complete-student').innerText = activeStudent;
+            document.getElementById('item-complete-word-text').innerText = `"${QUESTIONS[currentRound].word}"`;
+            document.getElementById('item-complete-time').innerText = formattedTimeStr;
+            document.getElementById('item-complete-score').innerText = `${soloScore} pts`;
+
+            const iconBox = document.getElementById('round-result-icon-box');
+            const icon = document.getElementById('round-result-icon');
+            const title = document.getElementById('round-result-status-title');
+
+            if (isWin) {
+                iconBox.className = "w-20 h-20 bg-gradient-to-tr from-emerald-400 to-teal-500 text-slate-950 rounded-full flex items-center justify-center text-4xl shadow-2xl mb-3 animate-bounce";
+                icon.className = "fa-solid fa-circle-check";
+                title.innerText = "QUESTION COMPLETED!";
+                title.className = "text-xs font-black text-emerald-400 tracking-widest uppercase mb-1";
+            } else {
+                iconBox.className = "w-20 h-20 bg-gradient-to-tr from-rose-500 to-red-600 text-white rounded-full flex items-center justify-center text-4xl shadow-2xl mb-3";
+                icon.className = "fa-solid fa-clock";
+                title.innerText = "TIME OUT!";
+                title.className = "text-xs font-black text-rose-400 tracking-widest uppercase mb-1";
+            }
+
+            document.getElementById('item-complete-modal-overlay').classList.remove('hidden');
+        }
+
+        // Direct option: proceed directly to the next question
+        function proceedToNextQuestionDirectly() {
+            document.getElementById('item-complete-modal-overlay').classList.add('hidden');
+            currentRound++;
+
+            if (currentRound >= QUESTIONS.length) {
+                finishGameChallenge();
+            } else {
+                resetTimer();
+                startPictureFlashPhase();
+            }
+        }
+
+        // Alternative option: change group before proceeding
+        function proceedToGroupSelectForNext() {
+            document.getElementById('item-complete-modal-overlay').classList.add('hidden');
+            currentRound++;
+
+            if (currentRound >= QUESTIONS.length) {
+                finishGameChallenge();
+            } else {
+                document.getElementById('select-round-num').innerText = currentRound + 1;
+                document.getElementById('student-select-overlay').classList.remove('hidden');
+            }
+        }
+
+        function finishGameChallenge() {
+            isRoundActive = false;
+            pauseTimer();
+            clearArena();
+
+            document.getElementById('final-finish-time').innerText = `${soloScore} pts`;
+            document.getElementById('solo-finish-overlay').classList.remove('hidden');
+
+            playGameShowFanfare();
+            launchConfetti();
+        }
+
+        function getLeaderboardData() {
+            try {
+                const data = localStorage.getItem('spelling_group_leaderboard');
+                return data ? JSON.parse(data) : [];
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function saveLeaderboardScore(groupName, wordNum, wordText, timeSecs, formattedTime) {
+            let data = getLeaderboardData();
+            
+            data.push({ 
+                name: groupName, 
+                wordNum: wordNum, 
+                wordText: wordText, 
+                timeSecs: timeSecs, 
+                formattedTime: formattedTime, 
+                date: new Date().toLocaleDateString() 
+            });
+
+            data.sort((a, b) => a.timeSecs - b.timeSecs);
+
+            try {
+                localStorage.setItem('spelling_group_leaderboard', JSON.stringify(data));
+            } catch(e){}
+        }
+
+        function openLeaderboardModal() {
+            const modal = document.getElementById('leaderboard-modal-overlay');
+            const tbody = document.getElementById('leaderboard-body-table');
+            const data = getLeaderboardData();
+
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500 italic">No recorded finishes yet. Play a round!</td></tr>`;
+            } else {
+                data.forEach((item, idx) => {
+                    const row = document.createElement('tr');
+                    row.className = idx === 0 ? "bg-amber-500/10 text-amber-300 font-black" : "hover:bg-slate-800/50 text-slate-200";
+
+                    let rankBadge = `${idx + 1}`;
+                    if (idx === 0) rankBadge = '🥇 1st';
+                    else if (idx === 1) rankBadge = '🥈 2nd';
+                    else if (idx === 2) rankBadge = '🥉 3rd';
+
+                    row.innerHTML = `
+                        <td class="p-3 text-center font-extrabold">${rankBadge}</td>
+                        <td class="p-3 text-yellow-300 font-extrabold">${item.name}</td>
+                        <td class="p-3 text-center text-slate-300 font-bold">Q${item.wordNum}</td>
+                        <td class="p-3 text-center comic-timer text-amber-400">${item.formattedTime}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeLeaderboardModal() {
+            document.getElementById('leaderboard-modal-overlay').classList.add('hidden');
+        }
+
+        function clearLeaderboardData() {
+            if (confirm("Clear all group highscores?")) {
+                localStorage.removeItem('spelling_group_leaderboard');
+                openLeaderboardModal();
+            }
+        }
+
+        function resetGameToStart() {
+            document.getElementById('solo-finish-overlay').classList.add('hidden');
+            document.getElementById('student-select-overlay').classList.remove('hidden');
+            currentRound = 0;
+            soloScore = 0;
+            activeStudent = "Group 1";
+            document.getElementById('student-reel-box').innerText = "👥 SELECT A GROUP";
+            document.getElementById('select-round-num').innerText = currentRound + 1;
+        }
+
+        function launchConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            const particles = [];
+            const colors = ['#ef4444', '#3b82f6', '#f59e0b', '#10b981', '#8b5cf6', '#ec4899'];
+
+            for (let i = 0; i < 120; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 16,
+                    vy: (Math.random() - 0.5) * 16 - 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 8 + 4,
+                    alpha: 1
+                });
+            }
+
+            function drawConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.16;
+                    p.alpha -= 0.008;
+
+                    if (p.alpha > 0) {
+                        alive = true;
+                        ctx.globalAlpha = p.alpha;
+                        ctx.fillStyle = p.color;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                });
+
+                if (alive) {
+                    requestAnimationFrame(drawConfetti);
+                }
+            }
+            drawConfetti();
+        }
+
+        window.addEventListener('resize', () => {
+            const arena = document.getElementById('solo-arena').getBoundingClientRect();
+            activeLetters.forEach(l => {
+                l.x = Math.min(l.x, arena.width - 40);
+                l.y = Math.min(l.y, arena.height - 40);
+            });
+        });
+    </script>
+</body>
+</html>
