@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Plate (我的餐盤) - Cute Nutrition Game</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter & Marcellus / Bubblegum Pop -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Mochiy+Pop+One&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Fredoka', 'Noto Sans TC', 'sans-serif'],
+                        pop: ['Mochiy Pop One', 'Fredoka', 'sans-serif']
+                    },
+                    colors: {
+                        fruit: { DEFAULT: '#FF5252', dark: '#E53935', light: '#FFEBEE' },
+                        veggies: { DEFAULT: '#4CAF50', dark: '#2E7D32', light: '#E8F5E9' },
+                        grains: { DEFAULT: '#FF9800', dark: '#F57C00', light: '#FFF3E0' },
+                        protein: { DEFAULT: '#9C27B0', dark: '#7B1FA2', light: '#F3E5F5' },
+                        dairy: { DEFAULT: '#03A9F4', dark: '#0288D1', light: '#E1F5FE' },
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+            background-color: #ffeedd;
+            /* Gingham Picnic / Table Setting Background Pattern */
+            background-image: 
+                linear-gradient(90deg, rgba(255, 182, 193, 0.4) 50%, transparent 50%),
+                linear-gradient(rgba(255, 182, 193, 0.4) 50%, transparent 50%);
+            background-size: 40px 40px;
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        /* Warm Wooden Table Mat Outer Frame */
+        .table-mat {
+            background: #fff8f0;
+            border: 12px solid #f3d0ab;
+            box-shadow: 0 15px 35px rgba(180, 100, 60, 0.18), inset 0 0 20px rgba(0,0,0,0.03);
+            border-radius: 40px;
+        }
+
+        /* Responsive Circular Plate Container */
+        .plate-container {
+            position: relative;
+            width: 100%;
+            max-width: 440px;
+            aspect-ratio: 1 / 1;
+            margin: 0 auto;
+        }
+
+        /* Main Circular Plate Shadow & Outer Rim */
+        .plate-main {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 14px solid #f0ede6;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.12), inset 0 0 15px rgba(0,0,0,0.06);
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* Exterior Attached Top-Right Dairy Cup */
+        .dairy-cup-container {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            width: 28%;
+            height: 28%;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 8px solid #f0ede6;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+            z-index: 20;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .dairy-cup-container.drop-hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 25px rgba(3, 169, 244, 0.8);
+            border-color: #03A9F4;
+        }
+
+        /* Plate Split Sector Columns */
+        .plate-half {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Left Split: Fruits (~38%) & Veggies (~62%) */
+        .sector-fruit {
+            height: 38%;
+            background-color: #FFEBEE;
+            border-bottom: 3px dashed #FFCDD2;
+            position: relative;
+            transition: all 0.25s ease;
+        }
+
+        .sector-veggies {
+            height: 62%;
+            background-color: #E8F5E9;
+            position: relative;
+            transition: all 0.25s ease;
+        }
+
+        /* Right Split: Grains (50%) & Protein (50%) */
+        .sector-grains {
+            height: 50%;
+            background-color: #FFF3E0;
+            border-bottom: 3px dashed #FFE0B2;
+            position: relative;
+            transition: all 0.25s ease;
+        }
+
+        .sector-protein {
+            height: 50%;
+            background-color: #F3E5F5;
+            position: relative;
+            transition: all 0.25s ease;
+        }
+
+        /* Plate Center Divider Line */
+        .plate-divider-v {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #e2ddd5;
+            z-index: 10;
+        }
+
+        /* Drop Target Hover Glow Effect */
+        .sector-drop-zone.drop-hover {
+            filter: brightness(0.93);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.15);
+            outline: 4px dashed #FF9800;
+            outline-offset: -8px;
+        }
+
+        /* Badge Styling inside Plate Sectors */
+        .sector-badge {
+            pointer-events: none; /* CRITICAL: Allows drag over underlying drop zone */
+            user-select: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(4px);
+            padding: 4px 10px;
+            border-radius: 999px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 12;
+        }
+
+        /* Food Card Styling */
+        .food-card {
+            touch-action: none;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+            cursor: grab;
+        }
+
+        .food-card:active {
+            cursor: grabbing;
+            transform: scale(1.08);
+        }
+
+        /* Custom Shake Animation for Incorrect Drop */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .shake-animation {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* Floating Touch Drag Ghost Element */
+        #drag-ghost {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%) scale(1.15);
+            opacity: 0.92;
+            transition: opacity 0.15s ease;
+        }
+
+        /* Cute Smiling Face Plate Overlay */
+        .smile-face-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 15;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.85;
+        }
+
+        .smile-eye {
+            width: 24px;
+            height: 24px;
+            background: #333;
+            border-radius: 50%;
+            position: relative;
+        }
+        .smile-eye::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 5px;
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+        }
+
+        .smile-cheek {
+            width: 28px;
+            height: 16px;
+            background: #ff8a80;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        .smile-mouth {
+            width: 60px;
+            height: 30px;
+            border-bottom: 6px solid #333;
+            border-radius: 0 0 50px 50px;
+        }
+
+        /* Placed item on plate */
+        .placed-food-item {
+            position: absolute;
+            z-index: 14;
+            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-4 md:p-6 text-slate-800">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header Banner -->
+        <header class="flex flex-col md:flex-row items-center justify-between gap-4 bg-white/90 backdrop-blur-md rounded-3xl p-4 sm:p-5 shadow-lg border-2 border-amber-100 mb-6">
+            <div class="flex items-center gap-3 text-center md:text-left">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-rose-400 flex items-center justify-center text-2xl shadow-md text-white font-black">
+                    🍱
+                </div>
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-black tracking-wide text-slate-800 font-pop">
+                        My Plate <span class="text-rose-500 font-sans">(我的餐盤)</span>
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-500 font-medium">
+                        台灣衛生福利部「我的餐盤」均衡飲食學習遊戲
+                    </p>
+                </div>
+            </div>
+
+            <!-- Mode Controls & Action Buttons -->
+            <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                <div class="bg-amber-100/80 p-1 rounded-2xl flex gap-1">
+                    <button id="btn-mode-guided" onclick="switchGameMode('guided')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-rose-500 shadow-sm">
+                        🎯 Guided Step Game
+                    </button>
+                    <button id="btn-mode-smile" onclick="switchGameMode('smile')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 hover:text-slate-900">
+                        😊 Creative Smile Plate
+                    </button>
+                </div>
+
+                <button onclick="toggleAudioBGM()" id="btn-bgm-toggle" class="p-2.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl transition font-bold text-sm flex items-center gap-1 shadow-sm" title="Toggle Sound / 音效">
+                    🔊 Sound
+                </button>
+
+                <button onclick="openDashboardModal()" class="p-2.5 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-xl transition font-bold text-sm flex items-center gap-1 shadow-sm" title="Teacher Settings / 教師家長設定">
+                    ⚙️ Dashboard
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Game Board Container (Table Mat Outer Container) -->
+        <main class="table-mat p-4 sm:p-6 md:p-8 relative">
+            
+            <!-- Guided Game Step Tabs Bar (Visible in Guided Mode) -->
+            <div id="guided-steps-bar" class="mb-6 bg-white/80 rounded-2xl p-2.5 shadow-sm border border-amber-100">
+                <div class="flex items-center justify-between mb-2 px-2">
+                    <span class="text-xs sm:text-sm font-bold text-slate-600 flex items-center gap-1">
+                        🏆 Learning Progress (學習進度): <span id="progress-text" class="text-rose-500 font-extrabold">0/100</span>
+                    </span>
+                    <span id="step-hint-badge" class="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                        Step 1: Whole Grains (全穀雜糧)
+                    </span>
+                </div>
+                <!-- 5 Step Tabs -->
+                <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
+                    <button id="tab-step-1" onclick="jumpToStep(1)" class="step-tab py-2 px-1 rounded-xl text-xs sm:text-sm font-bold transition flex flex-col sm:flex-row items-center justify-center gap-1 bg-amber-500 text-white shadow-md">
+                        <span>🌾 Step 1</span>
+                        <span class="hidden sm:inline">Grains</span>
+                    </button>
+                    <button id="tab-step-2" onclick="jumpToStep(2)" class="step-tab py-2 px-1 rounded-xl text-xs sm:text-sm font-bold transition flex flex-col sm:flex-row items-center justify-center gap-1 bg-slate-100 text-slate-500 hover:bg-slate-200">
+                        <span>🥩 Step 2</span>
+                        <span class="hidden sm:inline">Protein</span>
+                    </button>
+                    <button id="tab-step-3" onclick="jumpToStep(3)" class="step-tab py-2 px-1 rounded-xl text-xs sm:text-sm font-bold transition flex flex-col sm:flex-row items-center justify-center gap-1 bg-slate-100 text-slate-500 hover:bg-slate-200">
+                        <span>🍎 Step 3</span>
+                        <span class="hidden sm:inline">Fruits</span>
+                    </button>
+                    <button id="tab-step-4" onclick="jumpToStep(4)" class="step-tab py-2 px-1 rounded-xl text-xs sm:text-sm font-bold transition flex flex-col sm:flex-row items-center justify-center gap-1 bg-slate-100 text-slate-500 hover:bg-slate-200">
+                        <span>🥦 Step 4</span>
+                        <span class="hidden sm:inline">Veggies</span>
+                    </button>
+                    <button id="tab-step-5" onclick="jumpToStep(5)" class="step-tab py-2 px-1 rounded-xl text-xs sm:text-sm font-bold transition flex flex-col sm:flex-row items-center justify-center gap-1 bg-slate-100 text-slate-500 hover:bg-slate-200">
+                        <span>🥛 Step 5</span>
+                        <span class="hidden sm:inline">Dairy</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2-COLUMN MAIN GAME LAYOUT -->
+            <!-- LEFT SIDE: Food Selection Block (Drag items) | RIGHT SIDE: Plate Target Container -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
+                
+                <!-- LEFT COLUMN: Food Block Drag & Drop Options (lg:col-span-5) -->
+                <div class="lg:col-span-5 flex flex-col gap-4">
+                    <div class="bg-white/90 backdrop-blur rounded-3xl p-4 sm:p-5 shadow-md border-2 border-amber-200">
+                        <div class="flex items-center justify-between mb-3 border-b border-amber-100 pb-2">
+                            <h2 class="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
+                                🛒 <span id="food-block-title">Select Food Item (拖曳食物)</span>
+                            </h2>
+                            <span id="items-count-tag" class="text-xs bg-rose-100 text-rose-600 font-bold px-2.5 py-1 rounded-full">
+                                5 items available
+                            </span>
+                        </div>
+
+                        <p id="food-block-instruction" class="text-xs sm:text-sm text-slate-600 mb-4 bg-amber-50/80 p-2.5 rounded-xl border border-amber-100">
+                            Drag the correct food onto the plate sector on the right! (將符合分類的食物拖曳到右側餐盤Sector)
+                        </p>
+
+                        <!-- Food Drag Items Container (5 items rendered here) -->
+                        <div id="food-cards-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-3 min-h-[220px]">
+                            <!-- Dynamically populated food cards -->
+                        </div>
+
+                        <!-- Guided Mode Reset & Hint Controls -->
+                        <div class="flex gap-2 mt-4 pt-3 border-t border-slate-100">
+                            <button onclick="resetCurrentStep()" class="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl transition">
+                                🔄 Reset Step
+                            </button>
+                            <button onclick="playStepHintVoice()" class="flex-1 py-2 px-3 bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-xs sm:text-sm rounded-xl transition">
+                                💡 Read Hint (語音提示)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: The Plate Target Container (lg:col-span-7) -->
+                <div class="lg:col-span-7 flex flex-col items-center justify-center relative">
+                    
+                    <div class="w-full flex justify-center py-2">
+                        <!-- Plate Wrapper Container -->
+                        <div class="plate-container">
+                            
+                            <!-- Exterior Attached Top-Right Circle: Dairy Cup sector -->
+                            <div id="sector-dairy" data-sector="dairy" class="dairy-cup-container sector-drop-zone flex items-center justify-center cursor-pointer transition">
+                                <!-- Centered Dairy Badge -->
+                                <div class="sector-badge text-dairy dark bg-white/90 border border-dairy">
+                                    <span>🥛</span>
+                                    <span>Dairy 乳品</span>
+                                </div>
+                                <!-- Placed items container for dairy -->
+                                <div id="placed-items-dairy" class="absolute inset-0 rounded-full flex items-center justify-center flex-wrap p-2 gap-1 pointer-events-none"></div>
+                            </div>
+
+                            <!-- Main Circular Plate -->
+                            <div class="plate-main">
+                                
+                                <!-- Central Vertical Line Divider -->
+                                <div class="plate-divider-v"></div>
+
+                                <!-- LEFT HALF OF PLATE: Fruits (Top ~38%) & Vegetables (Bottom ~62%) -->
+                                <div class="plate-half">
+                                    
+                                    <!-- Left Top: Fruits (~38% height) -->
+                                    <div id="sector-fruit" data-sector="fruit" class="sector-fruit sector-drop-zone flex items-center justify-center p-2">
+                                        <div class="sector-badge text-rose-600 border border-rose-200">
+                                            <span>🍎</span>
+                                            <span>Fruits 水果 ~38%</span>
+                                        </div>
+                                        <div id="placed-items-fruit" class="absolute inset-0 flex items-center justify-center flex-wrap p-3 gap-1 pointer-events-none"></div>
+                                    </div>
+
+                                    <!-- Left Bottom: Vegetables (~62% height) -->
+                                    <div id="sector-veggies" data-sector="veggies" class="sector-veggies sector-drop-zone flex items-center justify-center p-2">
+                                        <div class="sector-badge text-emerald-700 border border-emerald-200">
+                                            <span>🥦</span>
+                                            <span>Veggies 蔬菜 ~62%</span>
+                                        </div>
+                                        <div id="placed-items-veggies" class="absolute inset-0 flex items-center justify-center flex-wrap p-3 gap-1 pointer-events-none"></div>
+                                    </div>
+
+                                </div>
+
+                                <!-- RIGHT HALF OF PLATE: Whole Grains (50%) & Protein (50%) -->
+                                <div class="plate-half">
+
+                                    <!-- Right Top: Whole Grains (50% height) -->
+                                    <div id="sector-grains" data-sector="grains" class="sector-grains sector-drop-zone flex items-center justify-center p-2">
+                                        <div class="sector-badge text-amber-700 border border-amber-200">
+                                            <span>🌾</span>
+                                            <span>Grains 全穀雜糧 50%</span>
+                                        </div>
+                                        <div id="placed-items-grains" class="absolute inset-0 flex items-center justify-center flex-wrap p-3 gap-1 pointer-events-none"></div>
+                                    </div>
+
+                                    <!-- Right Bottom: Protein (50% height) -->
+                                    <div id="sector-protein" data-sector="protein" class="sector-protein sector-drop-zone flex items-center justify-center p-2">
+                                        <div class="sector-badge text-purple-700 border border-purple-200">
+                                            <span>🥩</span>
+                                            <span>Protein 豆魚蛋肉 50%</span>
+                                        </div>
+                                        <div id="placed-items-protein" class="absolute inset-0 flex items-center justify-center flex-wrap p-3 gap-1 pointer-events-none"></div>
+                                    </div>
+
+                                </div>
+
+                                <!-- Creative Smile Face Plate Overlay (Active in Smile Mode) -->
+                                <div id="smile-face-overlay" class="smile-face-overlay hidden">
+                                    <div class="flex gap-16 mb-2">
+                                        <div class="flex flex-col items-center">
+                                            <div class="smile-eye"></div>
+                                            <div class="smile-cheek mt-1"></div>
+                                        </div>
+                                        <div class="flex flex-col items-center">
+                                            <div class="smile-eye"></div>
+                                            <div class="smile-cheek mt-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="smile-mouth mt-2"></div>
+                                    <span class="text-xs font-bold text-amber-800 bg-white/80 px-3 py-0.5 rounded-full mt-4 shadow-sm">
+                                        Creative Food Face Plate 😊
+                                    </span>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Smile Mode Action Controls -->
+                    <div id="smile-controls" class="hidden flex gap-3 mt-4">
+                        <button onclick="clearSmilePlate()" class="px-4 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-sm rounded-xl transition shadow-sm">
+                            🗑️ Clear Smile Plate
+                        </button>
+                        <button onclick="celebrateSmileArt()" class="px-4 py-2 bg-gradient-to-r from-amber-400 to-rose-400 text-white font-bold text-sm rounded-xl transition shadow-md hover:scale-105">
+                            🎉 Celebrate Food Art!
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Dashboard & Teacher Settings Modal -->
+    <div id="dashboard-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-amber-200 p-6">
+            <div class="flex items-center justify-between border-b pb-3 mb-4">
+                <h3 class="text-xl font-extrabold text-slate-800 flex items-center gap-2">
+                    ⚙️ Teacher & Parent Dashboard (教師家長後台)
+                </h3>
+                <button onclick="closeDashboardModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center font-bold text-slate-600">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Audio & Volume Synthesizer Controls -->
+            <div class="mb-6 bg-amber-50 p-4 rounded-2xl border border-amber-100">
+                <h4 class="font-bold text-amber-900 text-sm mb-3 flex items-center gap-2">
+                    🔊 Audio & Sound Engine Settings
+                </h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Background Music (BGM) Volume</label>
+                        <input type="range" id="bgm-volume" min="0" max="1" step="0.05" value="0.2" oninput="updateAudioVolumes()" class="w-full accent-rose-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Sound Effects (SFX) Volume</label>
+                        <input type="range" id="sfx-volume" min="0" max="1" step="0.05" value="0.7" oninput="updateAudioVolumes()" class="w-full accent-amber-500">
+                    </div>
+                </div>
+                <div class="flex gap-2 mt-3">
+                    <button onclick="playSFX('correct')" class="px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-bold">
+                        Test Correct SFX
+                    </button>
+                    <button onclick="playSFX('wrong')" class="px-3 py-1.5 bg-rose-500 text-white rounded-lg text-xs font-bold">
+                        Test Wrong SFX
+                    </button>
+                    <button onclick="playVictoryFanfare()" class="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-bold">
+                        Test Fanfare SFX
+                    </button>
+                </div>
+            </div>
+
+            <!-- Custom Food Media Management -->
+            <div class="mb-6">
+                <h4 class="font-bold text-slate-800 text-sm mb-2">
+                    🖼️ Custom Food Items Image & Emoji Management
+                </h4>
+                <p class="text-xs text-slate-500 mb-3">
+                    Select a food item to override its icon or image URL with a custom uploaded image link.
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Target Food Item</label>
+                        <select id="custom-food-select" onchange="loadFoodCustomizer()" class="w-full p-2 text-sm border rounded-xl bg-slate-50">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Custom Image URL (Optional)</label>
+                        <input type="url" id="custom-image-url" placeholder="https://example.com/image.png" class="w-full p-2 text-sm border rounded-xl">
+                    </div>
+                </div>
+                <button onclick="saveFoodImageOverride()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition">
+                    💾 Save Custom Food Override
+                </button>
+            </div>
+
+            <!-- Backup Config Export / Import -->
+            <div class="mb-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <h4 class="font-bold text-slate-800 text-sm mb-2">💾 Data Configuration (JSON Backup)</h4>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="exportConfigJSON()" class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs rounded-xl">
+                        📥 Export JSON Config
+                    </button>
+                    <label class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs rounded-xl cursor-pointer">
+                        📤 Import JSON Config
+                        <input type="file" id="import-json-file" accept=".json" onchange="importConfigJSON(event)" class="hidden">
+                    </label>
+                    <button onclick="resetAllProgress()" class="px-4 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold text-xs rounded-xl ml-auto">
+                        ⚠️ Reset All Saved Progress
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-2 border-t">
+                <button onclick="closeDashboardModal()" class="px-6 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-sm">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           1. FOOD DATASET (5 items per category x 5 categories = 25 foods total)
+           Categorized with standardized keys: grains, protein, fruit, veggies, dairy
+           ========================================================================== */
+        const DEFAULT_FOOD_DATABASE = [
+            // --- Whole Grains 全穀雜糧 (5 items) ---
+            { id: 'g1', category: 'grains', nameZh: '糙米飯', nameEn: 'Brown Rice', icon: '🌾', step: 1, image: '' },
+            { id: 'g2', category: 'grains', nameZh: '烤地瓜', nameEn: 'Sweet Potato', icon: '🍠', step: 1, image: '' },
+            { id: 'g3', category: 'grains', nameZh: '全麥吐司', nameEn: 'Whole Wheat Bread', icon: '🍞', step: 1, image: '' },
+            { id: 'g4', category: 'grains', nameZh: '甜玉米', nameEn: 'Sweet Corn', icon: '🌽', step: 1, image: '' },
+            { id: 'g5', category: 'grains', nameZh: '燕麥粥', nameEn: 'Oatmeal', icon: '🥣', step: 1, image: '' },
+
+            // --- Protein / Beans, Fish, Eggs, Meat 豆魚蛋肉 (5 items) ---
+            { id: 'p1', category: 'protein', nameZh: '嫩豆腐', nameEn: 'Fresh Tofu', icon: '🧈', step: 2, image: '' },
+            { id: 'p2', category: 'protein', nameZh: '香煎鮭魚', nameEn: 'Grilled Salmon', icon: '🐟', step: 2, image: '' },
+            { id: 'p3', category: 'protein', nameZh: '水煮蛋', nameEn: 'Boiled Egg', icon: '🥚', step: 2, image: '' },
+            { id: 'p4', category: 'protein', nameZh: '舒肥雞胸', nameEn: 'Chicken Breast', icon: '🍗', step: 2, image: '' },
+            { id: 'p5', category: 'protein', nameZh: '蒸黑豆', nameEn: 'Black Beans', icon: '🫘', step: 2, image: '' },
+
+            // --- Fruits 水果 (5 items) ---
+            { id: 'f1', category: 'fruit', nameZh: '紅蘋果', nameEn: 'Red Apple', icon: '🍎', step: 3, image: '' },
+            { id: 'f2', category: 'fruit', nameZh: '香蕉', nameEn: 'Banana', icon: '🍌', step: 3, image: '' },
+            { id: 'f3', category: 'fruit', nameZh: '甜西瓜', nameEn: 'Watermelon', icon: '🍉', step: 3, image: '' },
+            { id: 'f4', category: 'fruit', nameZh: '紫葡萄', nameEn: 'Grapes', icon: '🍇', step: 3, image: '' },
+            { id: 'f5', category: 'fruit', nameZh: '鮮草莓', nameEn: 'Strawberry', icon: '🍓', step: 3, image: '' },
+
+            // --- Vegetables 蔬菜 (5 items) ---
+            { id: 'v1', category: 'veggies', nameZh: '綠花椰菜', nameEn: 'Broccoli', icon: '🥦', step: 4, image: '' },
+            { id: 'v2', category: 'veggies', nameZh: '胡蘿蔔', nameEn: 'Carrot', icon: '🥕', step: 4, image: '' },
+            { id: 'v3', category: 'veggies', nameZh: '有機菠菜', nameEn: 'Spinach', icon: '🥬', step: 4, image: '' },
+            { id: 'v4', category: 'veggies', nameZh: '鮮番茄', nameEn: 'Tomato', icon: '🍅', step: 4, image: '' },
+            { id: 'v5', category: 'veggies', nameZh: '蒸南瓜', nameEn: 'Pumpkin', icon: '🎃', step: 4, image: '' },
+
+            // --- Dairy 乳品 (5 items) ---
+            { id: 'd1', category: 'dairy', nameZh: '全脂鮮乳', nameEn: 'Fresh Milk', icon: '🥛', step: 5, image: '' },
+            { id: 'd2', category: 'dairy', nameZh: '原味優格', nameEn: 'Yogurt', icon: '🍦', step: 5, image: '' },
+            { id: 'd3', category: 'dairy', nameZh: '高鈣起司', nameEn: 'Cheese Slice', icon: '🧀', step: 5, image: '' },
+            { id: 'd4', category: 'dairy', nameZh: '高鈣豆奶', nameEn: 'Soy Milk', icon: '🧃', step: 5, image: '' },
+            { id: 'd5', category: 'dairy', nameZh: '鮮奶昔', nameEn: 'Milkshake', icon: '🧋', step: 5, image: '' }
+        ];
+
+        /* Step Meta Configuration */
+        const STEP_CONFIG = {
+            1: { category: 'grains', titleZh: '全穀雜糧類', titleEn: 'Whole Grains', badgeColor: 'bg-amber-500' },
+            2: { category: 'protein', titleZh: '豆魚蛋肉類', titleEn: 'Protein Foods', badgeColor: 'bg-purple-600' },
+            3: { category: 'fruit', titleZh: '水果類', titleEn: 'Fruits', badgeColor: 'bg-rose-500' },
+            4: { category: 'veggies', titleZh: '蔬菜類', titleEn: 'Vegetables', badgeColor: 'bg-emerald-600' },
+            5: { category: 'dairy', titleZh: '乳品類', titleEn: 'Dairy', badgeColor: 'bg-sky-500' }
+        };
+
+        /* Game State */
+        let foodDatabase = JSON.parse(JSON.stringify(DEFAULT_FOOD_DATABASE));
+        let currentGameMode = 'guided'; // 'guided' | 'smile'
+        let currentStep = 1;
+        let stepPlacedItems = { 1: [], 2: [], 3: [], 4: [], 5: [] };
+        let activeDraggedFood = null;
+        let isBgmPlaying = false;
+
+        /* ==========================================================================
+           2. WEB AUDIO API SYNTHESIZER (Clean sound effects without external files)
+           ========================================================================== */
+        let audioCtx = null;
+        let bgmOscillator = null;
+        let bgmGainNode = null;
+        let sfxVolume = 0.7;
+        let bgmVolume = 0.2;
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSFX(type) {
+            initAudioContext();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                // Happy major chord chime
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                    
+                    gain.gain.setValueAtTime(0, now + idx * 0.08);
+                    gain.gain.linearRampToValueAtTime(sfxVolume * 0.4, now + idx * 0.08 + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.35);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + idx * 0.08);
+                    osc.stop(now + idx * 0.08 + 0.4);
+                });
+            } else if (type === 'wrong') {
+                // Low error tone
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(110, now + 0.25);
+
+                gain.gain.setValueAtTime(sfxVolume * 0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            }
+        }
+
+        function playVictoryFanfare() {
+            initAudioContext();
+            if (!audioCtx) return;
+
+            const notes = [
+                { f: 523.25, d: 0.15 }, { f: 659.25, d: 0.15 }, { f: 783.99, d: 0.15 },
+                { f: 1046.50, d: 0.4 }, { f: 880.00, d: 0.15 }, { f: 1046.50, d: 0.6 }
+            ];
+            let time = audioCtx.currentTime;
+
+            notes.forEach((note) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(note.f, time);
+
+                gain.gain.setValueAtTime(sfxVolume * 0.5, time);
+                gain.gain.exponentialRampToValueAtTime(0.01, time + note.d);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(time);
+                osc.stop(time + note.d);
+                time += note.d + 0.05;
+            });
+        }
+
+        function toggleAudioBGM() {
+            initAudioContext();
+            const btn = document.getElementById('btn-bgm-toggle');
+            if (isBgmPlaying) {
+                if (bgmOscillator) {
+                    try { bgmOscillator.stop(); } catch(e){}
+                }
+                isBgmPlaying = false;
+                btn.classList.remove('bg-rose-500', 'text-white');
+                btn.classList.add('bg-rose-50', 'text-rose-600');
+                btn.innerText = '🔊 Sound';
+            } else {
+                startSoftBGM();
+                isBgmPlaying = true;
+                btn.classList.remove('bg-rose-50', 'text-rose-600');
+                btn.classList.add('bg-rose-500', 'text-white');
+                btn.innerText = '🎶 Playing BGM';
+            }
+        }
+
+        function startSoftBGM() {
+            if (!audioCtx) return;
+            try {
+                bgmGainNode = audioCtx.createGain();
+                bgmGainNode.gain.setValueAtTime(bgmVolume * 0.15, audioCtx.currentTime);
+                bgmGainNode.connect(audioCtx.destination);
+
+                // Gentle low ambient synth
+                bgmOscillator = audioCtx.createOscillator();
+                bgmOscillator.type = 'sine';
+                bgmOscillator.frequency.setValueAtTime(261.63, audioCtx.currentTime); // C4
+                bgmOscillator.connect(bgmGainNode);
+                bgmOscillator.start();
+            } catch(e){}
+        }
+
+        function updateAudioVolumes() {
+            bgmVolume = parseFloat(document.getElementById('bgm-volume').value);
+            sfxVolume = parseFloat(document.getElementById('sfx-volume').value);
+            if (bgmGainNode && audioCtx) {
+                bgmGainNode.gain.setValueAtTime(bgmVolume * 0.15, audioCtx.currentTime);
+            }
+        }
+
+        /* Web Speech API Bilingual Voice Readout */
+        function speakText(textZh, textEn = '') {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Clear queue
+                const msg = new SpeechSynthesisUtterance(textZh + (textEn ? '. ' + textEn : ''));
+                msg.lang = 'zh-TW';
+                msg.rate = 1.0;
+                window.speechSynthesis.speak(msg);
+            }
+        }
+
+        /* ==========================================================================
+           3. CORE DRAG & DROP ENGINE (HTML5 DnD + Touch/Pointer Polyfill)
+           ========================================================================== */
+        let touchDragElement = null;
+        let touchGhost = null;
+
+        function renderFoodCards() {
+            const container = document.getElementById('food-cards-grid');
+            container.innerHTML = '';
+
+            let availableFoods = [];
+            if (currentGameMode === 'guided') {
+                // Render foods for current step (5 items per step)
+                const currentCat = STEP_CONFIG[currentStep].category;
+                availableFoods = foodDatabase.filter(f => f.category === currentCat);
+            } else {
+                // Smile Mode: Show all items or selection
+                availableFoods = foodDatabase;
+            }
+
+            document.getElementById('items-count-tag').innerText = `${availableFoods.length} items available`;
+
+            availableFoods.forEach(food => {
+                const isPlaced = isFoodAlreadyPlacedInCurrentStep(food.id);
+
+                const card = document.createElement('div');
+                card.className = `food-card bg-white p-3 rounded-2xl shadow-sm border-2 border-amber-100 flex flex-col items-center justify-center text-center select-none ${isPlaced ? 'opacity-40 pointer-events-none border-dashed' : 'hover:shadow-md hover:border-amber-300'}`;
+                card.dataset.foodId = food.id;
+                card.dataset.category = food.category;
+                card.draggable = !isPlaced;
+
+                // Inner Food Card Layout
+                card.innerHTML = `
+                    <div class="text-3xl mb-1 flex items-center justify-center h-10 w-10">
+                        ${food.image ? `<img src="${food.image}" class="w-10 h-10 object-contain rounded-lg" onerror="this.outerHTML='${food.icon}'">` : food.icon}
+                    </div>
+                    <div class="font-bold text-xs text-slate-800 leading-tight">${food.nameZh}</div>
+                    <div class="text-[10px] text-slate-400 font-semibold">${food.nameEn}</div>
+                `;
+
+                if (!isPlaced) {
+                    // HTML5 Drag Events
+                    card.addEventListener('dragstart', handleDragStart);
+                    card.addEventListener('dragend', handleDragEnd);
+
+                    // Touch / Pointer Events (For Mobile/Tablet support)
+                    card.addEventListener('pointerdown', handlePointerDown);
+                }
+
+                container.appendChild(card);
+            });
+        }
+
+        function handleDragStart(e) {
+            initAudioContext();
+            const foodId = e.currentTarget.dataset.foodId;
+            activeDraggedFood = foodDatabase.find(f => f.id === foodId);
+            e.dataTransfer.setData('text/plain', foodId);
+            e.currentTarget.classList.add('opacity-50');
+        }
+
+        function handleDragEnd(e) {
+            e.currentTarget.classList.remove('opacity-50');
+            removeAllDropHighlights();
+        }
+
+        /* Pointer / Touch Event Fallback for Mobile Devices */
+        function handlePointerDown(e) {
+            if (e.pointerType === 'mouse' && e.button !== 0) return; // Only primary clicks
+            initAudioContext();
+
+            const card = e.currentTarget;
+            const foodId = card.dataset.foodId;
+            activeDraggedFood = foodDatabase.find(f => f.id === foodId);
+
+            touchDragElement = card;
+
+            // Create Touch Ghost
+            touchGhost = card.cloneNode(true);
+            touchGhost.id = 'drag-ghost';
+            touchGhost.style.width = card.offsetWidth + 'px';
+            document.body.appendChild(touchGhost);
+
+            updateGhostPosition(e.clientX, e.clientY);
+
+            window.addEventListener('pointermove', handlePointerMove);
+            window.addEventListener('pointerup', handlePointerUp);
+        }
+
+        function handlePointerMove(e) {
+            if (!touchGhost) return;
+            updateGhostPosition(e.clientX, e.clientY);
+
+            // Highlight target drop zone under touch pointer
+            const elementUnder = document.elementFromPoint(e.clientX, e.clientY);
+            const dropZone = elementUnder ? elementUnder.closest('[data-sector]') : null;
+
+            removeAllDropHighlights();
+            if (dropZone) {
+                dropZone.classList.add('drop-hover');
+            }
+        }
+
+        function handlePointerUp(e) {
+            window.removeEventListener('pointermove', handlePointerMove);
+            window.removeEventListener('pointerup', handlePointerUp);
+
+            if (!touchGhost) return;
+
+            const elementUnder = document.elementFromPoint(e.clientX, e.clientY);
+            const dropZone = elementUnder ? elementUnder.closest('[data-sector]') : null;
+
+            if (dropZone && activeDraggedFood) {
+                const targetSector = dropZone.dataset.sector;
+                processFoodDrop(activeDraggedFood, targetSector, dropZone, e.clientX, e.clientY);
+            }
+
+            if (touchGhost && touchGhost.parentNode) {
+                touchGhost.parentNode.removeChild(touchGhost);
+            }
+            touchGhost = null;
+            touchDragElement = null;
+            removeAllDropHighlights();
+        }
+
+        function updateGhostPosition(x, y) {
+            if (touchGhost) {
+                touchGhost.style.left = `${x}px`;
+                touchGhost.style.top = `${y}px`;
+            }
+        }
+
+        /* Register Drop Targets for HTML5 DnD */
+        function setupDropZones() {
+            const dropZones = document.querySelectorAll('[data-sector]');
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drop-hover');
+                });
+
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drop-hover');
+                });
+
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drop-hover');
+                    const foodId = e.dataTransfer.getData('text/plain');
+                    const food = foodDatabase.find(f => f.id === foodId);
+                    if (food) {
+                        processFoodDrop(food, zone.dataset.sector, zone, e.clientX, e.clientY);
+                    }
+                });
+            });
+        }
+
+        function removeAllDropHighlights() {
+            document.querySelectorAll('[data-sector]').forEach(z => z.classList.remove('drop-hover'));
+        }
+
+        /* ==========================================================================
+           4. MATCHING LOGIC & GAMEPLAY PROGRESSION
+           ========================================================================== */
+        function processFoodDrop(food, targetSector, dropZoneElement, clientX, clientY) {
+            if (currentGameMode === 'smile') {
+                // Smile Mode: Free placement anywhere on plate
+                placeFoodOnSmilePlate(food, dropZoneElement, clientX, clientY);
+                playSFX('correct');
+                speakText(food.nameZh, food.nameEn);
+                return;
+            }
+
+            // --- Guided Mode Matching Rule ---
+            // Food category MUST match drop zone data-sector exactly!
+            if (food.category === targetSector) {
+                // Correct match!
+                playSFX('correct');
+                speakText(`正確！${food.nameZh}`, `Correct! ${food.nameEn}`);
+                
+                // Record in current step placed list
+                stepPlacedItems[currentStep].push(food.id);
+
+                // Render placed food token on sector
+                renderPlacedFoodOnSector(food, targetSector);
+
+                // Re-render food cards block
+                renderFoodCards();
+
+                // Update score and check step/game completion
+                updateProgressScore();
+
+            } else {
+                // Wrong category match!
+                playSFX('wrong');
+                speakText(`再試一次！${food.nameZh}屬於${getCategoryNameZh(food.category)}`, `Try again!`);
+
+                // Visual shake feedback on food card
+                const card = document.querySelector(`[data-food-id="${food.id}"]`);
+                if (card) {
+                    card.classList.add('shake-animation');
+                    setTimeout(() => card.classList.remove('shake-animation'), 500);
+                }
+            }
+        }
+
+        function renderPlacedFoodOnSector(food, category) {
+            const container = document.getElementById(`placed-items-${category}`);
+            if (!container) return;
+
+            const itemElem = document.createElement('div');
+            itemElem.className = 'placed-food-item bg-white/95 px-2 py-1 rounded-xl shadow-md border border-amber-200 flex items-center gap-1 text-xs font-bold';
+            itemElem.innerHTML = `
+                <span>${food.icon}</span>
+                <span class="text-[11px] text-slate-800">${food.nameZh}</span>
+            `;
+            container.appendChild(itemElem);
+        }
+
+        function placeFoodOnSmilePlate(food, dropZone, clientX, clientY) {
+            const container = document.getElementById(`placed-items-${food.category}`) || dropZone;
+            const itemElem = document.createElement('div');
+            itemElem.className = 'placed-food-item bg-white/90 p-2 rounded-2xl shadow-lg border border-amber-200 flex items-center gap-1 text-sm font-bold cursor-pointer';
+            itemElem.innerHTML = `
+                <span class="text-xl">${food.icon}</span>
+                <span class="text-xs text-slate-700">${food.nameZh}</span>
+            `;
+            
+            // Allow removal in smile mode on tap
+            itemElem.onclick = () => {
+                itemElem.remove();
+                speakText('移除', 'Removed');
+            };
+
+            container.appendChild(itemElem);
+        }
+
+        function isFoodAlreadyPlacedInCurrentStep(foodId) {
+            return stepPlacedItems[currentStep].includes(foodId);
+        }
+
+        function updateProgressScore() {
+            // Each category has 5 items. Completing each step awards 20 points (4 points per item).
+            let totalPlacedCount = 0;
+            Object.values(stepPlacedItems).forEach(list => totalPlacedCount += list.length);
+
+            const totalScore = totalPlacedCount * 4; // 25 total items * 4 = 100 points
+            document.getElementById('progress-text').innerText = `${totalScore}/100`;
+
+            // Check if current step's 5 items are all completed
+            if (stepPlacedItems[currentStep].length === 5) {
+                setTimeout(() => {
+                    if (currentStep < 5) {
+                        speakText(`太棒了！完成${STEP_CONFIG[currentStep].titleZh}。進入下一步！`, `Great job! Moving to step ${currentStep + 1}`);
+                        jumpToStep(currentStep + 1);
+                    } else if (totalScore >= 100) {
+                        triggerVictoryCelebration();
+                    }
+                }, 800);
+            }
+        }
+
+        function jumpToStep(stepNum) {
+            currentStep = stepNum;
+
+            // Update step tabs UI
+            document.querySelectorAll('.step-tab').forEach((tab, idx) => {
+                const s = idx + 1;
+                if (s === stepNum) {
+                    tab.className = 'step-tab py-2 px-1 rounded-xl text-xs sm:text-sm font-bold transition flex flex-col sm:flex-row items-center justify-center gap-1 bg-amber-500 text-white shadow-md';
+                } else {
+                    tab.className = 'step-tab py-2 px-1 rounded-xl text-xs sm:text-sm font-bold transition flex flex-col sm:flex-row items-center justify-center gap-1 bg-slate-100 text-slate-500 hover:bg-slate-200';
+                }
+            });
+
+            // Update Step Hint Badge & Title
+            const config = STEP_CONFIG[stepNum];
+            document.getElementById('step-hint-badge').innerText = `Step ${stepNum}: ${config.titleZh} (${config.titleEn})`;
+            document.getElementById('food-block-instruction').innerText = `Select and drag items belonging to ${config.titleZh} (${config.titleEn}) onto the plate sector.`;
+
+            renderFoodCards();
+        }
+
+        function resetCurrentStep() {
+            stepPlacedItems[currentStep] = [];
+            const cat = STEP_CONFIG[currentStep].category;
+            const container = document.getElementById(`placed-items-${cat}`);
+            if (container) container.innerHTML = '';
+
+            updateProgressScore();
+            renderFoodCards();
+            speakText('重設本關', 'Reset Step');
+        }
+
+        function playStepHintVoice() {
+            const config = STEP_CONFIG[currentStep];
+            speakText(`請選擇${config.titleZh}，例如食物欄中的食物，拖曳到對應餐盤。`, `Please drag ${config.titleEn} to the matching plate sector.`);
+        }
+
+        function getCategoryNameZh(cat) {
+            switch(cat) {
+                case 'grains': return '全穀雜糧類';
+                case 'protein': return '豆魚蛋肉類';
+                case 'fruit': return '水果類';
+                case 'veggies': return '蔬菜類';
+                case 'dairy': return '乳品類';
+                default: return '';
+            }
+        }
+
+        /* ==========================================================================
+           5. GAME MODE SWITCHING & VICTORY CELEBRATION
+           ========================================================================== */
+        function switchGameMode(mode) {
+            currentGameMode = mode;
+            const btnGuided = document.getElementById('btn-mode-guided');
+            const btnSmile = document.getElementById('btn-mode-smile');
+            const guidedStepsBar = document.getElementById('guided-steps-bar');
+            const smileOverlay = document.getElementById('smile-face-overlay');
+            const smileControls = document.getElementById('smile-controls');
+
+            if (mode === 'guided') {
+                btnGuided.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-rose-500 shadow-sm';
+                btnSmile.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 hover:text-slate-900';
+                guidedStepsBar.classList.remove('hidden');
+                smileOverlay.classList.add('hidden');
+                smileControls.classList.add('hidden');
+                document.getElementById('food-block-title').innerText = 'Select Food Item (拖曳食物)';
+                jumpToStep(currentStep);
+            } else {
+                btnSmile.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-rose-500 shadow-sm';
+                btnGuided.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 hover:text-slate-900';
+                guidedStepsBar.classList.add('hidden');
+                smileOverlay.classList.remove('hidden');
+                smileControls.classList.remove('hidden');
+                document.getElementById('food-block-title').innerText = 'Smile Art Palette (創意笑臉盤)';
+                document.getElementById('food-block-instruction').innerText = 'Drag any foods onto the smile face plate to create fun food faces! (自由拖曳食物擺出可愛笑臉)';
+                renderFoodCards();
+            }
+        }
+
+        function clearSmilePlate() {
+            ['grains', 'protein', 'fruit', 'veggies', 'dairy'].forEach(cat => {
+                const c = document.getElementById(`placed-items-${cat}`);
+                if (c) c.innerHTML = '';
+            });
+            speakText('清空餐盤', 'Cleared');
+        }
+
+        function celebrateSmileArt() {
+            playVictoryFanfare();
+            if (window.confetti) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+            speakText('太有創意了！完美的笑臉餐盤！', 'Congratulations! Beautiful food art!');
+        }
+
+        function triggerVictoryCelebration() {
+            playVictoryFanfare();
+            if (window.confetti) {
+                confetti({
+                    particleCount: 150,
+                    spread: 90,
+                    origin: { y: 0.5 }
+                });
+            }
+            speakText('恭喜完成我的餐盤！享用您的健康餐點！', 'Congratulations! Enjoy your healthy meal!');
+        }
+
+        /* ==========================================================================
+           6. TEACHER DASHBOARD & PERSISTENCE
+           ========================================================================== */
+        function openDashboardModal() {
+            populateCustomFoodSelect();
+            document.getElementById('dashboard-modal').classList.remove('hidden');
+        }
+
+        function closeDashboardModal() {
+            document.getElementById('dashboard-modal').classList.add('hidden');
+        }
+
+        function populateCustomFoodSelect() {
+            const select = document.getElementById('custom-food-select');
+            select.innerHTML = '';
+            foodDatabase.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.id;
+                opt.innerText = `${f.icon} ${f.nameZh} (${f.nameEn})`;
+                select.appendChild(opt);
+            });
+            loadFoodCustomizer();
+        }
+
+        function loadFoodCustomizer() {
+            const id = document.getElementById('custom-food-select').value;
+            const food = foodDatabase.find(f => f.id === id);
+            if (food) {
+                document.getElementById('custom-image-url').value = food.image || '';
+            }
+        }
+
+        function saveFoodImageOverride() {
+            const id = document.getElementById('custom-food-select').value;
+            const url = document.getElementById('custom-image-url').value.trim();
+            const food = foodDatabase.find(f => f.id === id);
+            if (food) {
+                food.image = url;
+                saveDataToLocalStorage();
+                renderFoodCards();
+                speakText('已更新食物圖片', 'Image updated');
+            }
+        }
+
+        function exportConfigJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(foodDatabase, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "my_plate_config.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importConfigJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (Array.isArray(parsed)) {
+                        foodDatabase = parsed;
+                        saveDataToLocalStorage();
+                        renderFoodCards();
+                        speakText('匯入成功', 'Config imported successfully');
+                    }
+                } catch(err) {
+                    alert('Invalid JSON file format.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function saveDataToLocalStorage() {
+            try {
+                localStorage.setItem('my_plate_food_db', JSON.stringify(foodDatabase));
+            } catch(e){}
+        }
+
+        function loadSavedData() {
+            try {
+                const saved = localStorage.getItem('my_plate_food_db');
+                if (saved) {
+                    foodDatabase = JSON.parse(saved);
+                }
+            } catch(e){}
+        }
+
+        function resetAllProgress() {
+            foodDatabase = JSON.parse(JSON.stringify(DEFAULT_FOOD_DATABASE));
+            stepPlacedItems = { 1: [], 2: [], 3: [], 4: [], 5: [] };
+            localStorage.removeItem('my_plate_food_db');
+            
+            ['grains', 'protein', 'fruit', 'veggies', 'dairy'].forEach(cat => {
+                const c = document.getElementById(`placed-items-${cat}`);
+                if (c) c.innerHTML = '';
+            });
+
+            jumpToStep(1);
+            updateProgressScore();
+            closeDashboardModal();
+            speakText('重置完成', 'Reset complete');
+        }
+
+        /* Application Load Entry Point */
+        window.onload = function() {
+            loadSavedData();
+            setupDropZones();
+            jumpToStep(1);
+        };
+    </script>
+</body>
+</html>
