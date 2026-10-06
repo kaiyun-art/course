@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FRUIT NINJA SPELL! - Solo Edition</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&family=Fredoka+One&family=Noto+Sans+TC:wght@600;800&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      box-sizing: border-box;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Fredoka One', 'Noto Sans TC', sans-serif;
+      background: #09090b;
+      color: #fff;
+    }
+    .font-ninja {
+      font-family: 'Permanent Marker', 'Noto Sans TC', cursive;
+    }
+    .font-arcade {
+      font-family: 'Bangers', cursive;
+      letter-spacing: 2px;
+    }
+    .font-game {
+      font-family: 'Comfortaa', 'Fredoka One', cursive;
+    }
+
+    /* Blade sheen effect */
+    @keyframes sheen {
+      0% { transform: translateX(-150%) skewX(-25deg); }
+      100% { transform: translateX(250%) skewX(-25deg); }
+    }
+    .blade-sheen::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 100%);
+      animation: sheen 2.8s infinite;
+      pointer-events: none;
+    }
+
+    /* Screen Shake on Bomb */
+    .shake {
+      animation: shake 0.45s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-5px, 0, 0); }
+      20%, 80% { transform: translate3d(6px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+      40%, 60% { transform: translate3d(8px, 0, 0); }
+    }
+
+    /* Wooden tray texture */
+    .wooden-tray {
+      background: radial-gradient(circle, #b45309 0%, #78350f 100%);
+      border: 6px solid #451a03;
+      box-shadow: inset 0 0 25px rgba(0,0,0,0.7), 0 10px 25px rgba(0,0,0,0.6);
+    }
+
+    /* Checkerboard for transparent image preview */
+    .checkerboard {
+      background-color: #1e1b4b;
+      background-image: linear-gradient(45deg, #111827 25%, transparent 25%), 
+                        linear-gradient(-45deg, #111827 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #111827 75%), 
+                        linear-gradient(-45deg, transparent 75%, #111827 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    }
+  </style>
+</head>
+<body class="relative w-full h-full select-none bg-stone-950 overflow-hidden">
+
+  <!-- DYNAMIC BACKGROUND LAYER -->
+  <div id="gameBgLayer" class="absolute inset-0 z-0 bg-cover bg-center transition-all duration-700" 
+       style="background-image: radial-gradient(circle at center, #2e1065 0%, #09090b 100%);">
+  </div>
+  <div id="gameBgOverlay" class="absolute inset-0 z-0 opacity-25 bg-[radial-gradient(#ffffff_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none"></div>
+
+  <!-- TOP UTILITY BAR -->
+  <header class="absolute top-2.5 right-3 z-50 flex items-center gap-2">
+    <button id="btnSoundToggle" class="px-3 py-1 bg-black/60 hover:bg-black/85 text-amber-300 rounded-full border border-amber-400/40 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-lg active:scale-95 transition">
+      <span id="soundIcon">🔊</span> <span id="soundLabel" class="hidden sm:inline lowercase">sound on</span>
+    </button>
+    <button id="btnOpenDashboard" class="px-3.5 py-1.5 bg-gradient-to-r from-red-600 via-amber-600 to-yellow-600 hover:brightness-110 text-white rounded-full font-bold text-xs sm:text-sm shadow-xl flex items-center gap-1.5 border border-amber-300/40 active:scale-95 transition">
+      <span>⚙️</span> <span class="hidden sm:inline lowercase">teacher dashboard</span>
+    </button>
+  </header>
+
+  <!-- SCREEN 1: TITLE SCREEN -->
+  <div id="screenTitle" class="absolute inset-0 z-40 flex flex-col items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+    <div class="max-w-2xl w-full text-center flex flex-col items-center">
+      
+      <div class="relative inline-block mb-2 px-8 py-2 blade-sheen">
+        <h2 class="text-xl sm:text-2xl text-amber-300 font-ninja tracking-widest lowercase drop-shadow-md">
+          ⚔️ solo ninja challenge ⚔️
+        </h2>
+        <h1 class="text-6xl sm:text-8xl font-arcade text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 via-orange-400 to-red-600 drop-shadow-[0_12px_28px_rgba(239,68,68,0.7)] transform -rotate-1">
+          FRUIT NINJA SPELL!
+        </h1>
+        <div class="h-1.5 w-full bg-gradient-to-r from-transparent via-amber-400 to-transparent mt-2"></div>
+      </div>
+
+      <div class="flex gap-3 sm:gap-4 justify-center text-4xl sm:text-5xl mb-5 animate-bounce">
+        <span>🍎</span><span>🍍</span><span>🥭</span><span>🍌</span><span>🍊</span><span>🍇</span><span>🍈</span>
+      </div>
+
+      <div class="w-full max-w-lg bg-stone-900/90 border-2 border-amber-400/50 rounded-2xl p-4 shadow-2xl backdrop-blur-md mb-5 text-stone-200">
+        <p class="text-sm font-ninja text-amber-300 text-center lowercase">
+          20 rounds of ninja challenges • 90 seconds each • 1 point per round victory!
+        </p>
+      </div>
+
+      <button id="btnStartGame" class="px-10 py-3.5 rounded-full font-arcade text-3xl sm:text-4xl text-amber-950 bg-gradient-to-b from-yellow-300 via-amber-400 to-orange-500 hover:from-yellow-200 hover:to-orange-400 shadow-[0_0_35px_rgba(245,158,11,0.7)] transition transform hover:scale-105 active:scale-95 border-4 border-yellow-200">
+        <span class="flex items-center gap-3 lowercase">
+          🗡️ start game 🍉
+        </span>
+      </button>
+
+      <p class="text-xs text-stone-300 mt-4 max-w-md lowercase text-center">
+        rounds 1-7: spell fruit | rounds 8-15: counting tray challenge | rounds 16-20: listen & spell!
+      </p>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: GROUP NUMBER SELECTION SCREEN (1-6) -->
+  <div id="screenGroupSelect" class="hidden absolute inset-0 z-40 flex flex-col items-center justify-center p-4 bg-stone-950/90 backdrop-blur-md">
+    <div class="max-w-2xl w-full flex flex-col items-center text-center">
+      
+      <div id="groupHeader" class="text-amber-400 font-arcade text-4xl sm:text-5xl mb-1 tracking-wider drop-shadow-lg lowercase">
+        ⚔️ select player group ⚔️
+      </div>
+      <div id="groupSubhead" class="text-stone-300 text-sm sm:text-base font-ninja lowercase mb-6">
+        choose group number 1 - 6
+      </div>
+
+      <!-- Group Selection Buttons Grid (1-6) -->
+      <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4 w-full mb-8">
+        <button class="btn-group-num p-4 bg-stone-900 hover:bg-amber-600 border-2 border-amber-400/60 rounded-2xl font-arcade text-4xl text-yellow-300 hover:text-white transition transform active:scale-95 shadow-xl flex flex-col items-center gap-1" data-num="1">
+          <span>1</span>
+          <span class="text-xs font-ninja text-stone-300 lowercase">group 1</span>
+        </button>
+        <button class="btn-group-num p-4 bg-stone-900 hover:bg-amber-600 border-2 border-amber-400/60 rounded-2xl font-arcade text-4xl text-yellow-300 hover:text-white transition transform active:scale-95 shadow-xl flex flex-col items-center gap-1" data-num="2">
+          <span>2</span>
+          <span class="text-xs font-ninja text-stone-300 lowercase">group 2</span>
+        </button>
+        <button class="btn-group-num p-4 bg-stone-900 hover:bg-amber-600 border-2 border-amber-400/60 rounded-2xl font-arcade text-4xl text-yellow-300 hover:text-white transition transform active:scale-95 shadow-xl flex flex-col items-center gap-1" data-num="3">
+          <span>3</span>
+          <span class="text-xs font-ninja text-stone-300 lowercase">group 3</span>
+        </button>
+        <button class="btn-group-num p-4 bg-stone-900 hover:bg-amber-600 border-2 border-amber-400/60 rounded-2xl font-arcade text-4xl text-yellow-300 hover:text-white transition transform active:scale-95 shadow-xl flex flex-col items-center gap-1" data-num="4">
+          <span>4</span>
+          <span class="text-xs font-ninja text-stone-300 lowercase">group 4</span>
+        </button>
+        <button class="btn-group-num p-4 bg-stone-900 hover:bg-amber-600 border-2 border-amber-400/60 rounded-2xl font-arcade text-4xl text-yellow-300 hover:text-white transition transform active:scale-95 shadow-xl flex flex-col items-center gap-1" data-num="5">
+          <span>5</span>
+          <span class="text-xs font-ninja text-stone-300 lowercase">group 5</span>
+        </button>
+        <button class="btn-group-num p-4 bg-stone-900 hover:bg-amber-600 border-2 border-amber-400/60 rounded-2xl font-arcade text-4xl text-yellow-300 hover:text-white transition transform active:scale-95 shadow-xl flex flex-col items-center gap-1" data-num="6">
+          <span>6</span>
+          <span class="text-xs font-ninja text-stone-300 lowercase">group 6</span>
+        </button>
+      </div>
+
+      <div class="bg-black/50 px-6 py-2 rounded-xl border border-white/10 text-stone-300 text-sm font-ninja lowercase mb-6">
+        selected group: <span id="lblSelectedGroup" class="text-amber-400 font-bold">group 1</span>
+      </div>
+
+      <!-- Action Button -->
+      <button id="btnStartRound" class="px-8 py-3 bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 hover:brightness-110 text-white font-arcade text-2xl sm:text-3xl rounded-2xl shadow-2xl border-2 border-amber-300/60 active:scale-95 transition flex items-center gap-2 lowercase">
+        <span>⚡</span> <span id="lblStartRoundBtn">start round 1</span> <span>⚡</span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- SCREEN 3: 10-SECOND QUESTION PREVIEW SCREEN -->
+  <div id="screenRoundIntro" class="hidden absolute inset-0 z-40 flex flex-col items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <div class="text-center flex flex-col items-center max-w-2xl w-full">
+      
+      <div id="roundIntroBanner" class="text-5xl sm:text-7xl font-arcade tracking-wider text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 via-orange-500 to-red-600 drop-shadow-[0_12px_24px_rgba(239,68,68,0.85)] mb-1 lowercase">
+        round 1
+      </div>
+      
+      <!-- Question Prompt -->
+      <div id="roundQuestionPrompt" class="text-2xl sm:text-4xl font-arcade text-yellow-300 tracking-wider mb-3 lowercase drop-shadow-md">
+        spell 'apple'
+      </div>
+
+      <!-- DISPLAY CONTAINER -->
+      <div id="previewDisplayContainer" class="w-full flex flex-col items-center">
+        <!-- Injected via JS -->
+      </div>
+
+      <!-- 10-SECOND COUNTDOWN -->
+      <div class="mt-4 flex items-center gap-3 bg-black/60 px-6 py-2 rounded-full border border-amber-400/40 shadow-lg">
+        <span class="text-stone-300 font-ninja text-sm sm:text-base lowercase">ninja challenge starts in:</span>
+        <span id="previewCountdownNumber" class="text-4xl sm:text-5xl font-arcade text-amber-400 animate-pulse">10</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCREEN 4: SOLO GAMEPLAY -->
+  <div id="screenGame" class="hidden absolute inset-0 z-30 flex flex-col">
+    
+    <!-- CENTRAL TOP TIMER & CONTROLS BAR -->
+    <div class="absolute top-2 left-1/2 transform -translate-x-1/2 z-40 flex items-center gap-3">
+      <button id="btnPauseGame" class="hidden sm:block bg-blue-600 hover:bg-blue-500 border-2 border-blue-400/50 text-white font-arcade rounded-xl px-4 py-1 shadow-lg lowercase text-sm sm:text-base transition active:scale-95 pointer-events-auto">pause</button>
+      
+      <div class="bg-black/80 backdrop-blur-md border-2 border-amber-400 rounded-full px-4 py-1 flex items-center gap-2 shadow-2xl pointer-events-auto">
+        <span class="text-xs font-arcade text-amber-400 lowercase">timer:</span>
+        <span id="gameTimerDisplay" class="font-arcade text-2xl sm:text-3xl text-yellow-300 font-bold tracking-widest">90s</span>
+      </div>
+
+      <button id="btnEndGame" class="hidden sm:block bg-red-600 hover:bg-red-500 border-2 border-red-400/50 text-white font-arcade rounded-xl px-4 py-1 shadow-lg lowercase text-sm sm:text-base transition active:scale-95 pointer-events-auto">end</button>
+    </div>
+
+    <!-- MOBILE CONTROLS ROW -->
+    <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 z-40 flex items-center gap-4 sm:hidden pointer-events-auto">
+      <button id="btnPauseGameMob" class="bg-blue-600 hover:bg-blue-500 border-2 border-blue-400/50 text-white font-arcade rounded-xl px-4 py-2 shadow-lg lowercase text-sm transition active:scale-95">pause</button>
+      <button id="btnEndGameMob" class="bg-red-600 hover:bg-red-500 border-2 border-red-400/50 text-white font-arcade rounded-xl px-4 py-2 shadow-lg lowercase text-sm transition active:scale-95">end</button>
+    </div>
+
+    <div id="pauseOverlay" class="hidden absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm pointer-events-none">
+       <div class="text-5xl sm:text-7xl font-arcade text-yellow-300 drop-shadow-[0_0_20px_rgba(234,179,8,0.8)] lowercase animate-pulse">paused</div>
+    </div>
+
+    <!-- MAIN GAME CONTAINER -->
+    <div id="soloContainer" class="relative w-full h-full overflow-hidden">
+      
+      <!-- HUD Header -->
+      <div class="absolute top-2 left-4 right-4 z-20 flex flex-col gap-1.5 pointer-events-none">
+        <div class="flex items-center justify-between bg-black/65 backdrop-blur-md rounded-2xl px-4 py-1.5 border border-amber-500/50 shadow-lg">
+          <div class="flex items-center gap-2 truncate">
+            <span class="text-lg">🦫</span>
+            <span id="hudPlayerName" class="font-ninja text-amber-300 text-sm sm:text-base font-bold truncate lowercase">group 1</span>
+          </div>
+          <!-- 3 Hearts -->
+          <div id="hudPlayerLives" class="flex gap-1 text-lg sm:text-xl">
+            <span>❤️</span><span>❤️️</span><span>❤️</span>
+          </div>
+          <!-- Score -->
+          <div class="font-arcade text-amber-300 text-base sm:text-xl lowercase">
+            total score: <span id="hudTotalScore">0</span>
+          </div>
+        </div>
+
+        <!-- Target Status -->
+        <div class="flex items-center justify-center gap-2 bg-black/55 backdrop-blur-md py-1.5 px-4 rounded-2xl border border-white/10 shadow-md">
+          <span id="hudGoalLabel" class="text-xs font-ninja text-amber-400 lowercase">spell:</span>
+          <div id="hudSlots" class="flex gap-1 flex-wrap justify-center items-center">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Canvas -->
+      <canvas id="canvasSolo" class="absolute inset-0 w-full h-full"></canvas>
+    </div>
+
+  </div>
+
+  <!-- SCREEN 5: ROUND RESULT / SCORE DISPLAY MODAL -->
+  <div id="screenWinner" class="hidden absolute inset-0 z-50 flex flex-col items-center justify-center p-4 bg-black/85 backdrop-blur-lg">
+    <div class="max-w-md w-full bg-stone-900 border-4 border-amber-400 rounded-3xl p-6 text-center shadow-[0_0_60px_rgba(245,158,11,0.6)]">
+      <div id="winnerIcon" class="text-5xl mb-2 animate-bounce">🏆</div>
+      <h2 id="winnerTitle" class="text-4xl sm:text-5xl font-arcade text-yellow-300 tracking-wider mb-1 lowercase">round complete!</h2>
+      <p id="winnerMessage" class="text-lg font-ninja text-amber-300 mb-4 lowercase">points earned!</p>
+
+      <div class="bg-black/55 rounded-2xl p-4 mb-5 border border-white/10 flex flex-col items-center justify-center gap-1">
+        <div id="scoreLabel" class="text-xs font-bold text-stone-400 lowercase">your current score</div>
+        <div id="modalScoreDisplay" class="text-5xl font-arcade text-yellow-400 my-1">0</div>
+        <div id="modalGroupBadge" class="text-xs text-amber-300 font-ninja lowercase">group 1 player</div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <button id="btnNextRound" class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-red-600 hover:brightness-110 font-arcade text-2xl text-white rounded-xl shadow-lg active:scale-95 transition lowercase flex items-center justify-center gap-2">
+          <span>➡️️</span> continue to group select
+        </button>
+        <button id="btnBackToMenu" class="px-4 py-2.5 bg-stone-800 hover:bg-stone-700 font-arcade text-xl text-stone-300 rounded-xl shadow-lg active:scale-95 transition lowercase">
+          menu 🏠
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 6: TEACHER CONTROL DASHBOARD -->
+  <div id="modalDashboard" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div class="bg-stone-900 border-2 border-amber-400 rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden text-stone-200">
+      
+      <div class="p-4 bg-gradient-to-r from-red-950 via-stone-900 to-amber-950 border-b border-amber-500/30 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">⚙️</span>
+          <h2 class="text-2xl font-arcade tracking-wider text-amber-300 lowercase">teacher control dashboard</h2>
+        </div>
+        <button id="btnCloseDashboard" class="text-stone-400 hover:text-white text-3xl font-bold px-2 py-0">&times;</button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-6 flex-1 text-sm">
+        
+        <!-- Section 1: Questions & Rounds List -->
+        <section class="bg-stone-950/80 border border-white/10 rounded-xl p-4">
+          <h3 class="text-lg font-bold font-arcade text-amber-400 mb-2 flex items-center gap-2 lowercase">
+            <span>📜</span> 20 game rounds overview (spelling, counting, listening)
+          </h3>
+          <p class="text-xs text-stone-400 mb-3 lowercase">
+            rounds 1-7: spelling. rounds 8-15: counting trays. rounds 16-20: listen & spell challenges.
+          </p>
+          <div id="dashboardRoundsList" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs max-h-48 overflow-y-auto pr-1">
+            <!-- Populated via script -->
+          </div>
+        </section>
+
+        <!-- Section 2: Arena Background Theme -->
+        <section class="bg-stone-950/80 border border-white/10 rounded-xl p-4">
+          <h3 class="text-lg font-bold font-arcade text-amber-400 mb-3 flex items-center gap-2 lowercase">
+            <span>🖼️</span> arena background theme
+          </h3>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+            <button class="bg-preset-btn p-2 rounded-xl border-2 border-transparent hover:border-amber-400 bg-stone-800 text-xs font-bold text-center transition lowercase" data-bg="gradient-purple">
+              <div class="h-12 rounded-lg bg-gradient-to-b from-indigo-950 to-stone-950 mb-1"></div>
+              midnight dojo
+            </button>
+            <button class="bg-preset-btn p-2 rounded-xl border-2 border-transparent hover:border-amber-400 bg-stone-800 text-xs font-bold text-center transition lowercase" data-bg="gradient-bamboo">
+              <div class="h-12 rounded-lg bg-gradient-to-b from-emerald-950 to-stone-950 mb-1"></div>
+              bamboo garden
+            </button>
+            <button class="bg-preset-btn p-2 rounded-xl border-2 border-transparent hover:border-amber-400 bg-stone-800 text-xs font-bold text-center transition lowercase" data-bg="gradient-sunset">
+              <div class="h-12 rounded-lg bg-gradient-to-b from-orange-950 to-stone-950 mb-1"></div>
+              sunset orchard
+            </button>
+            <button class="bg-preset-btn p-2 rounded-xl border-2 border-transparent hover:border-amber-400 bg-stone-800 text-xs font-bold text-center transition lowercase" data-bg="gradient-dojowood">
+              <div class="h-12 rounded-lg bg-gradient-to-b from-amber-950 to-stone-950 mb-1"></div>
+              wood floor
+            </button>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input id="customBgUrlInput" type="text" placeholder="Or paste background image URL..." 
+                   class="flex-1 bg-stone-900 border border-white/20 rounded-xl px-3 py-2 text-stone-200 text-xs focus:ring-1 focus:ring-amber-400 outline-none" />
+            <button id="btnApplyBgUrl" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 rounded-xl font-bold text-white text-xs lowercase">apply url</button>
+            <label class="px-4 py-2 bg-stone-800 hover:bg-stone-700 rounded-xl font-bold text-stone-300 text-xs cursor-pointer text-center lowercase">
+              upload file
+              <input id="bgFileInput" type="file" accept="image/*" class="hidden">
+            </label>
+          </div>
+        </section>
+
+        <!-- Section 3: Fruits & Transparent Pictures Manager -->
+        <section class="bg-stone-950/80 border border-white/10 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-lg font-bold font-arcade text-amber-400 flex items-center gap-2 lowercase">
+              <span>🍍</span> fruit pictures (transparent background) & custom upload
+            </h3>
+            <button id="btnResetFruitWords" class="text-xs text-rose-400 hover:underline lowercase">reset default pictures</button>
+          </div>
+          <p class="text-xs text-stone-400 mb-3 lowercase">
+            upload transparent PNG images or paste transparent image URLs for each fruit.
+          </p>
+
+          <div id="wordListGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-64 overflow-y-auto pr-1">
+            <!-- Populated via script -->
+          </div>
+        </section>
+
+        <!-- Section: Tray Customization -->
+        <section class="bg-stone-950/80 border border-white/10 rounded-xl p-4 mt-4">
+          <h3 class="text-lg font-bold font-arcade text-amber-400 mb-2 flex items-center gap-2 lowercase">
+            <span>🧺</span> custom fruit tray / basket image
+          </h3>
+          <p class="text-xs text-stone-400 mb-3 lowercase">
+            paste an image url to override the default wooden tray background in counting rounds.
+          </p>
+          <input id="customTrayUrlInput" type="text" placeholder="paste tray image url..." class="w-full bg-stone-900 border border-white/20 rounded-xl px-3 py-2 text-stone-200 text-xs focus:ring-1 focus:ring-amber-400 outline-none lowercase" />
+        </section>
+
+        <!-- Section 4: Audio & Volumes -->
+        <section class="bg-stone-950/80 border border-white/10 rounded-xl p-4">
+          <h3 class="text-lg font-bold font-arcade text-amber-400 mb-3 flex items-center gap-2 lowercase">
+            <span>🎙️</span> voice & audio controls
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+            <div>
+              <label class="block text-xs font-bold text-stone-300 mb-1 lowercase">fruit music volume</label>
+              <input id="sliderMusicVol" type="range" min="0" max="1" step="0.05" value="0.35" class="w-full accent-amber-400">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-300 mb-1 lowercase">juicy slice & bomb volume</label>
+              <input id="sliderSfxVol" type="range" min="0" max="1" step="0.05" value="0.75" class="w-full accent-amber-400">
+            </div>
+          </div>
+          <button id="btnTestVoice" class="px-4 py-2 bg-stone-800 hover:bg-stone-700 border border-amber-400/40 rounded-xl text-amber-300 text-xs font-bold flex items-center gap-2 lowercase">
+            <span>📢</span> test announcer voice ("round 1! spell apple! fight!")
+          </button>
+        </section>
+
+      </div>
+
+      <div class="p-3 bg-stone-950 border-t border-amber-500/30 flex justify-end gap-3">
+        <button id="btnSaveDashboard" class="px-6 py-2 bg-gradient-to-r from-amber-500 to-red-600 hover:brightness-110 text-white font-arcade text-lg rounded-xl shadow-lg lowercase">
+          save all settings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * GAME ROUND QUESTIONS
+     */
+    const ROUND_QUESTIONS = [
+      { round: 1, type: 'spell', word: 'apple', prompt: "spell 'apple'", fruitKey: 'apple' },
+      { round: 2, type: 'spell', word: 'pineapple', prompt: "spell 'pineapple'", fruitKey: 'pineapple' },
+      { round: 3, type: 'spell', word: 'papayas', prompt: "spell 'papayas'", fruitKey: 'papayas' },
+      { round: 4, type: 'spell', word: 'bananas', prompt: "spell 'bananas'", fruitKey: 'bananas' },
+      { round: 5, type: 'spell', word: 'orange', prompt: "spell 'orange'", fruitKey: 'orange' },
+      { round: 6, type: 'spell', word: 'grapes', prompt: "spell 'grapes'", fruitKey: 'grapes' },
+      { round: 7, type: 'spell', word: 'guavas', prompt: "spell 'guavas'", fruitKey: 'guavas' },
+      { round: 8, type: 'count', count: 6, prompt: "how many bananas does she need?", voiceover: "How many bananas does she need? She needs 6 bananas.", fruitKey: 'bananas', fruitName: 'bananas' },
+      { round: 9, type: 'count', count: 4, prompt: "how many pineapples do you need?", voiceover: "How many pineapples do you need? I need four pineapples.", fruitKey: 'pineapple', fruitName: 'pineapples' },
+      { round: 10, type: 'count', count: 10, prompt: "how many guavas does he need?", voiceover: "How many guavas does he need? He needs 10 guavas.", fruitKey: 'guavas', fruitName: 'guavas' },
+      { round: 11, type: 'count', count: 12, prompt: "how many apples do you need?", voiceover: "How many apples do you need? We need 12 apples.", fruitKey: 'apple', fruitName: 'apples' },
+      { round: 12, type: 'count', count: 5, prompt: "how many oranges do you need?", voiceover: "How many oranges do you need? They need 5 oranges.", fruitKey: 'orange', fruitName: 'oranges' },
+      { round: 13, type: 'count', count: 10, prompt: "how many grapes do you need?", voiceover: "How many grapes do you need? I need 10 grapes.", fruitKey: 'grapes', fruitName: 'grapes' },
+      { round: 14, type: 'count', count: 3, prompt: "how many papayas does amy need?", voiceover: "How many papayas does Amy need? Amy needs 3 papayas.", fruitKey: 'papayas', fruitName: 'papayas' },
+      { round: 15, type: 'count', count: 1, prompt: "how many pineapples does mom need?", voiceover: "How many pineapples does Mom need? Mom needs 1 pineapple.", fruitKey: 'pineapple', fruitName: 'pineapples' },
+      { round: 16, type: 'listen_spell', word: 'pineapple', prompt: "listen and spell", voiceover: "Listen carefully. Spell... pineapple.", fruitKey: 'pineapple' },
+      { round: 17, type: 'listen_spell', word: 'grapes', prompt: "listen and spell", voiceover: "Listen carefully. Spell... grapes.", fruitKey: 'grapes' },
+      { round: 18, type: 'listen_spell', word: 'oranges', prompt: "listen and spell", voiceover: "Listen carefully. Spell... oranges.", fruitKey: 'orange' },
+      { round: 19, type: 'listen_spell', word: 'guavas', prompt: "listen and spell", voiceover: "Listen carefully. Spell... guavas.", fruitKey: 'guavas' },
+      { round: 20, type: 'listen_spell', word: 'apples', prompt: "listen and spell", voiceover: "Listen carefully. Spell... apples.", fruitKey: 'apple' }
+    ];
+
+    /**
+     * FRUIT ASSET DEFINITIONS
+     */
+    const DEFAULT_FRUIT_MODELS = {
+      apple: { id: 'apple', name: 'apple', emoji: '🍎', color: '#ef4444', innerColor: '#fef08a', imgUrl: '' },
+      pineapple: { id: 'pineapple', name: 'pineapple', emoji: '🍍', color: '#eab308', innerColor: '#fef08a', imgUrl: '' },
+      papayas: { id: 'papayas', name: 'papayas', emoji: '🥭', color: '#ea580c', innerColor: '#fed7aa', imgUrl: '' },
+      bananas: { id: 'bananas', name: 'bananas', emoji: '🍌', color: '#eab308', innerColor: '#fef9c3', imgUrl: '' },
+      orange: { id: 'orange', name: 'orange', emoji: '🍊', color: '#f97316', innerColor: '#fed7aa', imgUrl: '' },
+      grapes: { id: 'grapes', name: 'grapes', emoji: '🍇', color: '#8b5cf6', innerColor: '#ede9fe', imgUrl: '' },
+      guavas: { id: 'guavas', name: 'guavas', emoji: '🍈', color: '#84cc16', innerColor: '#fda4af', imgUrl: '' }
+    };
+
+    let fruitAssets = JSON.parse(localStorage.getItem('ninja_spell_assets')) || DEFAULT_FRUIT_MODELS;
+    const fruitImageCache = new Map();
+
+    function preloadFruitImages() {
+      Object.values(fruitAssets).forEach(fruit => {
+        if (fruit.imgUrl && !fruitImageCache.has(fruit.imgUrl)) {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.src = fruit.imgUrl;
+          fruitImageCache.set(fruit.imgUrl, img);
+        }
+      });
+    }
+
+    function getFruitGraphicHtml(fruitKey, size = 110) {
+      const f = fruitAssets[fruitKey] || DEFAULT_FRUIT_MODELS.apple;
+      if (f.imgUrl && f.imgUrl.trim() !== '') {
+        return `<img src="${f.imgUrl}" alt="${f.name}" style="width:${size}px; height:${size}px;" class="object-contain filter drop-shadow-[0_10px_16px_rgba(0,0,0,0.6)]" onerror="this.src='https://placehold.co/${size}x${size}/ea580c/ffffff?text=${f.name}'"/>`;
+      }
+      switch (fruitKey) {
+        case 'apple':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" class="drop-shadow-xl">
+            <path d="M50 16 C48 8 52 4 56 2 C58 8 54 13 50 16 Z" fill="#15803d"/>
+            <path d="M50 18 Q50 8 58 6" stroke="#78350f" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path d="M50 24 C38 12 12 18 14 48 C16 76 38 88 50 88 C62 88 84 76 86 48 C88 18 62 12 50 24 Z" fill="url(#apGrad)"/>
+            <circle cx="34" cy="38" r="7" fill="#ffffff" opacity="0.4"/>
+            <defs>
+              <radialGradient id="apGrad" cx="35%" cy="35%">
+                <stop offset="0%" stop-color="#ff6b6b"/>
+                <stop offset="70%" stop-color="#dc2626"/>
+                <stop offset="100%" stop-color="#991b1b"/>
+              </radialGradient>
+            </defs>
+          </svg>`;
+        case 'orange':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" class="drop-shadow-xl">
+            <circle cx="50" cy="52" r="38" fill="url(#orGrad)"/>
+            <circle cx="50" cy="52" r="30" fill="#fed7aa" opacity="0.35"/>
+            <circle cx="38" cy="38" r="6" fill="#ffffff" opacity="0.45"/>
+            <path d="M50 14 C52 10 56 12 58 14 C54 16 52 18 50 14 Z" fill="#16a34a"/>
+            <defs>
+              <radialGradient id="orGrad" cx="35%" cy="35%">
+                <stop offset="0%" stop-color="#fb923c"/>
+                <stop offset="80%" stop-color="#ea580c"/>
+                <stop offset="100%" stop-color="#c2410c"/>
+              </radialGradient>
+            </defs>
+          </svg>`;
+        case 'bananas':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" class="drop-shadow-xl">
+            <path d="M18 76 C28 86 75 75 85 28 C80 32 55 60 18 76 Z" fill="#facc15"/>
+            <path d="M18 76 C35 78 70 58 83 25 C84 27 82 30 78 35 C52 66 26 77 18 76 Z" fill="#eab308"/>
+            <path d="M85 28 L89 22 L83 24 Z" fill="#65a30d"/>
+            <path d="M17 75 L12 79 L15 81 Z" fill="#78350f"/>
+          </svg>`;
+        case 'grapes':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" class="drop-shadow-xl">
+            <path d="M50 10 Q50 25 50 28" stroke="#78350f" stroke-width="4" fill="none"/>
+            <g fill="url(#grpGrad)">
+              <circle cx="42" cy="34" r="11"/><circle cx="58" cy="34" r="11"/>
+              <circle cx="34" cy="48" r="11"/><circle cx="50" cy="48" r="11"/><circle cx="66" cy="48" r="11"/>
+              <circle cx="42" cy="62" r="11"/><circle cx="58" cy="62" r="11"/>
+              <circle cx="50" cy="74" r="9"/>
+            </g>
+            <defs>
+              <radialGradient id="grpGrad" cx="30%" cy="30%">
+                <stop offset="0%" stop-color="#c084fc"/>
+                <stop offset="80%" stop-color="#7e22ce"/>
+                <stop offset="100%" stop-color="#581c87"/>
+              </radialGradient>
+            </defs>
+          </svg>`;
+        case 'guavas':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" class="drop-shadow-xl">
+            <circle cx="50" cy="52" r="38" fill="#65a30d"/>
+            <circle cx="50" cy="52" r="28" fill="#fb7185"/>
+            <circle cx="44" cy="48" r="2.5" fill="#881337"/><circle cx="54" cy="48" r="2.5" fill="#881337"/>
+            <circle cx="50" cy="58" r="2.5" fill="#881337"/><circle cx="44" cy="58" r="2.5" fill="#881337"/>
+          </svg>`;
+        case 'papayas':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" class="drop-shadow-xl">
+            <ellipse cx="50" cy="52" rx="32" ry="42" fill="#f97316"/>
+            <ellipse cx="50" cy="52" rx="20" ry="28" fill="#fed7aa"/>
+            <circle cx="48" cy="48" r="2.5" fill="#1c1917"/><circle cx="52" cy="54" r="2.5" fill="#1c1917"/>
+            <circle cx="47" cy="58" r="2.5" fill="#1c1917"/>
+          </svg>`;
+        case 'pineapple':
+          return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" class="drop-shadow-xl">
+            <path d="M50 8 L42 30 L50 26 L58 30 Z" fill="#15803d"/>
+            <path d="M42 16 L32 32 L44 30 Z" fill="#16a34a"/>
+            <path d="M58 16 L68 32 L56 30 Z" fill="#16a34a"/>
+            <ellipse cx="50" cy="62" rx="30" ry="34" fill="url(#pneGrad)"/>
+            <path d="M26 50 L74 74 M26 74 L74 50 M32 40 L68 84 M32 84 L68 40" stroke="#b45309" stroke-width="2.5" opacity="0.6"/>
+            <defs>
+              <radialGradient id="pneGrad" cx="40%" cy="40%">
+                <stop offset="0%" stop-color="#fef08a"/>
+                <stop offset="60%" stop-color="#eab308"/>
+                <stop offset="100%" stop-color="#a16207"/>
+              </radialGradient>
+            </defs>
+          </svg>`;
+        default:
+          return `<div class="text-6xl">${f.emoji}</div>`;
+      }
+    }
+
+    /**
+     * AUDIO SYNTHESIS
+     */
+    let audioCtx = null;
+    let musicMasterGain = null;
+    let sfxMasterGain = null;
+    let isSoundMuted = false;
+    let musicIsPlaying = false;
+    let musicTimer = null;
+    let musicStep = 0;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+
+        musicMasterGain = audioCtx.createGain();
+        musicMasterGain.gain.value = 0.35;
+        musicMasterGain.connect(audioCtx.destination);
+
+        sfxMasterGain = audioCtx.createGain();
+        sfxMasterGain.gain.value = 0.75;
+        sfxMasterGain.connect(audioCtx.destination);
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playJuicySliceSound() {
+      if (!audioCtx || isSoundMuted) return;
+      try {
+        const now = audioCtx.currentTime;
+        const swoosh = audioCtx.createOscillator();
+        const sGain = audioCtx.createGain();
+        swoosh.type = 'triangle';
+        swoosh.frequency.setValueAtTime(950, now);
+        swoosh.frequency.exponentialRampToValueAtTime(140, now + 0.12);
+        sGain.gain.setValueAtTime(0.5, now);
+        sGain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+        swoosh.connect(sGain);
+        sGain.connect(sfxMasterGain);
+        swoosh.start(now);
+        swoosh.stop(now + 0.12);
+
+        const carrier = audioCtx.createOscillator();
+        const mod = audioCtx.createOscillator();
+        const modGain = audioCtx.createGain();
+        const cGain = audioCtx.createGain();
+
+        carrier.type = 'sine';
+        carrier.frequency.setValueAtTime(520 + Math.random() * 180, now);
+        carrier.frequency.exponentialRampToValueAtTime(110, now + 0.22);
+
+        mod.type = 'triangle';
+        mod.frequency.setValueAtTime(160, now);
+        mod.frequency.linearRampToValueAtTime(25, now + 0.2);
+
+        modGain.gain.setValueAtTime(280, now);
+        modGain.gain.exponentialRampToValueAtTime(1, now + 0.2);
+
+        mod.connect(carrier.frequency);
+        carrier.connect(cGain);
+        cGain.gain.setValueAtTime(0.7, now);
+        cGain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+        cGain.connect(sfxMasterGain);
+
+        mod.start(now);
+        carrier.start(now);
+        mod.stop(now + 0.24);
+        carrier.stop(now + 0.24);
+      } catch (e) {}
+    }
+
+    function playBombExplosionSound() {
+      if (!audioCtx || isSoundMuted) return;
+      try {
+        const now = audioCtx.currentTime;
+        const sub = audioCtx.createOscillator();
+        const subGain = audioCtx.createGain();
+        sub.type = 'sawtooth';
+        sub.frequency.setValueAtTime(190, now);
+        sub.frequency.exponentialRampToValueAtTime(30, now + 0.7);
+        subGain.gain.setValueAtTime(0.95, now);
+        subGain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+        sub.connect(subGain);
+        subGain.connect(sfxMasterGain);
+        sub.start(now);
+        sub.stop(now + 0.7);
+
+        const bufferSize = audioCtx.sampleRate * 0.55;
+        const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+
+        const whiteNoise = audioCtx.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(900, now);
+        filter.frequency.exponentialRampToValueAtTime(80, now + 0.55);
+
+        const nGain = audioCtx.createGain();
+        nGain.gain.setValueAtTime(0.85, now);
+        nGain.gain.exponentialRampToValueAtTime(0.01, now + 0.55);
+
+        whiteNoise.connect(filter);
+        filter.connect(nGain);
+        nGain.connect(sfxMasterGain);
+
+        whiteNoise.start(now);
+        whiteNoise.stop(now + 0.55);
+      } catch (e) {}
+    }
+
+    function playWrongSound() {
+      if (!audioCtx || isSoundMuted) return;
+      try {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(120, now);
+        osc.frequency.linearRampToValueAtTime(50, now + 0.25);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.connect(gain);
+        gain.connect(sfxMasterGain);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } catch (e) {}
+    }
+
+    function startBubblyFruitMusic() {
+      if (musicIsPlaying) return;
+      initAudio();
+      musicIsPlaying = true;
+      musicStep = 0;
+
+      const pentatonic = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33];
+      const bassNotes = [130.81, 146.83, 164.81, 196.00];
+
+      musicTimer = setInterval(() => {
+        if (!musicIsPlaying || isSoundMuted || !audioCtx) return;
+        const now = audioCtx.currentTime;
+
+        if (Math.random() > 0.15) {
+          const melodyNote = pentatonic[(musicStep * 2 + Math.floor(Math.random() * 3)) % pentatonic.length];
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(melodyNote, now);
+          osc.frequency.exponentialRampToValueAtTime(melodyNote * 1.05, now + 0.08);
+
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+          osc.connect(gain);
+          gain.connect(musicMasterGain);
+          osc.start(now);
+          osc.stop(now + 0.16);
+        }
+
+        if (musicStep % 2 === 0) {
+          const bNote = bassNotes[(musicStep / 2) % bassNotes.length];
+          const bOsc = audioCtx.createOscillator();
+          const bGain = audioCtx.createGain();
+          bOsc.type = 'triangle';
+          bOsc.frequency.setValueAtTime(bNote, now);
+          bGain.gain.setValueAtTime(0.25, now);
+          bGain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+          bOsc.connect(bGain);
+          bGain.connect(musicMasterGain);
+          bOsc.start(now);
+          bOsc.stop(now + 0.3);
+        }
+
+        musicStep = (musicStep + 1) % 16;
+      }, 160);
+    }
+
+    function stopBubblyFruitMusic() {
+      musicIsPlaying = false;
+      if (musicTimer) {
+        clearInterval(musicTimer);
+        musicTimer = null;
+      }
+    }
+
+    function playWrestlingAnnouncer(textToSay) {
+      if (audioCtx && !isSoundMuted) {
+        try {
+          const now = audioCtx.currentTime;
+          const gong = audioCtx.createOscillator();
+          const gGain = audioCtx.createGain();
+          gong.type = 'sine';
+          gong.frequency.setValueAtTime(110, now);
+          gong.frequency.exponentialRampToValueAtTime(45, now + 1.2);
+          gGain.gain.setValueAtTime(0.6, now);
+          gGain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+          gong.connect(gGain);
+          gGain.connect(sfxMasterGain);
+          gong.start(now);
+          gong.stop(now + 1.2);
+        } catch(e) {}
+      }
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(textToSay.toLowerCase());
+        utterance.rate = 0.85;
+        utterance.pitch = 0.52;
+        utterance.volume = isSoundMuted ? 0 : 1;
+
+        const voices = window.speechSynthesis.getVoices();
+        const deepVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Daniel') || v.name.includes('Alex')));
+        if (deepVoice) utterance.voice = deepVoice;
+
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function playESLAnnouncer(textToSay) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(textToSay);
+        utterance.rate = 0.75;
+        utterance.pitch = 1.15;
+        utterance.volume = isSoundMuted ? 0 : 1;
+
+        const voices = window.speechSynthesis.getVoices();
+        const friendlyVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Victoria') || v.name.includes('Google US English')));
+        if (friendlyVoice) utterance.voice = friendlyVoice;
+
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    /**
+     * SOLO GAME STATE
+     */
+    let currentRoundIndex = 0;
+    let selectedGroupNum = 1;
+    let totalScore = 0;
+
+    let roundSecondsRemaining = 90;
+    let roundTimerInterval = null;
+    let isRoundActive = false;
+    let isPaused = false;
+
+    let soloState = {
+      name: "Group 1",
+      lives: 3,
+      spelledIndex: 0,
+      slicedCount: 0,
+      slashTrail: [],
+      objects: [],
+      splats: [],
+      persistentSplats: []
+    };
+
+    const canvasSolo = document.getElementById('canvasSolo');
+    const ctxSolo = canvasSolo.getContext('2d');
+
+    function resizeCanvases() {
+      const container = document.getElementById('soloContainer').getBoundingClientRect();
+      canvasSolo.width = container.width;
+      canvasSolo.height = container.height;
+    }
+    window.addEventListener('resize', resizeCanvases);
+
+    /**
+     * CONTROLS & SLICING
+     */
+    function processBladePoint(clientX, clientY) {
+      const rect = canvasSolo.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      soloState.slashTrail.push({ x, y, age: 1.0 });
+
+      if (isRoundActive && soloState.slashTrail.length >= 2) {
+        const ptA = soloState.slashTrail[soloState.slashTrail.length - 2];
+        const ptB = { x, y };
+        checkSlashCollisions(ptA, ptB);
+      }
+    }
+
+    window.addEventListener('mousedown', (e) => {
+      initAudio();
+      processBladePoint(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (e.buttons === 1) processBladePoint(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('touchstart', (e) => {
+      initAudio();
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        processBladePoint(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        processBladePoint(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
+      }
+    }, { passive: true });
+
+    /**
+     * FRUIT SPAWNER
+     */
+    function spawnFruit() {
+      const q = ROUND_QUESTIONS[currentRoundIndex];
+      if (!q) return;
+
+      const isCountingRound = (q.type === 'count');
+      const isBomb = Math.random() < 0.20;
+
+      let fruitKey = q.fruitKey;
+      let letter = '';
+
+      if (isCountingRound) {
+        if (Math.random() < 0.40) {
+          const keys = Object.keys(fruitAssets);
+          fruitKey = keys[Math.floor(Math.random() * keys.length)];
+        }
+      } else {
+        const neededLetter = (q.word[soloState.spelledIndex] || '').toLowerCase();
+        if (!isBomb) {
+          if (Math.random() < 0.50 && neededLetter) {
+            letter = neededLetter;
+          } else {
+            const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+            letter = Math.random() < 0.45 
+              ? q.word[Math.floor(Math.random() * q.word.length)].toLowerCase()
+              : alphabet[Math.floor(Math.random() * alphabet.length)];
+          }
+        }
+      }
+
+      const fruitModel = fruitAssets[fruitKey] || DEFAULT_FRUIT_MODELS.apple;
+
+      const baseVy = isCountingRound ? -(14.0 + Math.random() * 5.5) : -(8.0 + Math.random() * 3.0);
+      const wobbleAmp = isCountingRound ? 3.0 : 1.5;
+      const vx = (Math.random() - 0.5) * 6.0;
+
+      const floatObj = {
+        id: Math.random(),
+        isBomb: isBomb,
+        fruitKey: fruitKey,
+        fruit: fruitModel,
+        letter: letter.toLowerCase(),
+        isTargetFruit: (fruitKey === q.fruitKey),
+        x: 45 + Math.random() * Math.max(60, canvasSolo.width - 90),
+        y: canvasSolo.height + 60,
+        vx: vx,
+        vy: baseVy,
+        gravity: isCountingRound ? 0.35 : 0.12,
+        wobblePhase: Math.random() * Math.PI * 2,
+        wobbleSpeed: isCountingRound ? 0.06 : 0.035,
+        wobbleAmp: wobbleAmp,
+        radius: isBomb ? 50 : 75,
+        angle: (Math.random() - 0.5) * 0.25,
+        rotSpeed: isCountingRound ? (Math.random() - 0.5) * 0.05 : (Math.random() - 0.5) * 0.02,
+        isSliced: false
+      };
+
+      soloState.objects.push(floatObj);
+    }
+
+    function checkLineCircle(x1, y1, x2, y2, cx, cy, r) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const len = Math.hypot(dx, dy);
+      if (len === 0) return Math.hypot(cx - x1, cy - y1) <= r;
+      const u = Math.max(0, Math.min(1, ((cx - x1) * dx + (cy - y1) * dy) / (len * len)));
+      const nearestX = x1 + u * dx;
+      const nearestY = y1 + u * dy;
+      return Math.hypot(cx - nearestX, cy - nearestY) <= r;
+    }
+
+    function checkSlashCollisions(ptA, ptB) {
+      const slashAngle = Math.atan2(ptB.y - ptA.y, ptB.x - ptA.x);
+      
+      for (let i = soloState.objects.length - 1; i >= 0; i--) {
+        const obj = soloState.objects[i];
+        if (obj.isSliced) continue;
+
+        if (checkLineCircle(ptA.x, ptA.y, ptB.x, ptB.y, obj.x, obj.y, obj.radius)) {
+          obj.isSliced = true;
+          handleSlice(obj, slashAngle);
+          soloState.objects.splice(i, 1);
+        }
+      }
+    }
+
+    function handleSlice(obj, slashAngle = 0) {
+      const q = ROUND_QUESTIONS[currentRoundIndex];
+
+      if (obj.isBomb) {
+        playBombExplosionSound();
+        createExplosionParticles(obj.x, obj.y);
+        soloState.lives -= 1;
+        triggerShake();
+        updateHUD();
+
+        if (soloState.lives <= 0) {
+          endRoundWithScore(false, `💥 hit 3 bombs! round failed!`);
+        }
+        return;
+      }
+
+      playJuicySliceSound();
+      createJuicyParticles(obj);
+
+      const baseSize = 35 + Math.random() * 25;
+      const drops = [];
+      const numDrops = 10 + Math.floor(Math.random() * 10);
+      for(let d = 0; d < numDrops; d++) {
+        const spread = (Math.random() - 0.5) * 1.8;
+        const dist = baseSize + (Math.random() * 70);
+        const r = 2 + Math.random() * 5;
+        drops.push({ a: slashAngle + spread, d: dist, r: r });
+      }
+      
+      const blobPoints = [];
+      for(let b = 0; b < 10; b++) {
+        const a = (b / 10) * Math.PI * 2;
+        const rad = baseSize * (0.6 + Math.random() * 0.6);
+        blobPoints.push({ a, rad });
+      }
+
+      soloState.persistentSplats.push({
+        x: obj.x, y: obj.y,
+        angle: slashAngle,
+        type: 'slash',
+        size: 50 + Math.random() * 50
+      });
+      soloState.persistentSplats.push({
+        x: obj.x, y: obj.y,
+        type: 'realistic_splat',
+        color: obj.fruit.innerColor || obj.fruit.color || '#f43f5e',
+        size: baseSize,
+        drops: drops,
+        blobPoints: blobPoints
+      });
+      if (soloState.persistentSplats.length > 50) soloState.persistentSplats.splice(0, 2);
+
+      if (q.type === 'spell' || q.type === 'listen_spell') {
+        const neededLetter = (q.word[soloState.spelledIndex] || '').toLowerCase();
+        if (obj.letter === neededLetter) {
+          soloState.spelledIndex++;
+          updateHUD();
+
+          if (soloState.spelledIndex >= q.word.length) {
+            endRoundWithScore(true, `🏆 completed spelling '${q.word}'! +1 point!`);
+          }
+        } else {
+          playWrongSound();
+        }
+      } else if (q.type === 'count') {
+        if (obj.isTargetFruit) {
+          soloState.slicedCount++;
+          updateHUD();
+
+          if (soloState.slicedCount >= q.count) {
+            endRoundWithScore(true, `🏆 sliced all ${q.count} ${q.fruitName}! +1 point!`);
+          }
+        } else {
+          playWrongSound();
+        }
+      }
+    }
+
+    function createJuicyParticles(obj) {
+      soloState.splats.push({
+        type: 'half',
+        fruit: obj.fruit,
+        letter: obj.letter,
+        x: obj.x,
+        y: obj.y,
+        vx: -3.8,
+        vy: -2.2,
+        rot: obj.angle,
+        vRot: -0.09,
+        life: 1.0,
+        isLeft: true
+      });
+      soloState.splats.push({
+        type: 'half',
+        fruit: obj.fruit,
+        letter: '',
+        x: obj.x,
+        y: obj.y,
+        vx: 3.8,
+        vy: -2.2,
+        rot: obj.angle,
+        vRot: 0.09,
+        life: 1.0,
+        isLeft: false
+      });
+
+      const splashColor = obj.fruit.innerColor || obj.fruit.color || '#f43f5e';
+      for (let i = 0; i < 15; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = 2.5 + Math.random() * 6;
+        soloState.splats.push({
+          type: 'juice',
+          color: splashColor,
+          x: obj.x,
+          y: obj.y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          radius: 3.5 + Math.random() * 5.5,
+          life: 1.0
+        });
+      }
+    }
+
+    function createExplosionParticles(x, y) {
+      for (let i = 0; i < 26; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = 3 + Math.random() * 8;
+        soloState.splats.push({
+          type: 'fire',
+          color: Math.random() < 0.5 ? '#f97316' : '#ef4444',
+          x, y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          radius: 5 + Math.random() * 8,
+          life: 1.0
+        });
+      }
+    }
+
+    function triggerShake() {
+      const container = document.getElementById('soloContainer');
+      container.classList.remove('shake');
+      void container.offsetWidth;
+      container.classList.add('shake');
+      setTimeout(() => container.classList.remove('shake'), 450);
+    }
+
+    /**
+     * RENDERING
+     */
+    function renderScene() {
+      ctxSolo.clearRect(0, 0, canvasSolo.width, canvasSolo.height);
+      const q = ROUND_QUESTIONS[currentRoundIndex];
+
+      // Marks & Splats
+      for (let i = 0; i < soloState.persistentSplats.length; i++) {
+        const mark = soloState.persistentSplats[i];
+        ctxSolo.save();
+        ctxSolo.translate(mark.x, mark.y);
+        
+        if (mark.type === 'slash') {
+            ctxSolo.rotate(mark.angle);
+            ctxSolo.beginPath();
+            ctxSolo.moveTo(-mark.size, 0);
+            ctxSolo.lineTo(mark.size, 0);
+            ctxSolo.lineWidth = 5;
+            ctxSolo.strokeStyle = 'rgba(40, 20, 10, 0.4)';
+            ctxSolo.stroke();
+            ctxSolo.beginPath();
+            ctxSolo.moveTo(-mark.size, 1.5);
+            ctxSolo.lineTo(mark.size, 1.5);
+            ctxSolo.lineWidth = 2;
+            ctxSolo.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctxSolo.stroke();
+        } else if (mark.type === 'realistic_splat') {
+            ctxSolo.globalAlpha = 0.75;
+            for (let layer = 0; layer < 2; layer++) {
+                ctxSolo.fillStyle = layer === 0 ? mark.color : 'rgba(0,0,0,0.15)';
+                ctxSolo.beginPath();
+                const pts = mark.blobPoints;
+                const scale = layer === 0 ? 1 : 0.6;
+                for (let j = 0; j < pts.length; j++) {
+                    const p = pts[j];
+                    const nextP = pts[(j + 1) % pts.length];
+                    const px = Math.cos(p.a) * (p.rad * scale);
+                    const py = Math.sin(p.a) * (p.rad * scale);
+                    const nx = Math.cos(nextP.a) * (nextP.rad * scale);
+                    const ny = Math.sin(nextP.a) * (nextP.rad * scale);
+                    const mx = (px + nx) / 2;
+                    const my = (py + ny) / 2;
+                    if (j === 0) ctxSolo.moveTo(mx, my);
+                    ctxSolo.quadraticCurveTo(px, py, mx, my);
+                }
+                ctxSolo.fill();
+            }
+
+            ctxSolo.fillStyle = mark.color;
+            for(let d = 0; d < mark.drops.length; d++) {
+                const drop = mark.drops[d];
+                ctxSolo.save();
+                ctxSolo.translate(Math.cos(drop.a) * drop.d, Math.sin(drop.a) * drop.d);
+                ctxSolo.rotate(drop.a);
+                ctxSolo.beginPath();
+                ctxSolo.ellipse(0, 0, drop.r * 1.8, drop.r * 0.7, 0, 0, Math.PI * 2);
+                ctxSolo.fill();
+                ctxSolo.restore();
+            }
+        }
+        ctxSolo.restore();
+      }
+
+      // Floating items
+      for (let i = 0; i < soloState.objects.length; i++) {
+        const obj = soloState.objects[i];
+        ctxSolo.save();
+        ctxSolo.translate(obj.x, obj.y);
+        ctxSolo.rotate(obj.angle);
+
+        if (obj.isBomb) {
+          ctxSolo.beginPath();
+          ctxSolo.arc(0, 0, obj.radius, 0, Math.PI * 2);
+          ctxSolo.fillStyle = '#1c1917';
+          ctxSolo.fill();
+          ctxSolo.lineWidth = 3;
+          ctxSolo.strokeStyle = '#ef4444';
+          ctxSolo.stroke();
+
+          for (let s = 0; s < 8; s++) {
+            const spikeAngle = (s * Math.PI * 2) / 8;
+            const sx = Math.cos(spikeAngle) * (obj.radius + 6);
+            const sy = Math.sin(spikeAngle) * (obj.radius + 6);
+            ctxSolo.beginPath();
+            ctxSolo.arc(sx, sy, 4, 0, Math.PI * 2);
+            ctxSolo.fillStyle = '#dc2626';
+            ctxSolo.fill();
+          }
+
+          ctxSolo.font = '24px sans-serif';
+          ctxSolo.fillStyle = '#fff';
+          ctxSolo.textAlign = 'center';
+          ctxSolo.textBaseline = 'middle';
+          ctxSolo.fillText('💣', 0, 0);
+
+        } else {
+          const cachedImg = obj.fruit.imgUrl ? fruitImageCache.get(obj.fruit.imgUrl) : null;
+          if (cachedImg && cachedImg.complete && cachedImg.naturalWidth !== 0) {
+            ctxSolo.drawImage(cachedImg, -obj.radius, -obj.radius, obj.radius * 2, obj.radius * 2);
+          } else {
+            const grad = ctxSolo.createRadialGradient(-obj.radius * 0.35, -obj.radius * 0.35, 3, 0, 0, obj.radius);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.3, obj.fruit.color || '#ea580c');
+            grad.addColorStop(1, '#7c2d12');
+
+            ctxSolo.beginPath();
+            ctxSolo.arc(0, 0, obj.radius, 0, Math.PI * 2);
+            ctxSolo.fillStyle = grad;
+            ctxSolo.fill();
+            ctxSolo.lineWidth = 3.5;
+            ctxSolo.strokeStyle = 'rgba(255,255,255,0.85)';
+            ctxSolo.stroke();
+
+            ctxSolo.font = '20px sans-serif';
+            ctxSolo.textAlign = 'center';
+            ctxSolo.fillText(obj.fruit.emoji || '🍎', 0, -obj.radius * 0.45);
+          }
+
+          if (q && (q.type === 'spell' || q.type === 'listen_spell') && obj.letter) {
+            ctxSolo.beginPath();
+            ctxSolo.arc(0, 5, obj.radius * 0.6, 0, Math.PI * 2);
+            ctxSolo.fillStyle = 'rgba(15, 23, 42, 0.9)';
+            ctxSolo.fill();
+            ctxSolo.lineWidth = 4;
+            ctxSolo.strokeStyle = '#facc15';
+            ctxSolo.stroke();
+
+            ctxSolo.font = '900 52px Fredoka One, cursive';
+            ctxSolo.fillStyle = '#fef08a';
+            ctxSolo.textAlign = 'center';
+            ctxSolo.textBaseline = 'middle';
+            ctxSolo.fillText(obj.letter.toLowerCase(), 0, 6);
+          }
+        }
+
+        ctxSolo.restore();
+      }
+
+      // Particles
+      for (let i = soloState.splats.length - 1; i >= 0; i--) {
+        const p = soloState.splats[i];
+        ctxSolo.save();
+        ctxSolo.globalAlpha = Math.max(0, p.life);
+
+        if (p.type === 'half') {
+          ctxSolo.translate(p.x, p.y);
+          ctxSolo.rotate(p.rot);
+          ctxSolo.beginPath();
+          if (p.isLeft) {
+            ctxSolo.arc(0, 0, 32, Math.PI * 0.5, Math.PI * 1.5);
+          } else {
+            ctxSolo.arc(0, 0, 32, -Math.PI * 0.5, Math.PI * 0.5);
+          }
+          ctxSolo.fillStyle = p.fruit.innerColor || '#fed7aa';
+          ctxSolo.fill();
+          ctxSolo.lineWidth = 3;
+          ctxSolo.strokeStyle = p.fruit.color || '#ea580c';
+          ctxSolo.stroke();
+
+          if (p.letter) {
+            ctxSolo.font = '900 36px Fredoka One';
+            ctxSolo.fillStyle = '#1e293b';
+            ctxSolo.fillText(p.letter.toLowerCase(), p.isLeft ? -10 : 10, 10);
+          }
+        } else if (p.type === 'juice' || p.type === 'fire') {
+          if (p.type === 'juice') {
+            ctxSolo.save();
+            ctxSolo.translate(p.x, p.y);
+            const moveAngle = Math.atan2(p.vy, p.vx);
+            ctxSolo.rotate(moveAngle);
+            ctxSolo.beginPath();
+            const speed = Math.hypot(p.vx, p.vy);
+            const stretch = Math.max(1, speed * 0.45);
+            ctxSolo.ellipse(0, 0, (p.radius * p.life) * stretch, p.radius * p.life, 0, 0, Math.PI * 2);
+            ctxSolo.fillStyle = p.color;
+            ctxSolo.fill();
+            ctxSolo.restore();
+          } else {
+            ctxSolo.beginPath();
+            ctxSolo.arc(p.x, p.y, p.radius * p.life, 0, Math.PI * 2);
+            ctxSolo.fillStyle = p.color;
+            ctxSolo.fill();
+          }
+        }
+
+        ctxSolo.restore();
+      }
+
+      // Blade Trail
+      if (soloState.slashTrail.length >= 2) {
+        ctxSolo.save();
+        ctxSolo.lineCap = 'round';
+        ctxSolo.lineJoin = 'round';
+
+        for (let i = 1; i < soloState.slashTrail.length; i++) {
+          const ptA = soloState.slashTrail[i - 1];
+          const ptB = soloState.slashTrail[i];
+          const alpha = ptB.age;
+
+          ctxSolo.beginPath();
+          ctxSolo.moveTo(ptA.x, ptA.y);
+          ctxSolo.lineTo(ptB.x, ptB.y);
+          ctxSolo.lineWidth = 14 * alpha;
+          ctxSolo.strokeStyle = `rgba(245, 158, 11, ${alpha * 0.45})`;
+          ctxSolo.stroke();
+
+          ctxSolo.beginPath();
+          ctxSolo.moveTo(ptA.x, ptA.y);
+          ctxSolo.lineTo(ptB.x, ptB.y);
+          ctxSolo.lineWidth = 5 * alpha;
+          ctxSolo.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.95})`;
+          ctxSolo.stroke();
+        }
+        ctxSolo.restore();
+      }
+    }
+
+    /**
+     * ANIMATION LOOP
+     */
+    let lastSpawnTick = 0;
+
+    function gameLoop(timestamp) {
+      if (!lastSpawnTick) lastSpawnTick = timestamp;
+      let elapsed = timestamp - lastSpawnTick;
+      const q = ROUND_QUESTIONS[currentRoundIndex];
+
+      if (isRoundActive && q && !isPaused) {
+        const spawnDelay = (q.type === 'count') ? 480 : 880;
+
+        if (elapsed > spawnDelay) {
+          spawnFruit();
+          lastSpawnTick = timestamp;
+          elapsed = 0;
+        }
+
+        updatePhysics();
+      } else if (isPaused) {
+        lastSpawnTick = timestamp - elapsed;
+      }
+
+      renderScene();
+      requestAnimationFrame(gameLoop);
+    }
+
+    function updatePhysics() {
+      for (let i = soloState.objects.length - 1; i >= 0; i--) {
+        const obj = soloState.objects[i];
+        obj.vy += obj.gravity;
+        obj.y += obj.vy;
+        obj.x += obj.vx;
+        obj.wobblePhase += obj.wobbleSpeed;
+        obj.x += Math.sin(obj.wobblePhase) * obj.wobbleAmp;
+        obj.angle += obj.rotSpeed;
+
+        if (obj.y > canvasSolo.height + 80 && obj.vy > 0) {
+          soloState.objects.splice(i, 1);
+        }
+      }
+
+      for (let i = soloState.splats.length - 1; i >= 0; i--) {
+        const s = soloState.splats[i];
+        s.x += s.vx;
+        s.y += s.vy;
+        s.vy += 0.15;
+        s.life -= 0.022;
+        if (s.life <= 0) soloState.splats.splice(i, 1);
+      }
+
+      for (let i = soloState.slashTrail.length - 1; i >= 0; i--) {
+        soloState.slashTrail[i].age -= 0.07;
+        if (soloState.slashTrail[i].age <= 0) soloState.slashTrail.splice(i, 1);
+      }
+    }
+
+    /**
+     * HUD UPDATE
+     */
+    function updateHUD() {
+      const q = ROUND_QUESTIONS[currentRoundIndex];
+      if (!q) return;
+
+      document.getElementById('hudPlayerName').textContent = `group ${selectedGroupNum}`;
+      document.getElementById('hudTotalScore').textContent = totalScore;
+      
+      let hearts = '';
+      for (let i = 0; i < 3; i++) hearts += (i < soloState.lives) ? '❤️' : '🖤';
+      document.getElementById('hudPlayerLives').innerHTML = hearts;
+
+      if (q.type === 'spell' || q.type === 'listen_spell') {
+        document.getElementById('hudGoalLabel').textContent = 'spell:';
+        renderSpellingSlots('hudSlots', q.word, soloState.spelledIndex);
+      } else if (q.type === 'count') {
+        document.getElementById('hudGoalLabel').textContent = 'slice:';
+        renderCountingProgress('hudSlots', soloState.slicedCount, q.count, q.fruitKey);
+      }
+    }
+
+    function renderSpellingSlots(elemId, word, spelledCount) {
+      const container = document.getElementById(elemId);
+      container.innerHTML = '';
+      const lowerWord = word.toLowerCase();
+
+      for (let i = 0; i < lowerWord.length; i++) {
+        const letter = lowerWord[i];
+        const isSpelled = i < spelledCount;
+        const isNext = i === spelledCount;
+
+        const slot = document.createElement('div');
+        slot.className = `w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center font-game text-xl sm:text-2xl rounded-lg border-2 transition-all lowercase pb-1 ${
+          isSpelled
+            ? 'bg-amber-400 text-stone-950 border-yellow-200 font-extrabold shadow-md transform scale-105'
+            : isNext
+            ? 'bg-white/20 text-yellow-300 border-amber-400 animate-pulse font-bold'
+            : 'bg-black/50 text-stone-600 border-white/10'
+        }`;
+        slot.textContent = isSpelled ? letter : (isNext ? '?' : '_');
+        container.appendChild(slot);
+      }
+    }
+
+    function renderCountingProgress(elemId, current, total, fruitKey) {
+      const container = document.getElementById(elemId);
+      const f = fruitAssets[fruitKey] || DEFAULT_FRUIT_MODELS.apple;
+      container.innerHTML = `
+        <div class="flex items-center gap-1.5 font-arcade text-lg sm:text-xl text-yellow-300 lowercase">
+          <span>${f.emoji}</span>
+          <span class="text-white font-bold">${current}</span> / <span>${total}</span>
+        </div>
+      `;
+    }
+
+    /**
+     * GROUP SELECTION SCREEN
+     */
+    function openGroupSelectScreen() {
+      document.getElementById('screenTitle').classList.add('hidden');
+      document.getElementById('screenRoundIntro').classList.add('hidden');
+      document.getElementById('screenGame').classList.add('hidden');
+      document.getElementById('screenWinner').classList.add('hidden');
+
+      const groupScreen = document.getElementById('screenGroupSelect');
+      groupScreen.classList.remove('hidden');
+
+      const q = ROUND_QUESTIONS[currentRoundIndex];
+      const rNum = currentRoundIndex + 1;
+      document.getElementById('groupHeader').textContent = `⚔️ round ${rNum} solo challenge ⚔️`;
+      document.getElementById('groupSubhead').textContent = `question: ${q.prompt.toLowerCase()}`;
+      document.getElementById('lblStartRoundBtn').textContent = `start round ${rNum}`;
+
+      document.getElementById('lblSelectedGroup').textContent = `group ${selectedGroupNum}`;
+    }
+
+    /**
+     * 10-SECOND QUESTION PREVIEW
+     */
+    let preview10Timer = null;
+
+    function start10SecondRoundIntro() {
+      document.getElementById('screenGroupSelect').classList.add('hidden');
+      document.getElementById('screenRoundIntro').classList.remove('hidden');
+
+      const q = ROUND_QUESTIONS[currentRoundIndex];
+      const rNum = currentRoundIndex + 1;
+
+      soloState.spelledIndex = 0;
+      soloState.slicedCount = 0;
+      soloState.lives = 3;
+      soloState.objects = [];
+      soloState.splats = [];
+      soloState.slashTrail = [];
+      soloState.persistentSplats = [];
+
+      document.getElementById('roundIntroBanner').textContent = `round ${rNum}`;
+      document.getElementById('roundQuestionPrompt').textContent = q.prompt.toLowerCase();
+
+      const displayContainer = document.getElementById('previewDisplayContainer');
+      displayContainer.innerHTML = '';
+
+      if (q.type === 'spell') {
+        displayContainer.innerHTML = `
+          <div class="bg-stone-900/90 border-4 border-amber-400 rounded-3xl p-5 shadow-[0_0_50px_rgba(245,158,11,0.5)] flex flex-col items-center">
+            <div class="w-40 h-40 flex items-center justify-center mb-2">
+              ${getFruitGraphicHtml(q.fruitKey, 160)}
+            </div>
+            <div class="text-4xl sm:text-5xl font-arcade tracking-widest text-yellow-300 drop-shadow lowercase">
+              ${q.word.toLowerCase()}
+            </div>
+          </div>
+        `;
+        playWrestlingAnnouncer(`round ${rNum}! spell ${q.word}! fight!`);
+      } else if (q.type === 'listen_spell') {
+        displayContainer.innerHTML = `
+          <div class="bg-indigo-900/90 border-4 border-indigo-400 rounded-3xl p-8 shadow-[0_0_50px_rgba(99,102,241,0.5)] flex flex-col items-center">
+            <div class="text-7xl sm:text-8xl mb-4 animate-bounce">🎧</div>
+            <div class="text-3xl sm:text-4xl font-arcade tracking-widest text-indigo-200 drop-shadow lowercase">
+              listen carefully!
+            </div>
+            <div class="mt-4 px-5 py-2 bg-indigo-950 rounded-full border border-indigo-400/50 text-indigo-300 text-sm lowercase animate-pulse">
+                (secret spelling word)
+            </div>
+          </div>
+        `;
+        playESLAnnouncer(q.voiceover);
+      } else if (q.type === 'count') {
+        let fruitItemsHtml = '';
+        for (let i = 0; i < q.count; i++) {
+          fruitItemsHtml += `
+            <div class="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transform hover:scale-110 transition">
+              ${getFruitGraphicHtml(q.fruitKey, 60)}
+            </div>
+          `;
+        }
+
+        const trayImgUrl = localStorage.getItem('ninja_spell_tray') || '';
+        const trayStyle = trayImgUrl ? `background-image: url('${trayImgUrl}'); background-size: cover; background-position: center; border-color: transparent; box-shadow: none;` : '';
+
+        displayContainer.innerHTML = `
+          <div class="wooden-tray rounded-3xl p-4 sm:p-6 w-full max-w-lg flex flex-col items-center" style="${trayStyle}">
+            <div class="text-xs uppercase text-amber-200 font-bold mb-2 tracking-wider flex items-center gap-1.5 bg-black/60 px-3 py-1 rounded-full backdrop-blur-md">
+              <span>🧺</span> fruit tray (${q.count} ${q.fruitName.toLowerCase()})
+            </div>
+            <div class="flex flex-wrap gap-2.5 justify-center items-center py-2 max-h-48 overflow-y-auto">
+              ${fruitItemsHtml}
+            </div>
+          </div>
+        `;
+        playESLAnnouncer(q.voiceover);
+      }
+
+      let countdown = 10;
+      const countEl = document.getElementById('previewCountdownNumber');
+      countEl.textContent = countdown;
+
+      if (preview10Timer) clearInterval(preview10Timer);
+      preview10Timer = setInterval(() => {
+        countdown--;
+        if (countdown > 0) {
+          countEl.textContent = countdown;
+          if (audioCtx && !isSoundMuted) {
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.frequency.value = 440;
+            g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+            osc.connect(g);
+            g.connect(sfxMasterGain);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.08);
+          }
+        } else {
+          clearInterval(preview10Timer);
+          launch90SecondRound();
+        }
+      }, 1000);
+    }
+
+    /**
+     * 90-SECOND GAMEPLAY
+     */
+    function launch90SecondRound() {
+      document.getElementById('screenRoundIntro').classList.add('hidden');
+      document.getElementById('screenGame').classList.remove('hidden');
+
+      isPaused = false;
+      document.getElementById('pauseOverlay').classList.add('hidden');
+      document.getElementById('btnPauseGame').textContent = 'pause';
+      document.getElementById('btnPauseGameMob').textContent = 'pause';
+
+      resizeCanvases();
+      updateHUD();
+      isRoundActive = true;
+      startBubblyFruitMusic();
+
+      roundSecondsRemaining = 90;
+      document.getElementById('gameTimerDisplay').textContent = `${roundSecondsRemaining}s`;
+
+      if (roundTimerInterval) clearInterval(roundTimerInterval);
+      roundTimerInterval = setInterval(() => {
+        if (!isRoundActive) {
+          clearInterval(roundTimerInterval);
+          return;
+        }
+        if (isPaused) return;
+
+        roundSecondsRemaining--;
+        document.getElementById('gameTimerDisplay').textContent = `${roundSecondsRemaining}s`;
+
+        if (roundSecondsRemaining <= 0) {
+          clearInterval(roundTimerInterval);
+          handleRoundTimeout();
+        }
+      }, 1000);
+    }
+
+    function handleRoundTimeout() {
+      const q = ROUND_QUESTIONS[currentRoundIndex];
+      let success = false;
+      let msg = 'time expired!';
+
+      if (q.type === 'spell' || q.type === 'listen_spell') {
+        if (soloState.spelledIndex >= q.word.length) {
+          success = true;
+          msg = `⏱️ time up! word completed! +1 point!`;
+        } else {
+          msg = `⏱️ time up! word not completed!`;
+        }
+      } else {
+        if (soloState.slicedCount >= q.count) {
+          success = true;
+          msg = `⏱️ time up! target sliced! +1 point!`;
+        } else {
+          msg = `⏱️ time up! target count not reached!`;
+        }
+      }
+
+      endRoundWithScore(success, msg);
+    }
+
+    function endRoundWithScore(wonRound, msg) {
+      isRoundActive = false;
+      if (roundTimerInterval) clearInterval(roundTimerInterval);
+      stopBubblyFruitMusic();
+
+      if (wonRound) {
+        totalScore += 1;
+      }
+
+      const rNum = currentRoundIndex + 1;
+      const screenWinner = document.getElementById('screenWinner');
+      document.getElementById('winnerTitle').textContent = wonRound ? `round ${rNum} clear!` : `round ${rNum} finished`;
+      document.getElementById('winnerIcon').textContent = wonRound ? `🏆` : `💔`;
+      document.getElementById('winnerMessage').textContent = msg.toLowerCase();
+
+      document.getElementById('modalScoreDisplay').textContent = totalScore;
+      document.getElementById('modalGroupBadge').textContent = `group ${selectedGroupNum} player`;
+
+      screenWinner.classList.remove('hidden');
+
+      if (wonRound) {
+        playWrestlingAnnouncer(`round ${rNum} clear! +1 point! total score: ${totalScore}!`);
+      } else {
+        playWrestlingAnnouncer(`round ${rNum} over! total score: ${totalScore}!`);
+      }
+    }
+
+    /**
+     * TEACHER DASHBOARD
+     */
+    function openDashboard() {
+      initAudio();
+      document.getElementById('modalDashboard').classList.remove('hidden');
+      document.getElementById('customTrayUrlInput').value = localStorage.getItem('ninja_spell_tray') || '';
+
+      renderDashboardRoundsList();
+      renderDashboardFruitGrid();
+    }
+
+    function closeDashboard() {
+      document.getElementById('modalDashboard').classList.add('hidden');
+    }
+
+    function renderDashboardRoundsList() {
+      const container = document.getElementById('dashboardRoundsList');
+      container.innerHTML = '';
+
+      ROUND_QUESTIONS.forEach(q => {
+        const item = document.createElement('div');
+        item.className = 'bg-stone-900 border border-white/10 rounded-lg p-2 flex items-center justify-between';
+        
+        let tagHtml = '';
+        if (q.type === 'spell') tagHtml = '<span class="px-2 py-0.5 rounded text-[10px] font-bold lowercase bg-indigo-950 text-indigo-300 border border-indigo-500/40">spelling</span>';
+        else if (q.type === 'listen_spell') tagHtml = '<span class="px-2 py-0.5 rounded text-[10px] font-bold lowercase bg-purple-950 text-purple-300 border border-purple-500/40">listen & spell</span>';
+        else tagHtml = '<span class="px-2 py-0.5 rounded text-[10px] font-bold lowercase bg-emerald-950 text-emerald-300 border border-emerald-500/40">counting tray</span>';
+
+        item.innerHTML = `
+          <div>
+            <span class="text-amber-400 font-bold font-arcade lowercase">round ${q.round}:</span>
+            <span class="text-stone-200 ml-1 lowercase">${q.prompt}</span>
+          </div>
+          ${tagHtml}
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function renderDashboardFruitGrid() {
+      const container = document.getElementById('wordListGrid');
+      container.innerHTML = '';
+
+      Object.entries(fruitAssets).forEach(([key, fruit]) => {
+        const card = document.createElement('div');
+        card.className = 'bg-stone-900 border border-white/10 rounded-xl p-3 flex flex-col gap-2';
+
+        const previewContent = fruit.imgUrl 
+          ? `<img src="${fruit.imgUrl}" class="max-h-14 max-w-14 object-contain" onerror="this.src='https://placehold.co/100x100/1c1917/ffffff?text=${fruit.name}'"/>`
+          : `<div class="text-3xl">${fruit.emoji}</div>`;
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-14 h-14 rounded-lg checkerboard border border-white/20 flex items-center justify-center p-1 overflow-hidden">
+                ${previewContent}
+              </div>
+              <div>
+                <span class="font-bold text-amber-300 font-arcade text-lg lowercase">${fruit.name}</span>
+                <span class="text-[10px] text-stone-400 block">${fruit.imgUrl ? 'custom transparent image' : 'built-in graphic'}</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1.5 mt-1">
+            <input type="text" class="input-fruit-url bg-stone-950 border border-white/15 rounded-lg px-2 py-1 text-xs text-stone-200 outline-none focus:border-amber-400" 
+                   placeholder="Transparent PNG URL..." value="${fruit.imgUrl || ''}" data-key="${key}">
+            <div class="flex gap-2">
+              <label class="flex-1 px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px] rounded-lg cursor-pointer text-center font-bold lowercase">
+                upload transparent png
+                <input type="file" accept="image/png,image/webp,image/svg+xml" class="input-fruit-file hidden" data-key="${key}">
+              </label>
+              ${fruit.imgUrl ? `<button class="btn-clear-img px-2 py-1 bg-stone-800 hover:bg-stone-700 text-amber-300 text-[11px] rounded-lg font-bold lowercase" data-key="${key}">clear</button>` : ''}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      container.querySelectorAll('.input-fruit-url').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const k = e.target.dataset.key;
+          fruitAssets[k].imgUrl = e.target.value.trim();
+          preloadFruitImages();
+          renderDashboardFruitGrid();
+        });
+      });
+
+      container.querySelectorAll('.input-fruit-file').forEach(fileInput => {
+        fileInput.addEventListener('change', (e) => {
+          const k = e.target.dataset.key;
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+              fruitAssets[k].imgUrl = evt.target.result;
+              preloadFruitImages();
+              renderDashboardFruitGrid();
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      });
+
+      container.querySelectorAll('.btn-clear-img').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const k = e.target.dataset.key;
+          fruitAssets[k].imgUrl = '';
+          renderDashboardFruitGrid();
+        });
+      });
+    }
+
+    function saveAllDashboardSettings() {
+      localStorage.setItem('ninja_spell_assets', JSON.stringify(fruitAssets));
+      const trayVal = document.getElementById('customTrayUrlInput').value.trim();
+      localStorage.setItem('ninja_spell_tray', trayVal);
+
+      preloadFruitImages();
+      closeDashboard();
+    }
+
+    function setArenaBackground(bgType, customVal = '') {
+      const bgLayer = document.getElementById('gameBgLayer');
+      if (bgType === 'gradient-purple') {
+        bgLayer.style.backgroundImage = 'radial-gradient(circle at center, #2e1065 0%, #09090b 100%)';
+      } else if (bgType === 'gradient-bamboo') {
+        bgLayer.style.backgroundImage = 'radial-gradient(circle at center, #064e3b 0%, #022c22 100%)';
+      } else if (bgType === 'gradient-sunset') {
+        bgLayer.style.backgroundImage = 'radial-gradient(circle at center, #7c2d12 0%, #1c1917 100%)';
+      } else if (bgType === 'gradient-dojowood') {
+        bgLayer.style.backgroundImage = 'radial-gradient(circle at center, #451a03 0%, #09090b 100%)';
+      } else if (bgType === 'custom' && customVal) {
+        bgLayer.style.backgroundImage = `url('${customVal}')`;
+      }
+    }
+
+    /**
+     * INITIALIZATION & EVENT LISTENERS
+     */
+    document.addEventListener('DOMContentLoaded', () => {
+      preloadFruitImages();
+      requestAnimationFrame(gameLoop);
+
+      // Start Button
+      document.getElementById('btnStartGame').addEventListener('click', () => {
+        initAudio();
+        currentRoundIndex = 0;
+        totalScore = 0;
+        openGroupSelectScreen();
+      });
+
+      // Group Number Selection Buttons (1-6)
+      document.querySelectorAll('.btn-group-num').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          initAudio();
+          const target = e.currentTarget;
+          selectedGroupNum = parseInt(target.dataset.num, 10);
+          
+          document.querySelectorAll('.btn-group-num').forEach(b => {
+            b.classList.remove('bg-amber-600', 'text-white');
+            b.classList.add('bg-stone-900', 'text-yellow-300');
+          });
+          target.classList.remove('bg-stone-900', 'text-yellow-300');
+          target.classList.add('bg-amber-600', 'text-white');
+
+          document.getElementById('lblSelectedGroup').textContent = `group ${selectedGroupNum}`;
+          playJuicySliceSound();
+        });
+      });
+
+      // Start Round Button
+      document.getElementById('btnStartRound').addEventListener('click', () => {
+        initAudio();
+        start10SecondRoundIntro();
+      });
+
+      // Score Modal - Next Round (Does NOT progress question automatically; goes to group select for next round)
+      document.getElementById('btnNextRound').addEventListener('click', () => {
+        initAudio();
+        currentRoundIndex = (currentRoundIndex + 1) % ROUND_QUESTIONS.length;
+        openGroupSelectScreen();
+      });
+
+      // Score Modal - Back to Menu
+      document.getElementById('btnBackToMenu').addEventListener('click', () => {
+        initAudio();
+        document.getElementById('screenWinner').classList.add('hidden');
+        document.getElementById('screenTitle').classList.remove('hidden');
+      });
+
+      // Pause Controls
+      const togglePause = () => {
+        if (!isRoundActive) return;
+        isPaused = !isPaused;
+        const txt = isPaused ? 'resume' : 'pause';
+        document.getElementById('btnPauseGame').textContent = txt;
+        document.getElementById('btnPauseGameMob').textContent = txt;
+        document.getElementById('pauseOverlay').classList.toggle('hidden', !isPaused);
+      };
+      document.getElementById('btnPauseGame').addEventListener('click', togglePause);
+      document.getElementById('btnPauseGameMob').addEventListener('click', togglePause);
+
+      // End Game Controls
+      const endGameRound = () => {
+        if (!isRoundActive) return;
+        handleRoundTimeout();
+      };
+      document.getElementById('btnEndGame').addEventListener('click', endGameRound);
+      document.getElementById('btnEndGameMob').addEventListener('click', endGameRound);
+
+      // Utility Bar Buttons
+      document.getElementById('btnSoundToggle').addEventListener('click', () => {
+        isSoundMuted = !isSoundMuted;
+        document.getElementById('soundIcon').textContent = isSoundMuted ? '🔇' : '🔊';
+        document.getElementById('soundLabel').textContent = isSoundMuted ? 'sound off' : 'sound on';
+        if (isSoundMuted) stopBubblyFruitMusic();
+        else if (isRoundActive) startBubblyFruitMusic();
+      });
+
+      document.getElementById('btnOpenDashboard').addEventListener('click', openDashboard);
+      document.getElementById('btnCloseDashboard').addEventListener('click', closeDashboard);
+      document.getElementById('btnSaveDashboard').addEventListener('click', saveAllDashboardSettings);
+
+      // Background Presets
+      document.querySelectorAll('.bg-preset-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const bg = e.currentTarget.dataset.bg;
+          setArenaBackground(bg);
+        });
+      });
+
+      document.getElementById('btnApplyBgUrl').addEventListener('click', () => {
+        const url = document.getElementById('customBgUrlInput').value.trim();
+        if (url) setArenaBackground('custom', url);
+      });
+
+      document.getElementById('bgFileInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (evt) => setArenaBackground('custom', evt.target.result);
+          reader.readAsDataURL(file);
+        }
+      });
+
+      document.getElementById('btnResetFruitWords').addEventListener('click', () => {
+        fruitAssets = JSON.parse(JSON.stringify(DEFAULT_FRUIT_MODELS));
+        localStorage.removeItem('ninja_spell_assets');
+        renderDashboardFruitGrid();
+      });
+
+      document.getElementById('sliderMusicVol').addEventListener('input', (e) => {
+        if (musicMasterGain) musicMasterGain.gain.value = parseFloat(e.target.value);
+      });
+
+      document.getElementById('sliderSfxVol').addEventListener('input', (e) => {
+        if (sfxMasterGain) sfxMasterGain.gain.value = parseFloat(e.target.value);
+      });
+
+      document.getElementById('btnTestVoice').addEventListener('click', () => {
+        playWrestlingAnnouncer("round 1! spell apple! fight!");
+      });
+    });
+  </script>
+</body>
+</html>
