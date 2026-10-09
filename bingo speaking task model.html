@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WW5 L2 Bingo Speaking Task - Classroom Edition</title>
+  <title>WW5 L2 Bingo Speaking Task - Live Sync Edition</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -103,7 +103,7 @@
       background-position: 0 0, 10px 10px;
     }
 
-    /* Lined Notebook Paper Card */
+    /* Lined Notebook Paper Flashcard */
     .notebook-paper {
       background: #FFFFFF;
       background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
@@ -134,7 +134,7 @@
       box-shadow: 0 12px 24px rgba(0,0,0,0.18);
     }
 
-    /* Shiny Glossy 3D Letter Sticker Badge */
+    /* Shiny Glossy 3D Alphabet Badge */
     .alphabet-sticker {
       position: relative;
       overflow: hidden;
@@ -151,7 +151,6 @@
       transform: rotate(-4deg);
     }
     
-    /* Glossy Reflection Curve */
     .alphabet-sticker::before {
       content: '';
       position: absolute;
@@ -164,7 +163,7 @@
       pointer-events: none;
     }
 
-    /* Score Circle Gauge */
+    /* Score Gauge Circular Progress */
     .circle-bg {
       fill: none;
       stroke: #E5E7EB;
@@ -220,7 +219,7 @@
     </svg>
   </div>
 
-  <!-- Floating Classroom Background Doodles -->
+  <!-- Floating Background Classroom Doodles -->
   <div class="fixed top-12 left-6 text-3xl opacity-20 animate-float-slow pointer-events-none">✏️</div>
   <div class="fixed top-24 right-8 text-3xl opacity-20 animate-float-delay pointer-events-none">🎨</div>
   <div class="fixed bottom-20 left-8 text-3xl opacity-20 animate-float-delay pointer-events-none">🌍</div>
@@ -239,7 +238,7 @@
           <h1 id="mainAppTitleHeader" class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-wide flex items-center gap-2 font-heading">
             WW5 L2 Bingo Speaking Task
           </h1>
-          <p class="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+          <p class="text-xs font-bold text-slate-600 flex items-center gap-1.5 flex-wrap">
             <span>🗣️ Tap block & speak sentence:</span>
             <span class="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md font-extrabold">80+ PTS to clear!</span>
           </p>
@@ -248,6 +247,13 @@
 
       <!-- Header Action Buttons -->
       <div class="flex items-center gap-2 flex-wrap justify-center">
+        
+        <!-- Live Room Code Status Button -->
+        <button onclick="openRoomCodeModal()" id="roomStatusBtn" class="btn-bubbly px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-extrabold flex items-center gap-1.5 text-xs shadow-md">
+          <i class="fas fa-tower-broadcast animate-pulse text-amber-300"></i>
+          <span id="roomStatusText">Room: CLASS101</span>
+        </button>
+
         <button onclick="shuffleGridBoard()" class="btn-bubbly px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-extrabold flex items-center gap-1.5 text-xs shadow-md">
           <i class="fas fa-shuffle"></i> Shuffle Board
         </button>
@@ -291,12 +297,12 @@
       </div>
 
       <!-- Classroom Progress Bar -->
-      <div class="w-full md:w-60 bg-slate-800/80 h-4 rounded-full overflow-hidden p-0.5 border border-slate-600 shadow-inner">
+      <div class="w-full md:w-56 bg-slate-800/80 h-4 rounded-full overflow-hidden p-0.5 border border-slate-600 shadow-inner">
         <div id="gameProgressBar" class="h-full bg-gradient-to-r from-yellow-400 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
       </div>
 
       <div class="text-xs font-bold bg-emerald-900/80 text-emerald-200 px-3 py-1.5 rounded-xl flex items-center gap-2 border border-emerald-700">
-        <i class="fas fa-star text-yellow-300 text-sm"></i> Passing Rule: <span class="font-extrabold text-yellow-300">80+ PTS</span>
+        <i class="fas fa-satellite-dish text-yellow-300 animate-pulse"></i> Cloud Sync: <span id="cloudSyncStateBadge" class="font-extrabold text-yellow-300">Active</span>
       </div>
     </section>
 
@@ -310,7 +316,7 @@
 
         <div class="corkboard-texture p-2.5 sm:p-3.5 rounded-2xl border-2 border-amber-900/40">
           <div id="bingoGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5">
-            <!-- 16 Grid Blocks rendered dynamically with colorful alphabet badges & big sentences -->
+            <!-- 16 Grid Blocks rendered dynamically -->
           </div>
         </div>
       </div>
@@ -329,7 +335,6 @@
 
       <!-- Small Cute Alphabet Badge & Block Badge -->
       <div class="flex items-center gap-2.5 mb-3">
-        <!-- Bright Shiny Alphabet Badge -->
         <div id="modalAlphabetTile" class="alphabet-sticker w-9 h-9 text-base">
           A
         </div>
@@ -411,7 +416,6 @@
             <h4 id="scoreFeedbackTitle" class="text-lg font-bold text-slate-800 font-heading">Great Job!</h4>
             <p id="scoreFeedbackDesc" class="text-xs text-slate-600 mt-0.5">Your pronunciation was clear and accurate.</p>
 
-            <!-- Word Accuracy Breakdown -->
             <div class="mt-2.5 bg-slate-50 p-2 rounded-xl border border-slate-200">
               <div class="text-[9px] uppercase font-extrabold text-slate-400 mb-1">Word Analysis:</div>
               <div id="wordBreakdownList" class="flex flex-wrap gap-1 justify-center sm:justify-start text-xs font-semibold">
@@ -435,7 +439,43 @@
     </div>
   </div>
 
-  <!-- Teacher's Dashboard Modal (WITH CUSTOMIZABLE TOPIC TITLE) -->
+  <!-- Room Code Modal -->
+  <div id="roomCodeModal" class="fixed inset-0 bg-slate-900/65 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-4 border-indigo-300 relative animate-pop-in">
+      <button onclick="closeRoomCodeModal()" class="absolute top-3.5 right-3.5 text-slate-400 hover:text-slate-600 text-2xl w-9 h-9 rounded-full hover:bg-slate-100 flex items-center justify-center transition">
+        <i class="fas fa-xmark"></i>
+      </button>
+
+      <div class="text-center mb-4">
+        <div class="w-14 h-14 bg-indigo-100 text-indigo-700 rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-2">
+          📡
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 font-heading">Classroom Room Sync</h3>
+        <p class="text-xs text-slate-500 font-semibold">Enter a Room Code to automatically sync sentences across all student devices in real-time!</p>
+      </div>
+
+      <div class="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 mb-4">
+        <label for="roomCodeInput" class="text-xs font-extrabold text-indigo-900 uppercase block mb-1.5">Current Room Code:</label>
+        <div class="flex gap-2">
+          <input type="text" id="roomCodeInput" placeholder="e.g. CLASS101" class="flex-1 text-base font-extrabold uppercase tracking-wider px-3.5 py-2.5 rounded-xl border border-indigo-300 bg-white text-indigo-950 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center">
+          <button onclick="joinRoomFromModal()" class="btn-bubbly px-4 py-2.5 bg-indigo-600 text-white font-extrabold text-xs rounded-xl hover:bg-indigo-700">
+            Join Room
+          </button>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="generateNewRoomCode()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-slate-200">
+          🎲 Generate Random Code
+        </button>
+        <button onclick="copyCurrentRoomCode()" class="flex-1 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200">
+          📋 Copy Code
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Teacher's Dashboard Modal (WITH REAL-TIME SYNC) -->
   <div id="teacherModal" class="fixed inset-0 bg-slate-900/65 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-3xl max-w-4xl w-full p-5 sm:p-7 shadow-2xl border-4 border-purple-300 relative max-h-[90vh] flex flex-col animate-pop-in">
       
@@ -445,33 +485,40 @@
       </button>
 
       <!-- Dashboard Header -->
-      <div class="flex items-center gap-3 mb-2 shrink-0">
-        <div class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl font-bold">
-          👩‍🏫
+      <div class="flex items-center justify-between gap-3 mb-2 shrink-0 flex-wrap">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl font-bold">
+            👩‍🏫
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800 font-heading">Teacher's Dashboard</h2>
+            <p class="text-xs font-semibold text-slate-500">Edit Main Game Topic Title and Target Sentences (A–P).</p>
+          </div>
         </div>
-        <div>
-          <h2 class="text-xl sm:text-2xl font-bold text-slate-800 font-heading">Teacher's Dashboard</h2>
-          <p class="text-xs font-semibold text-slate-500">Customize main topic title, alphabet letters, and target sentences.</p>
+
+        <div class="bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs px-3 py-1.5 rounded-xl font-extrabold flex items-center gap-2">
+          <span>📡 Syncing Room:</span>
+          <span id="dashboardRoomCodeBadge" class="bg-indigo-600 text-white px-2 py-0.5 rounded-md font-mono">CLASS101</span>
         </div>
       </div>
 
       <!-- MAIN GAME TOPIC TITLE CUSTOMIZATION FIELD -->
       <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-3 rounded-2xl border-2 border-purple-200 mb-3 shrink-0 shadow-inner">
         <label for="teacherAppTitleInput" class="text-xs font-extrabold text-purple-900 uppercase tracking-wider block mb-1">
-          <i class="fas fa-pen-to-square text-purple-600"></i> Main Game Topic Title (Shown on Header):
+          <i class="fas fa-pen-to-square text-purple-600"></i> Main Game Topic Title (Header Banner):
         </label>
-        <input type="text" id="teacherAppTitleInput" placeholder="e.g. WW5 L2 Bingo Speaking Task or Unit 3: Daily Routines" class="w-full text-sm font-bold px-3 py-2 rounded-xl border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-slate-800">
+        <input type="text" id="teacherAppTitleInput" placeholder="e.g. WW5 L2 Bingo Speaking Task" class="w-full text-sm font-bold px-3 py-2 rounded-xl border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-slate-800">
       </div>
 
       <!-- Preset Toolbar -->
       <div class="flex flex-wrap justify-between items-center gap-2 mb-3 p-2.5 bg-purple-50 rounded-2xl border border-purple-100 shrink-0">
         <div class="text-xs font-extrabold text-purple-900 flex items-center gap-2">
-          <span>Curriculum Preset:</span>
+          <span>Preset:</span>
           <span class="bg-purple-200 text-purple-800 px-2 py-0.5 rounded-lg">WW5 Level 2 (Alphabets A-P)</span>
         </div>
         <div class="flex gap-2">
           <button onclick="shuffleGridBoard(); closeTeacherDashboard();" class="btn-bubbly px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition">
-            <i class="fas fa-shuffle"></i> Shuffle Grid Positions
+            <i class="fas fa-shuffle"></i> Shuffle Positions
           </button>
           <button onclick="resetToWW5Defaults()" class="btn-bubbly px-3 py-1 bg-white border border-purple-200 hover:bg-purple-100 text-purple-700 text-xs font-bold rounded-xl transition">
             <i class="fas fa-arrows-rotate"></i> Reset WW5 L2 Defaults
@@ -489,8 +536,8 @@
         <button onclick="closeTeacherDashboard()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl">
           Cancel
         </button>
-        <button onclick="saveTeacherChanges()" class="btn-bubbly px-5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-lg">
-          <i class="fas fa-floppy-disk"></i> Save Changes & Title
+        <button onclick="saveTeacherChanges()" class="btn-bubbly px-5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-lg flex items-center gap-1.5">
+          <i class="fas fa-cloud-arrow-up text-amber-300"></i> Save Changes & Sync to Devices
         </button>
       </div>
 
@@ -509,7 +556,7 @@
         BINGO ACHIEVED!
       </span>
 
-      <!-- EXACT WINNER BANNER MESSAGE -->
+      <!-- EXACT REQUIRED WINNER BANNER MESSAGE -->
       <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-heading leading-tight mb-2">
         Congrats! You complete the Bingo task
       </h2>
@@ -554,6 +601,126 @@
       </div>
     </div>
   </div>
+
+  <!-- Custom Floating Toast Notification -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-2xl shadow-2xl z-50 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2.5 border border-slate-700 text-xs font-extrabold pointer-events-none">
+    <span id="toastIcon">✨</span>
+    <span id="toastMessage">Notification Message</span>
+  </div>
+
+  <!-- Firebase 11.6.1 Web SDK Modules -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Global Environment Injection & Firebase Auth Handling
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'ww5-bingo-app';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' 
+      ? JSON.parse(__firebase_config) 
+      : {
+          apiKey: "demo-api-key",
+          authDomain: "demo-app.firebaseapp.com",
+          projectId: "demo-app",
+          storageBucket: "demo-app.appspot.com",
+          messagingSenderId: "123456789",
+          appId: "1:123456789:web:abcdef123456"
+        };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let authUser = null;
+    let roomUnsubscribe = null;
+
+    // Attach to global window for app access
+    window.firebaseCloud = {
+      appId,
+      db,
+      auth,
+      getAuthUser: () => authUser,
+      
+      // Save/Publish Room Changes to Firebase
+      pushRoomChanges: async (roomCode, data) => {
+        if (!authUser) {
+          console.warn("Auth not ready yet.");
+          return false;
+        }
+        try {
+          // RULE 1 Path Format: /artifacts/{appId}/public/data/rooms/{roomCode}
+          const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomCode.toUpperCase().trim());
+          await setDoc(roomRef, {
+            title: data.title,
+            blocks: data.blocks,
+            updatedAt: Date.now(),
+            updatedBy: authUser.uid
+          }, { merge: true });
+          return true;
+        } catch (err) {
+          console.error("Firebase push error:", err);
+          return false;
+        }
+      },
+
+      // Subscribe to Real-Time Room Document
+      subscribeToRoom: (roomCode, callback) => {
+        if (roomUnsubscribe) {
+          roomUnsubscribe();
+          roomUnsubscribe = null;
+        }
+
+        if (!authUser) return;
+
+        const cleanCode = roomCode.toUpperCase().trim();
+        // RULE 1 Path Format: /artifacts/{appId}/public/data/rooms/{roomCode}
+        const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', cleanCode);
+
+        // RULE: Always include error callback with onSnapshot
+        roomUnsubscribe = onSnapshot(roomRef, (snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.data();
+            callback({ success: true, data });
+          } else {
+            callback({ success: false, reason: 'doc_not_found' });
+          }
+        }, (error) => {
+          console.warn("Firestore snapshot error:", error);
+          callback({ success: false, reason: 'error', error });
+        });
+      }
+    };
+
+    // Authenticate First
+    async function initFirebaseAuth() {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (e) {
+        console.warn("Fallback to anonymous auth due to token issue:", e);
+        try {
+          await signInAnonymously(auth);
+        } catch (anonErr) {
+          console.error("Auth failed:", anonErr);
+        }
+      }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      authUser = user;
+      if (user) {
+        console.log("Firebase Auth Ready. UID:", user.uid);
+        if (window.onFirebaseReady) {
+          window.onFirebaseReady();
+        }
+      }
+    });
+
+    initFirebaseAuth();
+  </script>
 
   <script>
     /* VIBRANT RAINBOW GRADIENT PALETTES FOR ALPHABET STICKERS (A TO P) */
@@ -600,9 +767,10 @@
 
     // Global State Variables
     let appTitle = DEFAULT_APP_TITLE;
+    let currentRoomCode = "CLASS101";
     let blocksData = [];
-    let boardLayout = []; // Array of 16 block IDs corresponding to grid index 0..15
-    let clearedBlocks = {}; // { blockId: score }
+    let boardLayout = [];
+    let clearedBlocks = {};
     let currentActiveBlockId = null;
     let isSoundEnabled = true;
     let isRecording = false;
@@ -610,6 +778,17 @@
     let audioContext = null;
     let visualizerInterval = null;
     let victoryCelebrated = false;
+
+    // Toast Notification System
+    function showToast(msg, icon = "✨") {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastMessage').innerText = msg;
+      document.getElementById('toastIcon').innerText = icon;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
 
     function initAudioContext() {
       if (!audioContext) {
@@ -739,16 +918,15 @@
     }
 
     function initApp() {
-      // 1. Load Custom Main App Topic Title
-      const savedTitle = localStorage.getItem('WW5_APP_TITLE');
-      if (savedTitle && savedTitle.trim() !== "") {
-        appTitle = savedTitle.trim();
-      } else {
-        appTitle = DEFAULT_APP_TITLE;
-      }
-      updateMainTitleUI();
+      // 1. Load Local Room Code
+      const savedRoom = localStorage.getItem('WW5_ROOM_CODE');
+      if (savedRoom) currentRoomCode = savedRoom.toUpperCase().trim();
 
-      // 2. Load Blocks Data
+      // 2. Load Local Title
+      const savedTitle = localStorage.getItem('WW5_APP_TITLE');
+      if (savedTitle) appTitle = savedTitle;
+
+      // 3. Load Local Blocks Data
       const savedBlocks = localStorage.getItem('WW5_CLASSROOM_BLOCKS_V3');
       if (savedBlocks) {
         try {
@@ -760,7 +938,7 @@
         blocksData = JSON.parse(JSON.stringify(DEFAULT_WW5_BLOCKS));
       }
 
-      // 3. Load Cleared Blocks
+      // 4. Load Cleared Blocks
       const savedCleared = localStorage.getItem('WW5_CLASSROOM_CLEARED_V3');
       if (savedCleared) {
         try {
@@ -770,7 +948,7 @@
         }
       }
 
-      // 4. Load or Generate Board Layout
+      // 5. Load or Generate Board Layout
       const savedLayout = localStorage.getItem('WW5_CLASSROOM_LAYOUT_V3');
       if (savedLayout) {
         try {
@@ -782,16 +960,61 @@
         boardLayout = generateRandomLayout();
       }
 
+      updateMainTitleUI();
+      updateRoomUI();
       renderBingoGrid();
       checkBingoStatus(false);
       setupSpeechRecognition();
+
+      // Trigger Firebase Sync Initialization when auth is ready
+      if (window.firebaseCloud && window.firebaseCloud.getAuthUser()) {
+        connectToCloudRoom(currentRoomCode);
+      } else {
+        window.onFirebaseReady = () => {
+          connectToCloudRoom(currentRoomCode);
+        };
+      }
+    }
+
+    function connectToCloudRoom(code) {
+      if (!window.firebaseCloud) return;
+
+      currentRoomCode = code.toUpperCase().trim();
+      localStorage.setItem('WW5_ROOM_CODE', currentRoomCode);
+      updateRoomUI();
+
+      window.firebaseCloud.subscribeToRoom(currentRoomCode, (res) => {
+        if (res.success && res.data) {
+          // Live sync received from cloud teacher update!
+          if (res.data.title) {
+            appTitle = res.data.title;
+            localStorage.setItem('WW5_APP_TITLE', appTitle);
+            updateMainTitleUI();
+          }
+          if (res.data.blocks && Array.isArray(res.data.blocks)) {
+            blocksData = res.data.blocks;
+            localStorage.setItem('WW5_CLASSROOM_BLOCKS_V3', JSON.stringify(blocksData));
+            renderBingoGrid();
+          }
+          document.getElementById('cloudSyncStateBadge').innerText = "Live Synced";
+          document.getElementById('cloudSyncStateBadge').className = "font-extrabold text-emerald-300";
+          showToast(`Live synced with Room: ${currentRoomCode}`, "📡");
+        } else {
+          document.getElementById('cloudSyncStateBadge').innerText = "Ready";
+          document.getElementById('cloudSyncStateBadge').className = "font-extrabold text-amber-300";
+        }
+      });
     }
 
     function updateMainTitleUI() {
       const headerElem = document.getElementById('mainAppTitleHeader');
-      if (headerElem) {
-        headerElem.innerText = appTitle;
-      }
+      if (headerElem) headerElem.innerText = appTitle;
+    }
+
+    function updateRoomUI() {
+      document.getElementById('roomStatusText').innerText = `Room: ${currentRoomCode}`;
+      document.getElementById('dashboardRoomCodeBadge').innerText = currentRoomCode;
+      document.getElementById('roomCodeInput').value = currentRoomCode;
     }
 
     function generateRandomLayout() {
@@ -809,6 +1032,7 @@
       playSoundEffect('shuffle');
       renderBingoGrid();
       checkBingoStatus(true);
+      showToast("Board layout reshuffled!", "🔀");
     }
 
     function renderBingoGrid() {
@@ -1208,17 +1432,45 @@
       document.getElementById('manualSpeechInput').value = '';
     }
 
+    function openRoomCodeModal() {
+      playSoundEffect('pop');
+      document.getElementById('roomCodeModal').classList.remove('hidden');
+    }
+
+    function closeRoomCodeModal() {
+      document.getElementById('roomCodeModal').classList.add('hidden');
+    }
+
+    function joinRoomFromModal() {
+      const code = document.getElementById('roomCodeInput').value.trim();
+      if (code) {
+        connectToCloudRoom(code);
+        closeRoomCodeModal();
+        showToast(`Connected to Room: ${code.toUpperCase()}`, "📡");
+      }
+    }
+
+    function generateNewRoomCode() {
+      const randomCode = "CLASS" + Math.floor(100 + Math.random() * 900);
+      document.getElementById('roomCodeInput').value = randomCode;
+    }
+
+    function copyCurrentRoomCode() {
+      const code = document.getElementById('roomCodeInput').value || currentRoomCode;
+      navigator.clipboard.writeText(code).then(() => {
+        showToast(`Room Code "${code}" copied to clipboard!`, "📋");
+      }).catch(() => {
+        showToast(`Room Code is ${code}`, "ℹ️");
+      });
+    }
+
     function openTeacherDashboard() {
       initAudioContext();
       playSoundEffect('pop');
 
-      // Populate Main Topic Title Input
       const titleInput = document.getElementById('teacherAppTitleInput');
-      if (titleInput) {
-        titleInput.value = appTitle;
-      }
+      if (titleInput) titleInput.value = appTitle;
 
-      // Populate 16 Block Inputs
       const container = document.getElementById('teacherGridContainer');
       container.innerHTML = '';
 
@@ -1261,8 +1513,7 @@
       document.getElementById('teacherModal').classList.add('hidden');
     }
 
-    function saveTeacherChanges() {
-      // Save Main Game Topic Title
+    async function saveTeacherChanges() {
       const titleInput = document.getElementById('teacherAppTitleInput');
       if (titleInput && titleInput.value.trim() !== '') {
         appTitle = titleInput.value.trim();
@@ -1270,7 +1521,6 @@
         updateMainTitleUI();
       }
 
-      // Save 16 Blocks Data
       blocksData.forEach(block => {
         const letterInput = document.getElementById(`teacherLetter_${block.id}`);
         const sentenceInput = document.getElementById(`teacherSentence_${block.id}`);
@@ -1281,6 +1531,21 @@
 
       localStorage.setItem('WW5_CLASSROOM_BLOCKS_V3', JSON.stringify(blocksData));
       renderBingoGrid();
+
+      // Push Changes to Firebase Cloud Room
+      if (window.firebaseCloud) {
+        showToast("Syncing to cloud room...", "⏳");
+        const pushed = await window.firebaseCloud.pushRoomChanges(currentRoomCode, {
+          title: appTitle,
+          blocks: blocksData
+        });
+        if (pushed) {
+          showToast(`Synced live to Room: ${currentRoomCode}`, "🚀");
+        } else {
+          showToast("Saved locally (Cloud offline)", "💾");
+        }
+      }
+
       closeTeacherDashboard();
       playSoundEffect('pop');
     }
@@ -1294,6 +1559,7 @@
       localStorage.setItem('WW5_CLASSROOM_BLOCKS_V3', JSON.stringify(blocksData));
       openTeacherDashboard();
       playSoundEffect('pop');
+      showToast("Reset to WW5 Level 2 defaults!", "↩️");
     }
 
     function showVictoryModal(lineCount) {
@@ -1331,9 +1597,10 @@
       shuffleGridBoard();
       closeConfirmModal();
       playSoundEffect('pop');
+      showToast("Game progress reset!", "🔄");
     }
 
-    // Initialize application on page load
+    // Initialize application on load
     window.onload = function() {
       initApp();
     };
