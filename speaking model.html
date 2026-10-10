@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>WW5 L2 Bingo Speaking Task</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Fredoka & Patrick Hand for handwriting classroom aesthetics -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Patrick+Hand&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+
+  <!-- MQTT.js CDN for WebSocket real-time cross-device sync -->
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+  <!-- Canvas Confetti CDN for victory celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #2c1a0e;
+      background-image: radial-gradient(#3a2314 15%, transparent 16%), radial-gradient(#20130a 15%, transparent 16%);
+      background-size: 60px 60px;
+      background-position: 0 0, 30px 30px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    /* Wooden Bulletin Board Cork Texture */
+    .corkboard {
+      background-color: #d8a067;
+      background-image: 
+        radial-gradient(rgba(120, 70, 20, 0.25) 1px, transparent 0),
+        radial-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 0);
+      background-size: 12px 12px;
+      background-position: 0 0, 6px 6px;
+      box-shadow: inset 0 0 40px rgba(60, 30, 10, 0.6);
+      border: 18px solid #633f1f;
+      border-image: linear-gradient(to bottom right, #82542a, #422810, #734923) 1;
+    }
+
+    /* Lined Notebook Flashcard */
+    .notebook-card {
+      background: #ffffff;
+      background-image: linear-gradient(#e2e8f0 1px, transparent 1px);
+      background-size: 100% 1.4rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .notebook-card:hover {
+      transform: translateY(-4px) scale(1.02) rotate(0.5deg);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.15);
+    }
+    .notebook-card:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    /* Hand-written target sentence font */
+    .sentence-text {
+      font-family: 'Fredoka', 'Patrick Hand', sans-serif;
+      font-size: 1.28rem;
+      line-height: 1.35;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    /* Glossy 3D Candy Badge Styling */
+    .candy-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      box-shadow: 
+        inset 0 3px 5px rgba(255, 255, 255, 0.8),
+        inset 0 -3px 5px rgba(0, 0, 0, 0.4),
+        0 4px 6px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    /* Candy Colors */
+    .candy-A { background: linear-gradient(135deg, #ff4e50, #f9d423); }
+    .candy-B { background: linear-gradient(135deg, #ff007f, #7928ca); }
+    .candy-C { background: linear-gradient(135deg, #00c6ff, #0072ff); }
+    .candy-D { background: linear-gradient(135deg, #11998e, #38ef7d); }
+    .candy-E { background: linear-gradient(135deg, #ff8008, #ffc837); }
+    .candy-F { background: linear-gradient(135deg, #8a2387, #e94057); }
+    .candy-G { background: linear-gradient(135deg, #da22ff, #9733ee); }
+    .candy-H { background: linear-gradient(135deg, #00b4db, #0083b0); }
+    .candy-I { background: linear-gradient(135deg, #f857a6, #ff5858); }
+    .candy-J { background: linear-gradient(135deg, #56ab2f, #a8e063); }
+    .candy-K { background: linear-gradient(135deg, #e1eec3, #f05053); }
+    .candy-L { background: linear-gradient(135deg, #4776e6, #8e54e9); }
+    .candy-M { background: linear-gradient(135deg, #ff512f, #dd2476); }
+    .candy-N { background: linear-gradient(135deg, #1fa2ff, #12d8fa); }
+    .candy-O { background: linear-gradient(135deg, #f7971e, #ffd200); }
+    .candy-P { background: linear-gradient(135deg, #00c9ff, #92fe9d); }
+
+    /* Winning Bingo Line Pulse Animation */
+    @keyframes bingoPulse {
+      0% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.9), inset 0 0 15px rgba(250, 204, 21, 0.8); transform: scale(1); }
+      50% { box-shadow: 0 0 25px 8px rgba(250, 204, 21, 1), inset 0 0 25px rgba(250, 204, 21, 1); transform: scale(1.04); }
+      100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.9), inset 0 0 15px rgba(250, 204, 21, 0.8); transform: scale(1); }
+    }
+    .bingo-winner {
+      animation: bingoPulse 1.4s infinite ease-in-out;
+      border: 4px solid #f59e0b !important;
+      z-index: 20;
+    }
+
+    /* Corkboard Pushpin */
+    .pushpin {
+      width: 14px;
+      height: 14px;
+      background: radial-gradient(circle at 35% 35%, #ef4444, #991b1b);
+      border-radius: 50%;
+      box-shadow: 0 3px 5px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.8);
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Hanging Pennant Bunting Flag Banner */
+    .bunting-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      overflow: hidden;
+      padding-top: 2px;
+    }
+    .flag {
+      width: 0;
+      height: 0;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-top: 28px solid #ef4444;
+      filter: drop-shadow(0 3px 2px rgba(0,0,0,0.3));
+    }
+    .flag:nth-child(2n) { border-top-color: #3b82f6; }
+    .flag:nth-child(3n) { border-top-color: #eab308; }
+    .flag:nth-child(4n) { border-top-color: #22c55e; }
+    .flag:nth-child(5n) { border-top-color: #a855f7; }
+    .flag:nth-child(6n) { border-top-color: #f97316; }
+
+    /* Custom Scrollbar for Drawer */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden p-2 sm:p-4">
+
+  <!-- Top Pennant Bunting Flags -->
+  <div class="max-w-6xl mx-auto w-full mb-1">
+    <div class="bunting-container">
+      <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+      <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+      <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+      <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+      <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+      <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+      <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+    </div>
+  </div>
+
+  <!-- Header Navigation Bar -->
+  <header class="max-w-6xl mx-auto w-full bg-amber-900/90 backdrop-blur-md text-white rounded-2xl p-3 sm:p-4 shadow-2xl border-2 border-amber-600/50 mb-3 flex flex-wrap items-center justify-between gap-3">
+    
+    <!-- Title and Room Status -->
+    <div class="flex items-center space-x-3">
+      <div class="bg-amber-500 p-2.5 rounded-xl shadow-inner text-2xl">
+        🏫
+      </div>
+      <div>
+        <h1 id="appHeaderTitle" class="text-xl sm:text-2xl font-extrabold tracking-wide text-amber-200 drop-shadow">
+          WW5 Level 2: Speaking Bingo
+        </h1>
+        <div class="flex items-center gap-2 mt-0.5">
+          <!-- Connection Status Badge -->
+          <span id="syncStatusBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span id="syncStatusText">🟢 PC & iPad Synced: ROOM101</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex items-center gap-2 flex-wrap">
+      <button id="btnShuffle" onclick="shuffleBoard()" class="bg-amber-600 hover:bg-amber-500 active:scale-95 text-white font-bold px-3 py-2 rounded-xl shadow-md text-xs sm:text-sm flex items-center gap-1.5 transition">
+        🔀 Shuffle Board
+      </button>
+
+      <button id="btnResetBoard" onclick="confirmResetProgress()" class="bg-rose-700 hover:bg-rose-600 active:scale-95 text-white font-bold px-3 py-2 rounded-xl shadow-md text-xs sm:text-sm flex items-center gap-1.5 transition">
+        🔄 Reset Stars
+      </button>
+
+      <button id="btnTeacherPanel" onclick="toggleTeacherDrawer()" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold px-3.5 py-2 rounded-xl shadow-md text-xs sm:text-sm flex items-center gap-1.5 transition">
+        ⚙️ Teacher Mode
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Wooden Bulletin Board Wrapper -->
+  <main class="max-w-6xl mx-auto w-full flex-grow flex flex-col justify-center my-1">
+    <div class="corkboard rounded-3xl p-3 sm:p-6 shadow-2xl relative min-h-[580px]">
+      
+      <!-- Classroom Floating Decorative Doodles -->
+      <div class="absolute -top-4 -left-4 text-4xl opacity-80 pointer-events-none transform -rotate-12">✏️</div>
+      <div class="absolute -top-4 -right-4 text-4xl opacity-80 pointer-events-none transform rotate-12">🎨</div>
+      <div class="absolute -bottom-4 -left-4 text-4xl opacity-80 pointer-events-none transform rotate-12">📐</div>
+      <div class="absolute -bottom-4 -right-4 text-4xl opacity-80 pointer-events-none transform -rotate-12">⭐</div>
+
+      <!-- 4x4 Bingo Card Grid Layout -->
+      <div id="bingoGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4.5 h-full">
+        <!-- Cards generated dynamically via JavaScript -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Interactive Speaking Task Evaluation Modal -->
+  <div id="speakingModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden transition-opacity duration-300">
+    <div class="bg-amber-50 rounded-3xl border-4 border-amber-600 shadow-2xl max-w-lg w-full p-5 sm:p-6 relative transform transition-all scale-100 overflow-hidden">
+      
+      <!-- Modal Close Button -->
+      <button onclick="closeSpeakingModal()" class="absolute top-4 right-4 bg-amber-200 hover:bg-amber-300 text-amber-900 w-9 h-9 rounded-full font-black text-xl flex items-center justify-center transition shadow">
+        ✕
+      </button>
+
+      <!-- Modal Card Header -->
+      <div class="flex items-center gap-3 mb-3">
+        <div id="modalCandyBadge" class="candy-badge candy-A text-lg w-10 h-10">A</div>
+        <div>
+          <span class="text-xs font-bold text-amber-800 uppercase tracking-widest">Speaking Challenge</span>
+          <h2 id="modalCardTitle" class="text-lg font-extrabold text-amber-950">Card Evaluation</h2>
+        </div>
+      </div>
+
+      <!-- Target Sentence Box -->
+      <div class="bg-white rounded-2xl p-4 shadow-inner border border-amber-200 mb-4 relative">
+        <span class="text-xs font-bold text-slate-400 block mb-1">TARGET SENTENCE:</span>
+        <p id="modalTargetText" class="sentence-text text-amber-950 text-xl font-bold leading-snug">
+          I wake up at seven o'clock every morning.
+        </p>
+
+        <!-- TTS Model Voice Speaker Button -->
+        <button onclick="speakTargetSentence()" class="mt-3 bg-amber-500 hover:bg-amber-600 text-white font-bold px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-2 shadow transition active:scale-95">
+          🔊 Listen Model Voice
+        </button>
+      </div>
+
+      <!-- Waveform Audio Canvas Visualizer -->
+      <div class="bg-slate-900 rounded-xl p-2 mb-4 relative h-16 flex items-center justify-center overflow-hidden border border-slate-700">
+        <canvas id="waveformCanvas" class="w-full h-full"></canvas>
+        <div id="waveformPlaceholder" class="absolute text-slate-400 text-xs font-semibold flex items-center gap-1.5">
+          <span>🎙️ Press Record and Speak Clearly</span>
+        </div>
+      </div>
+
+      <!-- Audio Recorder Control & Gauge Area -->
+      <div class="flex flex-col items-center justify-center mb-4">
+        
+        <!-- Large Mic Button -->
+        <button id="btnRecord" onclick="toggleRecording()" class="w-20 h-20 rounded-full bg-rose-500 hover:bg-rose-600 text-white shadow-xl flex items-center justify-center text-3xl mb-2 transition transform active:scale-95 border-4 border-rose-300">
+          🎙️
+        </button>
+        <span id="recordStatusLabel" class="text-xs font-extrabold text-amber-900 tracking-wide uppercase">Tap Mic to Start</span>
+
+        <!-- Radial Accuracy Score Ring Gauge -->
+        <div id="scoreGaugeContainer" class="mt-3 flex items-center justify-center hidden">
+          <div class="relative w-24 h-24 flex items-center justify-center">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+              <path class="text-amber-200" stroke-width="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path id="scoreProgressCircle" class="text-emerald-500 transition-all duration-700" stroke-dasharray="0, 100" stroke-width="4" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <div class="absolute flex flex-col items-center justify-center">
+              <span id="scorePercentageText" class="text-2xl font-black text-slate-800">0%</span>
+              <span class="text-[9px] font-bold text-slate-500 uppercase">Score</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spoken Word Breakdown Section -->
+      <div id="wordBreakdownArea" class="bg-white rounded-xl p-3 border border-amber-200 min-h-[60px] flex flex-wrap gap-1.5 items-center justify-center mb-4 hidden">
+        <!-- Word Pills dynamically inserted here -->
+      </div>
+
+      <!-- Practice Typing Test Simulator Fallback -->
+      <div class="border-t border-amber-200 pt-3">
+        <details class="text-xs text-amber-900">
+          <summary class="cursor-pointer font-bold hover:underline text-amber-800">⚙️ Speech Test Fallback Input (For Non-Mic Browsers)</summary>
+          <div class="flex gap-2 mt-2">
+            <input id="testSpeechInput" type="text" placeholder="Type sentence to simulate speaking..." class="flex-grow p-2 rounded-lg border border-amber-300 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <button onclick="simulateSpeechTest()" class="bg-indigo-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-indigo-700">Evaluate</button>
+          </div>
+        </details>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Teacher's Customization Dashboard Panel -->
+  <div id="teacherDrawer" class="fixed inset-y-0 right-0 max-w-md w-full bg-slate-900 text-slate-100 z-50 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col border-l-4 border-indigo-500">
+    
+    <!-- Drawer Header -->
+    <div class="p-4 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">👩‍🏫</span>
+        <h2 class="text-lg font-black text-indigo-300">Teacher's Dashboard</h2>
+      </div>
+      <button onclick="toggleTeacherDrawer()" class="text-slate-400 hover:text-white font-bold text-xl px-2">✕</button>
+    </div>
+
+    <!-- Drawer Scrollable Content -->
+    <div class="p-4 flex-grow overflow-y-auto space-y-4">
+      
+      <!-- Room Code Manager Section -->
+      <div class="bg-slate-800 p-3.5 rounded-2xl border border-slate-700">
+        <label class="block text-xs font-bold text-indigo-300 uppercase tracking-wider mb-1">
+          Cloud Room Sync Code
+        </label>
+        <div class="flex gap-2">
+          <input id="roomCodeInput" type="text" value="ROOM101" class="uppercase font-mono font-black text-center bg-slate-900 border border-indigo-500/50 rounded-xl p-2 text-indigo-200 text-sm flex-grow focus:outline-none focus:ring-2 focus:ring-indigo-400">
+          <button onclick="applyNewRoomCode()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-2 rounded-xl text-xs shadow">
+            Connect
+          </button>
+          <button onclick="copyRoomLink()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-3 py-2 rounded-xl text-xs shadow" title="Copy Room Link">
+            📋 Link
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-1.5">
+          Connect PC and iPad to the exact same Room Code to synchronize cards in real-time.
+        </p>
+      </div>
+
+      <!-- Game Topic Title Input -->
+      <div class="bg-slate-800 p-3.5 rounded-2xl border border-slate-700">
+        <label class="block text-xs font-bold text-indigo-300 uppercase tracking-wider mb-1">
+          Game Topic Header Title
+        </label>
+        <input id="topicTitleInput" type="text" value="WW5 Level 2: Speaking Bingo" class="w-full bg-slate-900 border border-slate-600 rounded-xl p-2.5 text-sm text-slate-100 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400">
+      </div>
+
+      <!-- 16 Target Sentences Form -->
+      <div class="bg-slate-800 p-3.5 rounded-2xl border border-slate-700">
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-xs font-bold text-indigo-300 uppercase tracking-wider">
+            Target Sentences (16 Cards)
+          </label>
+          <button onclick="restoreDefaultCurriculum()" class="text-[11px] text-amber-400 hover:underline">
+            Restore WW5 Defaults
+          </button>
+        </div>
+
+        <div id="cardsEditorList" class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+          <!-- 16 Input fields populated via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Drawer Footer Actions -->
+    <div class="p-4 bg-slate-800 border-t border-slate-700 flex gap-2">
+      <button onclick="saveAndSyncTeacherSettings()" class="flex-grow bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 rounded-xl text-sm shadow-lg flex items-center justify-center gap-2 active:scale-95 transition">
+        📡 Save & Sync to PC & iPad
+      </button>
+    </div>
+  </div>
+
+  <!-- Victory Banner Modal Overlay -->
+  <div id="victoryModal" class="fixed inset-0 bg-slate-950/85 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-amber-100 border-8 border-amber-500 rounded-3xl p-6 max-w-md w-full text-center shadow-2xl relative animate-bounce">
+      <div class="text-6xl mb-2">🏆</div>
+      <h2 class="text-2xl sm:text-3xl font-black text-amber-950 mb-2 leading-tight">
+        Congrats! You complete the Bingo task
+      </h2>
+      <p class="text-amber-800 font-bold text-sm mb-5">
+        Outstanding speaking performance! You've cleared 4 cards in a row!
+      </p>
+      <button onclick="closeVictoryModal()" class="bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-lg px-8 py-3 rounded-2xl shadow-xl transition active:scale-95 border-2 border-amber-300">
+        Play Again! 🌟
+      </button>
+    </div>
+  </div>
+
+  <!-- Notification Toast Box -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 bg-slate-900 text-white font-bold text-xs sm:text-sm px-4 py-3 rounded-xl shadow-2xl border border-slate-700 transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2 pointer-events-none">
+    <span id="toastIcon">ℹ️</span>
+    <span id="toastMessage">Notification message</span>
+  </div>
+
+  <script>
+    /* WW5 Level 2 Default Target Sentences Curriculum */
+    const DEFAULT_SENTENCES = [
+      { id: 'A', text: "I wake up at seven o'clock every morning." },
+      { id: 'B', text: "He brushes his teeth after breakfast." },
+      { id: 'C', text: "She washes her face in the bathroom." },
+      { id: 'D', text: "They eat delicious lunch at noon." },
+      { id: 'E', text: "I comb my hair before going to school." },
+      { id: 'F', text: "He gets dressed in his school uniform." },
+      { id: 'G', text: "She walks to school with her friends." },
+      { id: 'H', text: "We do our homework in the afternoon." },
+      { id: 'I', text: "He plays basketball in the playground." },
+      { id: 'J', text: "She takes a warm shower in the evening." },
+      { id: 'K', text: "They watch TV together in the living room." },
+      { id: 'L', text: "I pack my school bag before bedtime." },
+      { id: 'M', text: "He reads an exciting storybook at night." },
+      { id: 'N', text: "She feeds her hungry cat every day." },
+      { id: 'O', text: "We ride our bicycles in the park." },
+      { id: 'P', text: "I go to sleep at nine o'clock." }
+    ];
+
+    // Global Application State
+    let state = {
+      roomCode: 'ROOM101',
+      topicTitle: "WW5 Level 2: Speaking Bingo",
+      cards: JSON.parse(JSON.stringify(DEFAULT_SENTENCES)).map(card => ({
+        ...card,
+        cleared: false,
+        score: 0
+      })),
+      winningIndices: [],
+      hasWon: false,
+      senderId: Math.random().toString(36).substring(2, 9)
+    };
+
+    // Active Card Modal State
+    let activeCardIndex = null;
+    let isRecording = false;
+    let recognitionInstance = null;
+    let audioContext = null;
+    let microphoneStream = null;
+    let analyserNode = null;
+    let animationFrameId = null;
+
+    // Cloud Synchronization Clients
+    let mqttClient = null;
+    let localBroadcastChannel = null;
+
+    // Web Audio Synthesizer for SFX
+    class WebAudioSFX {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playPop() {
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.08);
+      }
+      playStar() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0, now + idx * 0.08);
+          gain.gain.linearRampToValueAtTime(0.2, now + idx * 0.08 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.08);
+          osc.stop(now + idx * 0.08 + 0.25);
+        });
+      }
+      playVictory() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50, 880, 1046.50];
+        const times = [0, 0.12, 0.24, 0.36, 0.52, 0.68];
+        notes.forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0, now + times[i]);
+          gain.gain.linearRampToValueAtTime(0.25, now + times[i] + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + times[i] + 0.35);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + times[i]);
+          osc.stop(now + times[i] + 0.35);
+        });
+      }
+    }
+    const sfx = new WebAudioSFX();
+
+    // iOS Safari Web Audio & Speech Touch Unlock
+    function unlockiOSAcoustics() {
+      sfx.init();
+      if ('speechSynthesis' in window) {
+        const dummyUtterance = new SpeechSynthesisUtterance('');
+        dummyUtterance.volume = 0;
+        window.speechSynthesis.speak(dummyUtterance);
+      }
+      window.removeEventListener('touchstart', unlockiOSAcoustics);
+      window.removeEventListener('click', unlockiOSAcoustics);
+    }
+    window.addEventListener('touchstart', unlockiOSAcoustics, { once: true });
+    window.addEventListener('click', unlockiOSAcoustics, { once: true });
+
+    // Initialize Real-time Cloud Sync
+    function initSyncEngine() {
+      // 1. BroadcastChannel for local same-browser multi-tab testing
+      try {
+        if (localBroadcastChannel) localBroadcastChannel.close();
+        localBroadcastChannel = new BroadcastChannel(`ww5_bingo_${state.roomCode}`);
+        localBroadcastChannel.onmessage = (event) => {
+          if (event.data && event.data.senderId !== state.senderId) {
+            handleIncomingSyncData(event.data);
+          }
+        };
+      } catch (e) { console.log('BroadcastChannel not supported'); }
+
+      // 2. MQTT over WebSocket for PC <-> iPad sync
+      updateSyncBadge('🟡 Syncing...', 'bg-amber-500/20 text-amber-300 border-amber-500/40');
+      
+      try {
+        if (mqttClient) mqttClient.end(true);
+        // Broker EMQX WebSocket port 8084 (wss)
+        mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt', {
+          clientId: 'WW5_Bingo_' + state.senderId,
+          clean: true,
+          connectTimeout: 4000,
+          reconnectPeriod: 3000
+        });
+
+        mqttClient.on('connect', () => {
+          const topic = `ww5/bingo/room/${state.roomCode}`;
+          mqttClient.subscribe(topic, (err) => {
+            if (!err) {
+              updateSyncBadge(`🟢 PC & iPad Synced: ${state.roomCode}`, 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40');
+            }
+          });
+        });
+
+        mqttClient.on('message', (topic, message) => {
+          try {
+            const payload = JSON.parse(message.toString());
+            if (payload && payload.senderId !== state.senderId) {
+              handleIncomingSyncData(payload);
+            }
+          } catch (err) { console.error('Error parsing sync message:', err); }
+        });
+
+        mqttClient.on('error', () => {
+          updateSyncBadge(`🔵 Local Multi-Tab: ${state.roomCode}`, 'bg-sky-500/20 text-sky-300 border-sky-500/40');
+        });
+
+      } catch (err) {
+        updateSyncBadge(`🔵 Local Multi-Tab: ${state.roomCode}`, 'bg-sky-500/20 text-sky-300 border-sky-500/40');
+      }
+    }
+
+    function updateSyncBadge(text, classNames) {
+      const badge = document.getElementById('syncStatusBadge');
+      const label = document.getElementById('syncStatusText');
+      if (badge && label) {
+        label.textContent = text;
+        badge.className = `inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border ${classNames}`;
+      }
+    }
+
+    // Broadcast local state changes to connected devices
+    function broadcastState() {
+      const payload = {
+        senderId: state.senderId,
+        topicTitle: state.topicTitle,
+        cards: state.cards,
+        timestamp: Date.now()
+      };
+
+      if (localBroadcastChannel) {
+        localBroadcastChannel.postMessage(payload);
+      }
+      if (mqttClient && mqttClient.connected) {
+        const topic = `ww5/bingo/room/${state.roomCode}`;
+        mqttClient.publish(topic, JSON.stringify(payload), { qos: 0, retain: false });
+      }
+    }
+
+    // Apply incoming state payload from another device
+    function handleIncomingSyncData(payload) {
+      if (payload.topicTitle) {
+        state.topicTitle = payload.topicTitle;
+        document.getElementById('appHeaderTitle').textContent = state.topicTitle;
+        document.getElementById('topicTitleInput').value = state.topicTitle;
+      }
+      if (payload.cards && Array.isArray(payload.cards)) {
+        state.cards = payload.cards;
+        renderBingoGrid();
+        renderTeacherCardsEditor();
+        checkBingoLines();
+      }
+      showToast('☁️ Synced with connected device!');
+    }
+
+    // Render the 4x4 Bingo Grid
+    function renderBingoGrid() {
+      const grid = document.getElementById('bingoGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      state.cards.forEach((card, index) => {
+        const isWinningCard = state.winningIndices.includes(index);
+        
+        const cardElem = document.createElement('div');
+        cardElem.className = `notebook-card relative rounded-2xl p-3 flex flex-col justify-between cursor-pointer border-2 ${
+          card.cleared 
+            ? 'border-emerald-400 bg-emerald-50/60' 
+            : 'border-slate-200'
+        } ${isWinningCard ? 'bingo-winner' : ''}`;
+
+        cardElem.onclick = () => openSpeakingModal(index);
+
+        cardElem.innerHTML = `
+          <div class="pushpin"></div>
+          
+          <!-- Top Row: Candy Badge & Score -->
+          <div class="flex items-center justify-between mt-1 mb-1">
+            <div class="candy-badge candy-${card.id}">
+              ${card.id}
+            </div>
+            ${card.cleared ? `
+              <span class="bg-emerald-500 text-white font-extrabold text-[10px] px-2 py-0.5 rounded-full shadow flex items-center gap-1">
+                ⭐ ${card.score || 100}%
+              </span>
+            ` : ''}
+          </div>
+
+          <!-- Middle: Prominent Target Sentence -->
+          <div class="flex-grow flex items-center justify-center text-center my-1">
+            <p class="sentence-text leading-snug">
+              ${card.text}
+            </p>
+          </div>
+
+          <!-- Bottom Status Indicator -->
+          <div class="flex items-center justify-center pt-1 border-t border-slate-100">
+            ${card.cleared ? `
+              <span class="text-xs font-black text-emerald-600 flex items-center gap-1">
+                ✅ CLEARED
+              </span>
+            ` : `
+              <span class="text-[11px] font-bold text-slate-400 group-hover:text-amber-600 transition">
+                🗣️ Tap to Speak
+              </span>
+            `}
+          </div>
+        `;
+
+        grid.appendChild(cardElem);
+      });
+    }
+
+    // Check 4-in-a-Row Bingo Condition
+    function checkBingoLines() {
+      const size = 4;
+      const lines = [
+        // Rows
+        [0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15],
+        // Columns
+        [0, 4, 8, 12], [1, 5, 9, 13], [2, 6, 10, 14], [3, 7, 11, 15],
+        // Diagonals
+        [0, 5, 10, 15], [3, 6, 9, 12]
+      ];
+
+      let winningIndices = new Set();
+      let victory = false;
+
+      lines.forEach(line => {
+        const isLineComplete = line.every(idx => state.cards[idx] && state.cards[idx].cleared);
+        if (isLineComplete) {
+          victory = true;
+          line.forEach(idx => winningIndices.add(idx));
+        }
+      });
+
+      state.winningIndices = Array.from(winningIndices);
+      renderBingoGrid();
+
+      if (victory && !state.hasWon) {
+        state.hasWon = true;
+        triggerVictoryCelebration();
+      }
+    }
+
+    function triggerVictoryCelebration() {
+      sfx.playVictory();
+      
+      // Full canvas confetti
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      }
+
+      document.getElementById('victoryModal').classList.remove('hidden');
+    }
+
+    function closeVictoryModal() {
+      document.getElementById('victoryModal').classList.add('hidden');
+    }
+
+    // Open Speaking Modal
+    function openSpeakingModal(index) {
+      sfx.playPop();
+      activeCardIndex = index;
+      const card = state.cards[index];
+
+      document.getElementById('modalCardTitle').textContent = `Card ${card.id} Speaking Task`;
+      document.getElementById('modalTargetText').textContent = card.text;
+      
+      const candyBadge = document.getElementById('modalCandyBadge');
+      candyBadge.className = `candy-badge candy-${card.id} text-lg w-10 h-10`;
+      candyBadge.textContent = card.id;
+
+      // Reset modal controls
+      document.getElementById('scoreGaugeContainer').classList.add('hidden');
+      document.getElementById('wordBreakdownArea').classList.add('hidden');
+      document.getElementById('waveformPlaceholder').classList.remove('hidden');
+      document.getElementById('recordStatusLabel').textContent = 'Tap Mic to Start';
+      document.getElementById('btnRecord').className = "w-20 h-20 rounded-full bg-rose-500 hover:bg-rose-600 text-white shadow-xl flex items-center justify-center text-3xl mb-2 transition transform active:scale-95 border-4 border-rose-300";
+
+      document.getElementById('speakingModal').classList.remove('hidden');
+    }
+
+    function closeSpeakingModal() {
+      if (isRecording) stopRecording();
+      document.getElementById('speakingModal').classList.add('hidden');
+      activeCardIndex = null;
+    }
+
+    // TTS Pronunciation Model Reader
+    function speakTargetSentence() {
+      sfx.init();
+      if (!('speechSynthesis' in window)) {
+        showToast('⚠️ Speech Synthesis not supported on this browser.');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const text = document.getElementById('modalTargetText').textContent;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.85; // Clear model pace for young learners
+      utterance.lang = 'en-US';
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Toggle Mic Recording
+    function toggleRecording() {
+      sfx.init();
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    }
+
+    function startRecording() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        showToast('⚠️ Web Speech API not supported. Use the simulation box below.');
+        return;
+      }
+
+      try {
+        recognitionInstance = new SpeechRecognition();
+        recognitionInstance.continuous = false;
+        recognitionInstance.interimResults = true;
+        recognitionInstance.lang = 'en-US';
+
+        recognitionInstance.onstart = () => {
+          isRecording = true;
+          document.getElementById('recordStatusLabel').textContent = 'Listening... Speak Now!';
+          document.getElementById('waveformPlaceholder').classList.add('hidden');
+          document.getElementById('btnRecord').className = "w-20 h-20 rounded-full bg-emerald-500 animate-pulse text-white shadow-2xl flex items-center justify-center text-3xl mb-2 border-4 border-emerald-300";
+          initWaveformVisualizer();
+        };
+
+        recognitionInstance.onresult = (event) => {
+          let transcript = '';
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            transcript += event.results[i][0].transcript;
+          }
+          if (event.results[0].isFinal) {
+            evaluateSpeech(transcript);
+          }
+        };
+
+        recognitionInstance.onerror = (event) => {
+          console.error('Speech recognition error:', event.error);
+          stopRecording();
+          showToast(`⚠️ Mic Error: ${event.error}. Try practice fallback input.`);
+        };
+
+        recognitionInstance.onend = () => {
+          if (isRecording) stopRecording();
+        };
+
+        recognitionInstance.start();
+
+      } catch (err) {
+        console.error('Error starting recognition:', err);
+        showToast('⚠️ Microphone access error.');
+      }
+    }
+
+    function stopRecording() {
+      isRecording = false;
+      if (recognitionInstance) {
+        try { recognitionInstance.stop(); } catch(e){}
+      }
+      document.getElementById('recordStatusLabel').textContent = 'Tap Mic to Start';
+      document.getElementById('btnRecord').className = "w-20 h-20 rounded-full bg-rose-500 hover:bg-rose-600 text-white shadow-xl flex items-center justify-center text-3xl mb-2 transition transform active:scale-95 border-4 border-rose-300";
+      stopWaveformVisualizer();
+    }
+
+    // Waveform Visualizer Logic
+    function initWaveformVisualizer() {
+      const canvas = document.getElementById('waveformCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      navigator.mediaDevices?.getUserMedia({ audio: true }).then(stream => {
+        microphoneStream = stream;
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyserNode = audioContext.createAnalyser();
+        analyserNode.fftSize = 64;
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyserNode);
+
+        const bufferLength = analyserNode.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        function draw() {
+          if (!isRecording) return;
+          animationFrameId = requestAnimationFrame(draw);
+          analyserNode.getByteFrequencyData(dataArray);
+
+          ctx.fillStyle = 'rgb(15, 23, 42)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          const barWidth = (canvas.width / bufferLength) * 2.5;
+          let barHeight;
+          let x = 0;
+
+          for (let i = 0; i < bufferLength; i++) {
+            barHeight = dataArray[i] / 2;
+            ctx.fillStyle = `rgb(${barHeight + 100}, 99, 235)`;
+            ctx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight / 2);
+            x += barWidth + 2;
+          }
+        }
+        draw();
+      }).catch(err => {
+        console.log('Waveform fallback mode');
+      });
+    }
+
+    function stopWaveformVisualizer() {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      if (microphoneStream) microphoneStream.getTracks().forEach(t => t.stop());
+      if (audioContext) audioContext.close();
+    }
+
+    // AI Speech Accuracy Evaluator
+    function evaluateSpeech(spokenText) {
+      stopRecording();
+
+      const targetText = document.getElementById('modalTargetText').textContent;
+      const cleanTarget = normalizeText(targetText);
+      const cleanSpoken = normalizeText(spokenText);
+
+      const targetWords = cleanTarget.split(' ');
+      const spokenWords = cleanSpoken.split(' ');
+
+      let matchedCount = 0;
+      const breakdownHTML = targetWords.map(word => {
+        const matched = spokenWords.includes(word);
+        if (matched) matchedCount++;
+        return `
+          <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold ${
+            matched ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300'
+          }">
+            ${word} ${matched ? '✓' : '✗'}
+          </span>
+        `;
+      }).join('');
+
+      const score = Math.min(100, Math.round((matchedCount / targetWords.length) * 100));
+
+      // Display breakdown & gauge
+      const breakdownArea = document.getElementById('wordBreakdownArea');
+      breakdownArea.innerHTML = breakdownHTML;
+      breakdownArea.classList.remove('hidden');
+
+      const gaugeContainer = document.getElementById('scoreGaugeContainer');
+      gaugeContainer.classList.remove('hidden');
+
+      document.getElementById('scorePercentageText').textContent = `${score}%`;
+      const circle = document.getElementById('scoreProgressCircle');
+      circle.setAttribute('stroke-dasharray', `${score}, 100`);
+
+      // >= 80% passing threshold clears the card!
+      if (score >= 80) {
+        sfx.playStar();
+        if (activeCardIndex !== null) {
+          state.cards[activeCardIndex].cleared = true;
+          state.cards[activeCardIndex].score = score;
+          renderBingoGrid();
+          checkBingoLines();
+          broadcastState();
+        }
+        showToast(`🎉 Star Earned! Excellent Score: ${score}%`);
+      } else {
+        showToast(`💡 Score: ${score}%. Try speaking again to reach 80%+!`);
+      }
+    }
+
+    function normalizeText(text) {
+      return text.toLowerCase().replace(/[^\w\s]/gi, '').trim();
+    }
+
+    function simulateSpeechTest() {
+      const input = document.getElementById('testSpeechInput');
+      if (input && input.value.trim().length > 0) {
+        evaluateSpeech(input.value.trim());
+        input.value = '';
+      }
+    }
+
+    // Teacher Dashboard Functions
+    function toggleTeacherDrawer() {
+      sfx.playPop();
+      const drawer = document.getElementById('teacherDrawer');
+      drawer.classList.toggle('translate-x-full');
+    }
+
+    function renderTeacherCardsEditor() {
+      const container = document.getElementById('cardsEditorList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      state.cards.forEach((card, idx) => {
+        const item = document.createElement('div');
+        item.className = "flex items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-700";
+        item.innerHTML = `
+          <div class="candy-badge candy-${card.id} text-xs w-7 h-7 flex-shrink-0">
+            ${card.id}
+          </div>
+          <input type="text" id="teacherCard_${idx}" value="${card.text}" class="flex-grow bg-slate-800 border border-slate-600 rounded-lg p-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-400">
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function saveAndSyncTeacherSettings() {
+      sfx.playPop();
+      
+      // Update Title
+      const titleInput = document.getElementById('topicTitleInput').value.trim();
+      if (titleInput) {
+        state.topicTitle = titleInput;
+        document.getElementById('appHeaderTitle').textContent = state.topicTitle;
+      }
+
+      // Update Cards
+      state.cards.forEach((card, idx) => {
+        const input = document.getElementById(`teacherCard_${idx}`);
+        if (input && input.value.trim()) {
+          card.text = input.value.trim();
+        }
+      });
+
+      renderBingoGrid();
+      broadcastState();
+      toggleTeacherDrawer();
+      showToast('🚀 Topic & Sentences Synced to PC & iPad!');
+    }
+
+    function restoreDefaultCurriculum() {
+      if (confirm("Restore original WW5 Level 2 curriculum sentences?")) {
+        state.cards = JSON.parse(JSON.stringify(DEFAULT_SENTENCES)).map(card => ({
+          ...card,
+          cleared: false,
+          score: 0
+        }));
+        renderBingoGrid();
+        renderTeacherCardsEditor();
+        broadcastState();
+        showToast('↺ Restored WW5 Default Sentences');
+      }
+    }
+
+    function applyNewRoomCode() {
+      const input = document.getElementById('roomCodeInput');
+      if (!input || !input.value.trim()) return;
+      const newCode = input.value.trim().toUpperCase();
+      state.roomCode = newCode;
+      initSyncEngine();
+      showToast(`🔑 Switched to Room: ${newCode}`);
+    }
+
+    function copyRoomLink() {
+      const url = `${window.location.origin}${window.location.pathname}?room=${state.roomCode}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url);
+      } else {
+        const temp = document.createElement('input');
+        document.body.appendChild(temp);
+        temp.value = url;
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+      }
+      showToast('📋 Room link copied to clipboard!');
+    }
+
+    function shuffleBoard() {
+      sfx.playPop();
+      // Fisher-Yates Shuffle
+      for (let i = state.cards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [state.cards[i], state.cards[j]] = [state.cards[j], state.cards[i]];
+      }
+      renderBingoGrid();
+      checkBingoLines();
+      broadcastState();
+      showToast('🔀 Board Shuffled');
+    }
+
+    function confirmResetProgress() {
+      sfx.playPop();
+      state.cards.forEach(c => {
+        c.cleared = false;
+        c.score = 0;
+      });
+      state.hasWon = false;
+      state.winningIndices = [];
+      renderBingoGrid();
+      broadcastState();
+      showToast('🔄 Star progress reset!');
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toastNotification');
+      const msg = document.getElementById('toastMessage');
+      if (!toast || !msg) return;
+      msg.textContent = message;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    window.onload = function () {
+      // Check for URL query param room code
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomParam = urlParams.get('room');
+      if (roomParam) {
+        state.roomCode = roomParam.toUpperCase();
+        document.getElementById('roomCodeInput').value = state.roomCode;
+      }
+
+      renderBingoGrid();
+      renderTeacherCardsEditor();
+      initSyncEngine();
+    };
+  </script>
+</body>
+</html>
