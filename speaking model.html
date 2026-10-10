@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>WW5 L2 Bingo Speaking Task</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts: Fredoka, Nunito, Patrick Hand -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&family=Patrick+Hand&display=swap" rel="stylesheet">
+  
+  <!-- MQTT JS Client for PC & iPad Real-time Sync -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js"></script>
+  
+  <!-- Canvas Confetti for Victory Fireworks -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Tailwind Custom Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Nunito', 'sans-serif'],
+            fredoka: ['Fredoka', 'sans-serif'],
+            handwriting: ['Patrick Hand', 'cursive']
+          },
+          colors: {
+            cork: '#d29a5c',
+            corkDark: '#b87c3e',
+            woodBorder: '#7c4d25',
+            chalkboard: '#1b4d3e',
+            paperBg: '#fffdfa'
+          },
+          animation: {
+            'bunt-swing': 'swing 3s ease-in-out infinite alternate',
+            'bounce-soft': 'bounceSoft 2s infinite',
+            'pulse-gold': 'pulseGold 1.5s infinite',
+            'pop-in': 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+          },
+          keyframes: {
+            swing: {
+              '0%': { transform: 'rotate(-3deg)' },
+              '100%': { transform: 'rotate(3deg)' }
+            },
+            bounceSoft: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-6px)' }
+            },
+            pulseGold: {
+              '0%, 100%': { boxShadow: '0 0 15px rgba(234, 179, 8, 0.8), 0 0 30px rgba(234, 179, 8, 0.4)' },
+              '50%': { boxShadow: '0 0 25px rgba(250, 204, 21, 1), 0 0 45px rgba(250, 204, 21, 0.7)' }
+            },
+            popIn: {
+              '0%': { opacity: '0', transform: 'scale(0.8)' },
+              '100%': { opacity: '1', transform: 'scale(1)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #f3f0e6;
+      background-image: radial-gradient(#e2dad0 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Classroom Corkboard Texture */
+    .cork-texture {
+      background-color: #cb9250;
+      background-image: 
+        radial-gradient(rgba(255,255,255,0.15) 1px, transparent 0),
+        radial-gradient(rgba(0,0,0,0.1) 1px, transparent 0);
+      background-size: 12px 12px, 18px 18px;
+      background-position: 0 0, 6px 6px;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.3);
+    }
+
+    /* Notebook Lined Paper Effect */
+    .notebook-paper {
+      background: #ffffff;
+      background-image: linear-gradient(#e8f0fe 1px, transparent 1px);
+      background-size: 100% 1.8rem;
+      position: relative;
+    }
+    .notebook-paper::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 20px;
+      width: 2px;
+      background-color: #ffb3b3;
+    }
+
+    /* Glossy 3D Alphabet Badges */
+    .candy-badge {
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), inset 0 -2px 4px rgba(0,0,0,0.2), 0 3px 6px rgba(0,0,0,0.15);
+    }
+
+    /* Bunting Flags */
+    .bunting-flag {
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden font-sans">
+
+  <!-- Top Bunting Decorative Banner -->
+  <div class="relative w-full h-8 overflow-hidden flex justify-between items-start pointer-events-none z-20 px-2">
+    <div class="w-full flex justify-around">
+      <div class="w-8 h-10 bg-red-500 bunting-flag animate-bunt-swing origin-top"></div>
+      <div class="w-8 h-10 bg-yellow-400 bunting-flag animate-bunt-swing origin-top" style="animation-delay: 0.2s;"></div>
+      <div class="w-8 h-10 bg-blue-500 bunting-flag animate-bunt-swing origin-top" style="animation-delay: 0.4s;"></div>
+      <div class="w-8 h-10 bg-green-500 bunting-flag animate-bunt-swing origin-top" style="animation-delay: 0.1s;"></div>
+      <div class="w-8 h-10 bg-purple-500 bunting-flag animate-bunt-swing origin-top" style="animation-delay: 0.5s;"></div>
+      <div class="w-8 h-10 bg-pink-500 bunting-flag animate-bunt-swing origin-top" style="animation-delay: 0.3s;"></div>
+      <div class="w-8 h-10 bg-amber-500 bunting-flag animate-bunt-swing origin-top" style="animation-delay: 0.6s;"></div>
+      <div class="w-8 h-10 bg-indigo-500 bunting-flag animate-bunt-swing origin-top" style="animation-delay: 0.25s;"></div>
+      <div class="w-8 h-10 bg-teal-500 bunting-flag animate-bunt-swing origin-top" style="animation-delay: 0.45s;"></div>
+    </div>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header class="max-w-5xl mx-auto w-full px-4 pt-1 pb-3 flex flex-wrap justify-between items-center gap-3 z-30">
+    <div class="flex items-center gap-3">
+      <div class="bg-amber-500 text-white p-3 rounded-2xl shadow-lg transform -rotate-3 border-2 border-amber-600">
+        <i class="fa-solid fa-graduation-cap text-2xl"></i>
+      </div>
+      <div>
+        <!-- Customized Main Game Title -->
+        <h1 id="appHeaderTitle" class="text-2xl sm:text-3xl md:text-4xl font-fredoka font-bold text-amber-900 tracking-wide drop-shadow-sm leading-tight">
+          WW5 L2: Bingo Speaking Task
+        </h1>
+        <p class="text-xs sm:text-sm font-bold text-amber-700/80 flex items-center gap-2">
+          <span>Read sentence aloud to complete 4-in-a-row Bingo!</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Header Actions & Room Badge -->
+    <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+      <!-- Sync Status Badge -->
+      <div id="syncBadge" class="bg-emerald-100 border-2 border-emerald-400 text-emerald-800 text-xs sm:text-sm font-bold px-3 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="syncText">🟢 Sync: WW5L2</span>
+      </div>
+
+      <!-- Room Switch Button -->
+      <button onclick="openRoomModal()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold px-3 py-1.5 rounded-xl border-2 border-slate-300 text-xs sm:text-sm transition-all active:scale-95 shadow-sm flex items-center gap-1.5">
+        <i class="fa-solid fa-wifi text-indigo-500"></i> Room
+      </button>
+
+      <!-- Teacher Dashboard Trigger Button -->
+      <button onclick="toggleTeacherDashboard()" class="bg-amber-600 hover:bg-amber-700 text-white font-fredoka font-semibold px-3.5 py-1.5 rounded-xl border-2 border-amber-700 text-xs sm:text-sm transition-all shadow-md active:scale-95 flex items-center gap-1.5">
+        <i class="fa-solid fa-sliders text-amber-200"></i> Teacher Panel
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto w-full px-2 sm:px-4 flex-1 flex flex-col justify-center my-2">
+    
+    <!-- Classroom Corkboard Container -->
+    <div class="cork-texture border-8 sm:border-[12px] border-woodBorder rounded-3xl p-3 sm:p-5 md:p-6 shadow-2xl relative overflow-hidden">
+      
+      <!-- Top Decorative Pushpins -->
+      <div class="absolute top-2 left-4 text-red-600 text-lg sm:text-xl drop-shadow"><i class="fa-solid fa-thumbtack transform rotate-45"></i></div>
+      <div class="absolute top-2 right-4 text-yellow-500 text-lg sm:text-xl drop-shadow"><i class="fa-solid fa-thumbtack transform -rotate-12"></i></div>
+
+      <!-- Game Status Bar & Bingo Line Counter -->
+      <div class="bg-amber-900/80 backdrop-blur-md text-amber-50 rounded-2xl p-2.5 sm:p-3 mb-4 flex flex-wrap justify-between items-center gap-2 border border-amber-700/50">
+        <div class="flex items-center gap-2 sm:gap-4 pl-1">
+          <div class="flex items-center gap-1.5 bg-amber-950/60 px-3 py-1 rounded-xl border border-amber-600/30">
+            <i class="fa-solid fa-trophy text-amber-400 text-sm"></i>
+            <span class="text-xs sm:text-sm font-bold text-amber-200">Bingo Lines:</span>
+            <span id="bingoLineCount" class="text-base sm:text-lg font-fredoka font-bold text-yellow-300">0 / 4</span>
+          </div>
+          <div class="flex items-center gap-1.5 bg-amber-950/60 px-3 py-1 rounded-xl border border-amber-600/30">
+            <i class="fa-solid fa-star text-yellow-400 text-sm"></i>
+            <span class="text-xs sm:text-sm font-bold text-amber-200">Cleared:</span>
+            <span id="solvedCount" class="text-base sm:text-lg font-fredoka font-bold text-amber-100">0 / 16</span>
+          </div>
+        </div>
+
+        <!-- Board Action Controls -->
+        <div class="flex items-center gap-2">
+          <button onclick="shuffleBoard()" class="bg-amber-500 hover:bg-amber-400 text-amber-950 font-bold px-3 py-1.5 rounded-xl text-xs sm:text-sm border-2 border-amber-300 shadow-sm active:scale-95 transition-all flex items-center gap-1">
+            <i class="fa-solid fa-shuffle"></i> Shuffle Grid
+          </button>
+          <button onclick="resetBoardProgress()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1.5 rounded-xl text-xs sm:text-sm border-2 border-rose-400 shadow-sm active:scale-95 transition-all flex items-center gap-1">
+            <i class="fa-solid fa-rotate-right"></i> Reset Progress
+          </button>
+        </div>
+      </div>
+
+      <!-- 4x4 Bingo Tile Grid -->
+      <div id="bingoGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4">
+        <!-- 16 Dynamic Grid Tiles Rendered Here -->
+      </div>
+    </div>
+  </main>
+
+  <!-- AI Speech Evaluator Modal -->
+  <div id="speechModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white border-4 border-amber-500 rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all animate-pop-in">
+      
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-amber-500 to-amber-600 text-white p-4 flex justify-between items-center">
+        <div class="flex items-center gap-2.5">
+          <span id="modalTileBadge" class="candy-badge bg-gradient-to-br from-pink-500 to-rose-600 text-white font-fredoka text-xl font-bold w-10 h-10 rounded-2xl flex items-center justify-center shadow-md">
+            A
+          </span>
+          <div>
+            <h3 class="font-fredoka text-lg sm:text-xl font-bold">Speaking Evaluation</h3>
+            <p class="text-xs text-amber-100">Read the target sentence clearly into your microphone</p>
+          </div>
+        </div>
+        <button onclick="closeSpeechModal()" class="text-amber-100 hover:text-white bg-amber-700/50 hover:bg-amber-700 w-8 h-8 rounded-full flex items-center justify-center transition-all">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-4 sm:p-6 space-y-4">
+        
+        <!-- Target Sentence Card -->
+        <div class="notebook-paper p-4 rounded-2xl border-2 border-slate-200 shadow-inner min-h-[90px] flex items-center justify-between gap-3">
+          <p id="modalTargetText" class="font-handwriting text-2xl sm:text-3xl text-slate-800 font-bold leading-snug pl-6">
+            I get up at seven o'clock every morning.
+          </p>
+          <button onclick="playTTS()" title="Listen to Teacher Audio" class="bg-indigo-500 hover:bg-indigo-600 text-white w-11 h-11 rounded-2xl flex-shrink-0 flex items-center justify-center shadow-md active:scale-95 transition-all">
+            <i class="fa-solid fa-volume-high text-lg"></i>
+          </button>
+        </div>
+
+        <!-- Speech Score & Feedback Gauge Container -->
+        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center gap-3">
+          
+          <!-- Radial Accuracy Gauge -->
+          <div class="relative w-28 h-28 flex items-center justify-center">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+              <path class="text-slate-200" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path id="scoreGaugeArc" class="text-emerald-500 transition-all duration-700" stroke-linecap="round" stroke-dasharray="0, 100" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <div class="absolute flex flex-col items-center justify-center text-center">
+              <span id="scoreDisplay" class="font-fredoka text-3xl font-bold text-slate-700">0%</span>
+              <span id="passStatusLabel" class="text-[10px] font-bold tracking-wider uppercase text-slate-400">Target 80%+</span>
+            </div>
+          </div>
+
+          <!-- Live Audio Waveform Canvas -->
+          <canvas id="waveformCanvas" class="w-full h-10 bg-slate-900 rounded-xl hidden"></canvas>
+
+          <!-- Live Recognized Speech Hypothesis -->
+          <div class="w-full text-center min-h-[32px]">
+            <p id="liveHypothesis" class="text-xs sm:text-sm font-semibold text-slate-500 italic">
+              Click the microphone button to start speaking...
+            </p>
+          </div>
+
+          <!-- Word Accuracy Breakdown Pills -->
+          <div id="wordBreakdown" class="flex flex-wrap gap-1.5 justify-center w-full min-h-[28px]">
+            <!-- Dynamic word pill badges rendered here -->
+          </div>
+        </div>
+
+        <!-- Mic Recording & Action Controls -->
+        <div class="flex items-center justify-center gap-3 pt-1">
+          <button id="micBtn" onclick="toggleSpeechRecording()" class="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-fredoka text-lg font-bold px-6 py-3 rounded-2xl shadow-lg border-2 border-rose-300 flex items-center gap-2 transition-all active:scale-95">
+            <i id="micIcon" class="fa-solid fa-microphone text-xl"></i>
+            <span id="micBtnText">Tap to Record</span>
+          </button>
+
+          <!-- Fallback Practice Mode Toggle -->
+          <button onclick="toggleFallbackInput()" title="Type response if mic unavailable" class="bg-slate-200 hover:bg-slate-300 text-slate-700 w-12 h-12 rounded-2xl border-2 border-slate-300 flex items-center justify-center transition-all">
+            <i class="fa-solid fa-keyboard text-lg"></i>
+          </button>
+        </div>
+
+        <!-- Fallback Typing Input Area -->
+        <div id="fallbackArea" class="hidden space-y-2 pt-2 border-t border-slate-200">
+          <label class="text-xs font-bold text-slate-500">Practice Mode Typing Input:</label>
+          <div class="flex gap-2">
+            <input type="text" id="manualInput" placeholder="Type sentence here..." class="flex-1 px-3 py-2 border-2 border-slate-300 rounded-xl text-sm focus:outline-none focus:border-amber-500" />
+            <button onclick="evaluateManualInput()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all">
+              Test
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Teacher's Dashboard Slide-out Drawer -->
+  <div id="teacherDrawer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex justify-end">
+    <div class="bg-white w-full max-w-xl h-full shadow-2xl flex flex-col justify-between overflow-hidden animate-pop-in">
+      
+      <!-- Drawer Header -->
+      <div class="bg-amber-900 text-white p-4 sm:p-5 flex justify-between items-center border-b-4 border-amber-600">
+        <div class="flex items-center gap-3">
+          <div class="bg-amber-700 p-2.5 rounded-2xl text-amber-300">
+            <i class="fa-solid fa-sliders text-xl"></i>
+          </div>
+          <div>
+            <h2 class="font-fredoka text-xl font-bold">Teacher's Dashboard</h2>
+            <p class="text-xs text-amber-200">Customize main title & 16 Target Sentences</p>
+          </div>
+        </div>
+        <button onclick="toggleTeacherDashboard()" class="text-amber-200 hover:text-white bg-amber-800 hover:bg-amber-700 w-9 h-9 rounded-full flex items-center justify-center transition-all">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Drawer Content Scroll Area -->
+      <div class="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6">
+        
+        <!-- SECTION 1: Game Title Customizer -->
+        <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 space-y-2">
+          <label for="customTitleInput" class="text-xs font-bold uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+            <i class="fa-solid fa-pen-to-square text-amber-600"></i> Custom Game / Topic Title
+          </label>
+          <input type="text" id="customTitleInput" placeholder="Enter custom title e.g. WW5 L2: Unit 3 Speaking Bingo" class="w-full px-3.5 py-2.5 border-2 border-amber-300 rounded-xl font-bold text-slate-800 text-sm sm:text-base focus:outline-none focus:border-amber-500 bg-white shadow-sm" />
+          <p class="text-xs text-amber-700 italic">This title will instantly update on all connected student PC & iPad screens!</p>
+        </div>
+
+        <!-- SECTION 2: Room Sync Settings -->
+        <div class="bg-indigo-50 border-2 border-indigo-200 rounded-2xl p-4 space-y-3">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-bold uppercase tracking-wider text-indigo-900 flex items-center gap-1.5">
+              <i class="fa-solid fa-network-wired text-indigo-600"></i> Cross-Device Room Code
+            </label>
+            <span class="text-xs font-bold bg-indigo-200 text-indigo-800 px-2.5 py-0.5 rounded-full">PC & iPad Synced</span>
+          </div>
+          <div class="flex gap-2">
+            <input type="text" id="teacherRoomInput" class="flex-1 uppercase font-mono font-bold px-3.5 py-2 border-2 border-indigo-300 rounded-xl text-sm focus:outline-none focus:border-indigo-500 bg-white" placeholder="Room Code" />
+            <button onclick="applyNewRoomCode()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all shadow-sm">
+              Connect Room
+            </button>
+          </div>
+          <button onclick="copyShareLink()" class="w-full bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-2 border border-indigo-300 transition-all">
+            <i class="fa-solid fa-copy"></i> Copy Student Invite Link
+          </button>
+        </div>
+
+        <!-- SECTION 3: 16 Target Sentences Editor -->
+        <div>
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="font-fredoka text-lg font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-amber-600"></i> Target Sentences (A–P)
+            </h3>
+            <button onclick="resetDefaultCurriculum()" class="text-xs font-bold text-rose-600 hover:text-rose-700 underline">
+              Reset Default Curriculum
+            </button>
+          </div>
+
+          <div id="sentenceEditorsContainer" class="space-y-3">
+            <!-- 16 Input fields (A to P) generated by JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Drawer Footer Actions -->
+      <div class="p-4 bg-slate-50 border-t-2 border-slate-200 flex gap-3">
+        <button onclick="toggleTeacherDashboard()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 rounded-2xl text-sm transition-all">
+          Cancel
+        </button>
+        <button onclick="saveAndBroadcastTeacherData()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-fredoka font-bold text-base py-3 rounded-2xl shadow-lg border-2 border-amber-600 transition-all active:scale-95 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-paper-plane"></i> Save & Broadcast
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Victory Banner Modal -->
+  <div id="victoryModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border-4 border-yellow-400 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-5 shadow-2xl animate-pop-in relative overflow-hidden">
+      
+      <!-- Decorative Background Flares -->
+      <div class="absolute -top-12 -left-12 w-32 h-32 bg-yellow-300/40 rounded-full blur-2xl"></div>
+      <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-amber-400/40 rounded-full blur-2xl"></div>
+
+      <div class="w-20 h-20 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto border-4 border-yellow-400 shadow-inner animate-bounce-soft">
+        <i class="fa-solid fa-crown text-4xl"></i>
+      </div>
+
+      <div class="space-y-2">
+        <h2 id="victoryText" class="font-fredoka text-2xl sm:text-3xl font-bold text-amber-900 leading-tight">
+          Congrats! You complete the Bingo task
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-600 font-semibold">
+          Awesome speaking practice! You achieved 4-in-a-row Bingo!
+        </p>
+      </div>
+
+      <div class="pt-2 flex flex-col gap-2">
+        <button onclick="closeVictoryModal()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-fredoka text-lg font-bold py-3 rounded-2xl shadow-lg border-2 border-yellow-300 transition-all active:scale-95">
+          Continue Practice ⭐
+        </button>
+        <button onclick="resetBoardProgress(); closeVictoryModal();" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-2xl text-xs sm:text-sm border border-slate-300 transition-all">
+          Play Again
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Room Join Modal -->
+  <div id="roomModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border-4 border-indigo-400 rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl animate-pop-in">
+      <div class="text-center space-y-1">
+        <h3 class="font-fredoka text-xl font-bold text-indigo-900">Join Classroom Room</h3>
+        <p class="text-xs text-slate-500">Enter room code to sync with teacher & classmates</p>
+      </div>
+
+      <input type="text" id="modalRoomCodeInput" placeholder="e.g. WW5L2" class="w-full uppercase font-mono text-center font-bold text-xl px-4 py-3 border-2 border-indigo-300 rounded-2xl focus:outline-none focus:border-indigo-500" />
+
+      <div class="flex gap-2">
+        <button onclick="closeRoomModal()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl text-sm transition-all">
+          Cancel
+        </button>
+        <button onclick="confirmJoinRoom()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-md">
+          Join Room
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Bar -->
+  <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-900/90 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-2xl shadow-xl z-50 hidden flex items-center gap-2 border border-slate-700 transition-all">
+    <i class="fa-solid fa-circle-info text-amber-400"></i>
+    <span id="toastMsg">Notification Message</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center py-3 text-xs font-bold text-amber-800/60 z-10">
+    <span>WW5 L2 Interactive Classroom &bull; AI Speaking Bingo</span>
+  </footer>
+
+  <script>
+
+    // 1. DEFAULT WW5 LEVEL 2 CURRICULUM SENTENCES (A through P)
+    const DEFAULT_CURRICULUM = {
+      A: "I get up at seven o'clock every morning.",
+      B: "He washes his face before breakfast.",
+      C: "She brushes her teeth every day.",
+      D: "They eat breakfast in the kitchen.",
+      E: "I go to school by bus.",
+      F: "He does his homework after school.",
+      G: "She watches TV in the living room.",
+      H: "We play soccer in the park.",
+      I: "He reads a book before bed.",
+      J: "She takes a shower at night.",
+      K: "I clean my room on Saturday.",
+      L: "They ride bicycles in the afternoon.",
+      M: "He listens to music in his bedroom.",
+      N: "She helps her mom in the kitchen.",
+      O: "We have lunch at twelve o'clock.",
+      P: "I go to sleep at nine o'clock."
+    };
+
+    // Letter color gradient badge themes
+    const LETTER_THEMES = {
+      A: 'from-pink-500 to-rose-500',
+      B: 'from-amber-400 to-orange-500',
+      C: 'from-emerald-400 to-teal-500',
+      D: 'from-sky-400 to-blue-500',
+      E: 'from-indigo-400 to-purple-500',
+      F: 'from-fuchsia-400 to-pink-500',
+      G: 'from-rose-400 to-red-500',
+      H: 'from-orange-400 to-amber-500',
+      I: 'from-lime-400 to-green-500',
+      J: 'from-teal-400 to-cyan-500',
+      K: 'from-cyan-400 to-blue-500',
+      L: 'from-blue-400 to-indigo-500',
+      M: 'from-purple-400 to-fuchsia-500',
+      N: 'from-pink-400 to-rose-400',
+      O: 'from-amber-500 to-yellow-500',
+      P: 'from-emerald-500 to-teal-600'
+    };
+
+    // State Variables
+    let appTitle = localStorage.getItem('ww5_game_title') || "WW5 L2: Bingo Speaking Task";
+    let roomCode = localStorage.getItem('ww5_room_code') || "WW5L2";
+    let sentences = JSON.parse(localStorage.getItem('ww5_sentences')) || { ...DEFAULT_CURRICULUM };
+    let boardState = []; // Array of 16 tile objects
+    let solvedSet = new Set(JSON.parse(localStorage.getItem('ww5_solved_set') || '[]'));
+    let activeTile = null;
+
+    // Speech & Web Audio state
+    let recognition = null;
+    let isRecording = false;
+    let audioCtx = null;
+    let mqttClient = null;
+    let broadcastChannel = null;
+
+    // Web Audio Synthesizer (No external URL dependency)
+    function initAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      try {
+        initAudioContext();
+        if (!audioCtx) return;
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'pop') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, now);
+          osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.linearRampToValueAtTime(0, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'star') {
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.type = 'triangle';
+            o.frequency.setValueAtTime(freq, now + idx * 0.08);
+            g.gain.setValueAtTime(0.2, now + idx * 0.08);
+            g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.25);
+            o.start(now + idx * 0.08);
+            o.stop(now + idx * 0.08 + 0.25);
+          });
+        } else if (type === 'line') {
+          const chord = [440, 554.37, 659.25, 880];
+          chord.forEach(freq => {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.type = 'sine';
+            o.frequency.setValueAtTime(freq, now);
+            g.gain.setValueAtTime(0.2, now);
+            g.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+            o.start(now);
+            o.stop(now + 0.6);
+          });
+        } else if (type === 'fanfare') {
+          const melody = [
+            { f: 523.25, t: 0 }, { f: 659.25, t: 0.12 }, { f: 783.99, t: 0.24 },
+            { f: 1046.50, t: 0.36 }, { f: 880, t: 0.55 }, { f: 1046.50, t: 0.75 }
+          ];
+          melody.forEach(note => {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.type = 'square';
+            o.frequency.setValueAtTime(note.f, now + note.t);
+            g.gain.setValueAtTime(0.15, now + note.t);
+            g.gain.exponentialRampToValueAtTime(0.001, now + note.t + 0.3);
+            o.start(now + note.t);
+            o.stop(now + note.t + 0.3);
+          });
+        }
+      } catch (err) {
+        console.warn("Audio Context unlock error:", err);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Check room query parameter from URL link
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('room')) {
+        roomCode = urlParams.get('room').toUpperCase();
+        localStorage.setItem('ww5_room_code', roomCode);
+      }
+
+      initBoardState();
+      initBroadcastChannel();
+      initMQTT();
+      renderAppHeader();
+      renderBoard();
+      setupTeacherEditors();
+      initSpeechRecognition();
+
+      // Touch listener to unlock Audio Context on iPad
+      document.addEventListener('touchstart', initAudioContext, { once: true });
+      document.addEventListener('click', initAudioContext, { once: true });
+    });
+
+    function initBoardState() {
+      const keys = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P'];
+      // Saved shuffle order or default
+      const savedPositions = JSON.parse(localStorage.getItem('ww5_board_order'));
+      
+      let letterList = [...keys];
+      if (savedPositions && savedPositions.length === 16) {
+        letterList = savedPositions;
+      }
+
+      boardState = letterList.map((letter, idx) => ({
+        index: idx,
+        letter: letter,
+        target: sentences[letter] || DEFAULT_CURRICULUM[letter]
+      }));
+    }
+
+    function initBroadcastChannel() {
+      if ('BroadcastChannel' in window) {
+        broadcastChannel = new BroadcastChannel('ww5_bingo_channel');
+        broadcastChannel.onmessage = (event) => {
+          handleIncomingSync(event.data);
+        };
+      }
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'ww5_sync_payload') {
+          const payload = JSON.parse(e.newValue);
+          handleIncomingSync(payload);
+        }
+      });
+    }
+
+    function initMQTT() {
+      try {
+        const clientID = 'ww5_client_' + Math.random().toString(16).substring(2, 8);
+        mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt', {
+          clientId: clientID,
+          keepalive: 60,
+          clean: true
+        });
+
+        mqttClient.on('connect', () => {
+          updateSyncBadge(true);
+          mqttClient.subscribe(`ww5_bingo_room/${roomCode}`, (err) => {
+            if (!err) {
+              console.log(`Subscribed to MQTT room: ${roomCode}`);
+            }
+          });
+        });
+
+        mqttClient.on('message', (topic, message) => {
+          try {
+            const data = JSON.parse(message.toString());
+            if (data.senderId !== clientID) {
+              handleIncomingSync(data);
+            }
+          } catch (e) {
+            console.error("MQTT JSON parse error", e);
+          }
+        });
+
+        mqttClient.on('error', () => updateSyncBadge(false));
+        mqttClient.on('offline', () => updateSyncBadge(false));
+      } catch (e) {
+        console.warn("MQTT initialized with local channel fallback");
+        updateSyncBadge(true, "Local Sync");
+      }
+    }
+
+    function updateSyncBadge(connected, customText = null) {
+      const badge = document.getElementById('syncBadge');
+      const text = document.getElementById('syncText');
+      if (connected) {
+        badge.className = "bg-emerald-100 border-2 border-emerald-400 text-emerald-800 text-xs sm:text-sm font-bold px-3 py-1.5 rounded-full flex items-center gap-2 shadow-sm";
+        text.innerText = customText || `🟢 Sync: ${roomCode}`;
+      } else {
+        badge.className = "bg-amber-100 border-2 border-amber-400 text-amber-800 text-xs sm:text-sm font-bold px-3 py-1.5 rounded-full flex items-center gap-2 shadow-sm";
+        text.innerText = `🟡 Reconnecting...`;
+      }
+    }
+
+    function broadcastState(updatedState = {}) {
+      const payload = {
+        appTitle: appTitle,
+        sentences: sentences,
+        solvedList: Array.from(solvedSet),
+        roomCode: roomCode,
+        timestamp: Date.now(),
+        senderId: mqttClient ? mqttClient.options.clientId : 'local',
+        ...updatedState
+      };
+
+      // 1. Local Storage fallback trigger
+      localStorage.setItem('ww5_sync_payload', JSON.stringify(payload));
+      
+      // 2. Broadcast Channel
+      if (broadcastChannel) {
+        broadcastChannel.postMessage(payload);
+      }
+
+      // 3. MQTT Broker for PC <-> iPad sync across different networks
+      if (mqttClient && mqttClient.connected) {
+        mqttClient.publish(`ww5_bingo_room/${roomCode}`, JSON.stringify(payload));
+      }
+    }
+
+    function handleIncomingSync(data) {
+      if (!data) return;
+
+      let changed = false;
+
+      // Update Title across all devices
+      if (data.appTitle && data.appTitle !== appTitle) {
+        appTitle = data.appTitle;
+        localStorage.setItem('ww5_game_title', appTitle);
+        renderAppHeader();
+        changed = true;
+      }
+
+      // Update Sentences across devices
+      if (data.sentences) {
+        sentences = { ...data.sentences };
+        localStorage.setItem('ww5_sentences', JSON.stringify(sentences));
+        // Update targets in current board
+        boardState.forEach(tile => {
+          tile.target = sentences[tile.letter] || DEFAULT_CURRICULUM[tile.letter];
+        });
+        changed = true;
+      }
+
+      // Sync Solved Blocks
+      if (data.solvedList && Array.isArray(data.solvedList)) {
+        solvedSet = new Set(data.solvedList);
+        localStorage.setItem('ww5_solved_set', JSON.stringify(data.solvedList));
+        changed = true;
+      }
+
+      if (changed) {
+        renderBoard();
+        checkBingoWin(false); // check without triggers
+      }
+    }
+
+    function renderAppHeader() {
+      document.getElementById('appHeaderTitle').innerText = appTitle;
+      document.title = appTitle;
+      const customTitleInput = document.getElementById('customTitleInput');
+      if (customTitleInput) customTitleInput.value = appTitle;
+    }
+
+    function renderBoard() {
+      const grid = document.getElementById('bingoGrid');
+      grid.innerHTML = '';
+
+      const winningIndices = checkBingoWin(false).winningIndices;
+
+      boardState.forEach((tile, idx) => {
+        const isSolved = solvedSet.has(tile.letter);
+        const isWinning = winningIndices.has(idx);
+        const badgeTheme = LETTER_THEMES[tile.letter] || 'from-amber-400 to-orange-500';
+
+        const card = document.createElement('div');
+        
+        let borderStyle = "border-2 border-slate-200 shadow-md hover:shadow-xl";
+        if (isWinning) {
+          borderStyle = "border-4 border-yellow-400 animate-pulse-gold shadow-2xl";
+        } else if (isSolved) {
+          borderStyle = "border-3 border-emerald-400 bg-emerald-50/80 shadow-lg";
+        }
+
+        card.className = `notebook-paper rounded-2xl p-3 sm:p-4 flex flex-col justify-between cursor-pointer transform transition-all hover:-translate-y-1 active:scale-95 min-h-[135px] sm:min-h-[150px] relative overflow-hidden ${borderStyle}`;
+        card.onclick = () => openSpeechModal(tile);
+
+        card.innerHTML = `
+          <!-- Top Card Bar -->
+          <div class="flex justify-between items-center z-10">
+            <!-- 3D Candy Alphabet Badge -->
+            <div class="candy-badge bg-gradient-to-br ${badgeTheme} text-white font-fredoka text-lg sm:text-xl font-bold w-9 h-9 sm:w-10 sm:h-10 rounded-2xl flex items-center justify-center">
+              ${tile.letter}
+            </div>
+
+            <!-- Cleared Star Badge -->
+            ${isSolved ? `
+              <span class="bg-yellow-400 text-amber-950 px-2.5 py-0.5 rounded-full text-xs font-bold font-fredoka flex items-center gap-1 shadow-sm">
+                <i class="fa-solid fa-star text-amber-800"></i> Done
+              </span>
+            ` : `
+              <span class="text-slate-300 group-hover:text-amber-500 transition-colors">
+                <i class="fa-solid fa-microphone text-sm"></i>
+              </span>
+            `}
+          </div>
+
+          <!-- Target Sentence (High Contrast Center) -->
+          <div class="my-auto py-2 pl-5 pr-1 z-10">
+            <p class="font-handwriting text-lg sm:text-xl md:text-2xl font-bold text-slate-800 leading-snug break-words">
+              ${tile.target}
+            </p>
+          </div>
+
+          <!-- Solved Checkmark Overlay -->
+          ${isSolved ? `
+            <div class="absolute bottom-1 right-2 text-emerald-500/20 text-4xl pointer-events-none">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+          ` : ''}
+        `;
+
+        grid.appendChild(card);
+      });
+
+      document.getElementById('solvedCount').innerText = `${solvedSet.size} / 16`;
+    }
+
+    function shuffleBoard() {
+      playSound('pop');
+      // Fisher-Yates shuffle
+      for (let i = boardState.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [boardState[i], boardState[j]] = [boardState[j], boardState[i]];
+      }
+
+      // Save new order positions
+      const newOrder = boardState.map(t => t.letter);
+      localStorage.setItem('ww5_board_order', JSON.stringify(newOrder));
+      
+      renderBoard();
+      showToast("Grid shuffled!");
+    }
+
+    function resetBoardProgress() {
+      if (solvedSet.size === 0) return;
+      playSound('pop');
+      solvedSet.clear();
+      localStorage.removeItem('ww5_solved_set');
+      broadcastState();
+      renderBoard();
+      showToast("Progress reset!");
+    }
+
+    function openSpeechModal(tile) {
+      playSound('pop');
+      activeTile = tile;
+      
+      const modal = document.getElementById('speechModal');
+      document.getElementById('modalTileBadge').innerText = tile.letter;
+      document.getElementById('modalTargetText').innerText = tile.target;
+      
+      // Reset Gauge & Breakdown UI
+      updateScoreGauge(0);
+      document.getElementById('liveHypothesis').innerText = "Click the microphone button to start speaking...";
+      document.getElementById('liveHypothesis').className = "text-xs sm:text-sm font-semibold text-slate-500 italic";
+      document.getElementById('wordBreakdown').innerHTML = '';
+      document.getElementById('fallbackArea').classList.add('hidden');
+      document.getElementById('manualInput').value = '';
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeSpeechModal() {
+      stopSpeechRecording();
+      document.getElementById('speechModal').classList.add('hidden');
+    }
+
+    function playTTS() {
+      if (!activeTile) return;
+      playSound('pop');
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(activeTile.target);
+        utterance.rate = 0.85; // slightly slower for young learners
+        utterance.lang = 'en-US';
+        window.speechSynthesis.speak(utterance);
+      } else {
+        showToast("Speech synthesis not supported in browser");
+      }
+    }
+
+    function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => {
+          isRecording = true;
+          updateMicUI(true);
+        };
+
+        recognition.onresult = (event) => {
+          let interimTranscript = '';
+          let finalTranscript = '';
+
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              finalTranscript += event.results[i][0].transcript;
+            } else {
+              interimTranscript += event.results[i][0].transcript;
+            }
+          }
+
+          const currentText = finalTranscript || interimTranscript;
+          if (currentText) {
+            document.getElementById('liveHypothesis').innerText = `"${currentText}"`;
+          }
+
+          if (finalTranscript) {
+            evaluateSpeech(finalTranscript);
+          }
+        };
+
+        recognition.onerror = (event) => {
+          console.warn("Speech recognition error:", event.error);
+          stopSpeechRecording();
+          showToast(`Mic error: ${event.error}. Try practice mode!`);
+        };
+
+        recognition.onend = () => {
+          isRecording = false;
+          updateMicUI(false);
+        };
+      }
+    }
+
+    function toggleSpeechRecording() {
+      if (!recognition) {
+        showToast("Speech recognition unavailable. Using Practice Mode.");
+        toggleFallbackInput();
+        return;
+      }
+
+      if (isRecording) {
+        stopSpeechRecording();
+      } else {
+        initAudioContext();
+        try {
+          recognition.start();
+        } catch (e) {
+          stopSpeechRecording();
+        }
+      }
+    }
+
+    function stopSpeechRecording() {
+      if (recognition && isRecording) {
+        recognition.stop();
+      }
+      isRecording = false;
+      updateMicUI(false);
+    }
+
+    function updateMicUI(recording) {
+      const micBtn = document.getElementById('micBtn');
+      const micIcon = document.getElementById('micIcon');
+      const micBtnText = document.getElementById('micBtnText');
+
+      if (recording) {
+        micBtn.className = "bg-gradient-to-r from-red-600 to-rose-600 text-white font-fredoka text-lg font-bold px-6 py-3 rounded-2xl shadow-lg border-2 border-red-300 flex items-center gap-2 animate-pulse";
+        micIcon.className = "fa-solid fa-circle-stop text-xl";
+        micBtnText.innerText = "Listening...";
+      } else {
+        micBtn.className = "bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-fredoka text-lg font-bold px-6 py-3 rounded-2xl shadow-lg border-2 border-rose-300 flex items-center gap-2 transition-all active:scale-95";
+        micIcon.className = "fa-solid fa-microphone text-xl";
+        micBtnText.innerText = "Tap to Record";
+      }
+    }
+
+    function evaluateSpeech(spokenText) {
+      if (!activeTile) return;
+
+      const targetWords = cleanWords(activeTile.target);
+      const spokenWords = cleanWords(spokenText);
+
+      let matchedCount = 0;
+      const breakdownHTML = targetWords.map(targetWord => {
+        const isMatch = spokenWords.includes(targetWord);
+        if (isMatch) matchedCount++;
+
+        return `
+          <span class="px-2.5 py-1 rounded-xl text-xs font-bold ${isMatch ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300'}">
+            ${targetWord} ${isMatch ? '✓' : '✗'}
+          </span>
+        `;
+      }).join('');
+
+      document.getElementById('wordBreakdown').innerHTML = breakdownHTML;
+
+      // Calculate score based on fuzzy word match & distance
+      const score = Math.round((matchedCount / targetWords.length) * 100);
+      updateScoreGauge(score);
+
+      const passStatusLabel = document.getElementById('passStatusLabel');
+
+      if (score >= 80) {
+        playSound('star');
+        passStatusLabel.innerText = "PASSED ⭐";
+        passStatusLabel.className = "text-[10px] font-bold tracking-wider uppercase text-emerald-600 font-fredoka";
+        
+        // Mark as solved
+        solvedSet.add(activeTile.letter);
+        localStorage.setItem('ww5_solved_set', JSON.stringify(Array.from(solvedSet)));
+        
+        broadcastState();
+        renderBoard();
+
+        setTimeout(() => {
+          closeSpeechModal();
+          checkBingoWin(true);
+        }, 1200);
+
+      } else {
+        passStatusLabel.innerText = "TRY AGAIN";
+        passStatusLabel.className = "text-[10px] font-bold tracking-wider uppercase text-rose-500 font-fredoka";
+      }
+    }
+
+    function cleanWords(text) {
+      return text.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+    }
+
+    function updateScoreGauge(score) {
+      const strokeVal = Math.min(100, Math.max(0, score));
+      document.getElementById('scoreGaugeArc').setAttribute('stroke-dasharray', `${strokeVal}, 100`);
+      document.getElementById('scoreDisplay').innerText = `${score}%`;
+    }
+
+    function toggleFallbackInput() {
+      const area = document.getElementById('fallbackArea');
+      area.classList.toggle('hidden');
+    }
+
+    function evaluateManualInput() {
+      const val = document.getElementById('manualInput').value;
+      if (val.trim()) {
+        evaluateSpeech(val);
+      }
+    }
+
+    function checkBingoWin(triggerEffects = true) {
+      const lines = [
+        // Rows
+        [0, 1, 2, 3],
+        [4, 5, 6, 7],
+        [8, 9, 10, 11],
+        [12, 13, 14, 15],
+        // Columns
+        [0, 4, 8, 12],
+        [1, 5, 9, 13],
+        [2, 6, 10, 14],
+        [3, 7, 11, 15],
+        // Diagonals
+        [0, 5, 10, 15],
+        [3, 6, 9, 12]
+      ];
+
+      let completedLineCount = 0;
+      const winningIndices = new Set();
+
+      lines.forEach(line => {
+        const isLineComplete = line.every(idx => {
+          const tile = boardState[idx];
+          return tile && solvedSet.has(tile.letter);
+        });
+
+        if (isLineComplete) {
+          completedLineCount++;
+          line.forEach(i => winningIndices.add(i));
+        }
+      });
+
+      document.getElementById('bingoLineCount').innerText = `${completedLineCount} / 4`;
+
+      if (triggerEffects && completedLineCount > 0) {
+        playSound('line');
+      }
+
+      // Check if user reached Bingo Victory
+      if (completedLineCount >= 1 && triggerEffects) {
+        const hasTriggeredVictory = localStorage.getItem('ww5_victory_triggered');
+        if (!hasTriggeredVictory) {
+          localStorage.setItem('ww5_victory_triggered', 'true');
+          setTimeout(() => {
+            triggerVictoryCelebration();
+          }, 400);
+        }
+      }
+
+      return { lineCount: completedLineCount, winningIndices };
+    }
+
+    function triggerVictoryCelebration() {
+      playSound('fanfare');
+      
+      // Canvas Confetti Explosion
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      }
+
+      document.getElementById('victoryModal').classList.remove('hidden');
+    }
+
+    function closeVictoryModal() {
+      document.getElementById('victoryModal').classList.add('hidden');
+    }
+
+    function toggleTeacherDashboard() {
+      playSound('pop');
+      const drawer = document.getElementById('teacherDrawer');
+      drawer.classList.toggle('hidden');
+      if (!drawer.classList.contains('hidden')) {
+        setupTeacherEditors();
+      }
+    }
+
+    function setupTeacherEditors() {
+      document.getElementById('customTitleInput').value = appTitle;
+      document.getElementById('teacherRoomInput').value = roomCode;
+
+      const container = document.getElementById('sentenceEditorsContainer');
+      container.innerHTML = '';
+
+      const letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P'];
+
+      letters.forEach(letter => {
+        const row = document.createElement('div');
+        row.className = "flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200";
+        
+        const badgeTheme = LETTER_THEMES[letter] || 'from-amber-400 to-orange-500';
+
+        row.innerHTML = `
+          <span class="candy-badge bg-gradient-to-br ${badgeTheme} text-white font-fredoka text-sm font-bold w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0">
+            ${letter}
+          </span>
+          <input type="text" id="sentenceInput_${letter}" value="${sentences[letter] || DEFAULT_CURRICULUM[letter]}" class="flex-1 px-3 py-1.5 border border-slate-300 rounded-lg text-xs sm:text-sm font-semibold focus:outline-none focus:border-amber-500 bg-white" />
+        `;
+
+        container.appendChild(row);
+      });
+    }
+
+    function saveAndBroadcastTeacherData() {
+      playSound('pop');
+      
+      // 1. Get Custom Game Title
+      const newTitle = document.getElementById('customTitleInput').value.trim();
+      if (newTitle) {
+        appTitle = newTitle;
+        localStorage.setItem('ww5_game_title', appTitle);
+        renderAppHeader();
+      }
+
+      // 2. Get All 16 Sentences
+      const letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P'];
+      letters.forEach(letter => {
+        const inp = document.getElementById(`sentenceInput_${letter}`);
+        if (inp && inp.value.trim()) {
+          sentences[letter] = inp.value.trim();
+        }
+      });
+
+      localStorage.setItem('ww5_sentences', JSON.stringify(sentences));
+
+      // Update current board targets
+      boardState.forEach(tile => {
+        tile.target = sentences[tile.letter] || DEFAULT_CURRICULUM[tile.letter];
+      });
+
+      // Broadcast changes to all devices (PC & iPad)
+      broadcastState();
+      renderBoard();
+      
+      toggleTeacherDashboard();
+      showToast("Title & sentences saved and synced across all devices!");
+    }
+
+    function resetDefaultCurriculum() {
+      playSound('pop');
+      sentences = { ...DEFAULT_CURRICULUM };
+      localStorage.setItem('ww5_sentences', JSON.stringify(sentences));
+      setupTeacherEditors();
+      showToast("Reset to WW5 L2 Default Curriculum!");
+    }
+
+    function openRoomModal() {
+      playSound('pop');
+      document.getElementById('modalRoomCodeInput').value = roomCode;
+      document.getElementById('roomModal').classList.remove('hidden');
+    }
+
+    function closeRoomModal() {
+      document.getElementById('roomModal').classList.add('hidden');
+    }
+
+    function confirmJoinRoom() {
+      const code = document.getElementById('modalRoomCodeInput').value.trim().toUpperCase();
+      if (code) {
+        applyNewRoomCode(code);
+        closeRoomModal();
+      }
+    }
+
+    function applyNewRoomCode(newCode = null) {
+      playSound('pop');
+      const inputCode = newCode || document.getElementById('teacherRoomInput').value.trim().toUpperCase();
+      if (inputCode && inputCode !== roomCode) {
+        roomCode = inputCode;
+        localStorage.setItem('ww5_room_code', roomCode);
+        
+        // Reconnect MQTT to new room topic
+        if (mqttClient) {
+          mqttClient.end(true, () => {
+            initMQTT();
+          });
+        }
+        updateSyncBadge(true);
+        showToast(`Connected to Room: ${roomCode}`);
+      }
+    }
+
+    function copyShareLink() {
+      const shareUrl = `${window.location.origin}${window.location.pathname}?room=${roomCode}`;
+      
+      // Standard execCommand copy fallback for safe iframe execution
+      const tempInput = document.createElement('input');
+      tempInput.value = shareUrl;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+
+      showToast("Room invite link copied to clipboard!");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const msg = document.getElementById('toastMsg');
+      msg.innerText = message;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2500);
+    }
+  </script>
+</body>
+</html>
