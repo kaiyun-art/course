@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WW5 L2 Bingo Speaking Task</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts for Cute Classroom Vibe -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Patrick+Hand&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+
+    <!-- MQTT WebSockets JS Client for Cross-Device Live Fallback Sync -->
+    <script src="https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js"></script>
+
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Custom Tailwind Theme Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        handwriting: ['"Patrick Hand"', '"Comic Neue"', 'cursive'],
+                        cute: ['"Fredoka"', 'sans-serif']
+                    },
+                    colors: {
+                        cork: '#d4a373',
+                        corkDark: '#bc8a5f',
+                        woodBorder: '#8c5a3c',
+                        chalkboard: '#2b4c3f',
+                        paper: '#fefae0',
+                        starYellow: '#ffb703',
+                        starOrange: '#fb8500'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: #faedcd;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Wooden Frame Corkboard Texture */
+        .corkboard-bg {
+            background-color: #d4a373;
+            background-image: 
+                radial-gradient(rgba(140, 90, 60, 0.25) 1px, transparent 0),
+                radial-gradient(rgba(254, 250, 224, 0.3) 1px, transparent 0);
+            background-size: 16px 16px;
+            background-position: 0 0, 8px 8px;
+            box-shadow: inset 0 0 25px rgba(60, 30, 10, 0.6);
+        }
+
+        .wood-border {
+            border: 12px solid #6f4228;
+            border-image: linear-gradient(to bottom right, #8c5a3c, #52311b, #8c5a3c) 1 1 1 1;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        /* Lined Notebook Paper Flashcards */
+        .lined-paper {
+            background: #ffffff;
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 100% 1.4rem;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.25s ease-in-out;
+        }
+
+        .lined-paper:hover {
+            transform: translateY(-3px) rotate(1deg);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Candy 3D Badges A-P */
+        .badge-candy {
+            background: linear-gradient(135deg, #ff70a6 0%, #ff9770 100%);
+            box-shadow: 0 4px 0 #d9487d, inset 0 2px 2px rgba(255, 255, 255, 0.6);
+            color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .badge-candy-alt1 { background: linear-gradient(135deg, #ffd670 0%, #e9ff70 100%); box-shadow: 0 4px 0 #caaa35; color: #5a4b00; }
+        .badge-candy-alt2 { background: linear-gradient(135deg, #70d6ff 0%, #70a6ff 100%); box-shadow: 0 4px 0 #3b82c4; color: #ffffff; }
+        .badge-candy-alt3 { background: linear-gradient(135deg, #ff9770 0%, #ff70a6 100%); box-shadow: 0 4px 0 #c4593b; color: #ffffff; }
+
+        /* Pushpin Graphic */
+        .pushpin {
+            width: 18px;
+            height: 18px;
+            background: radial-gradient(circle at 30% 30%, #ef4444, #991b1b);
+            border-radius: 50%;
+            box-shadow: 2px 3px 5px rgba(0,0,0,0.4);
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        .pushpin::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            right: 2px;
+            width: 4px;
+            height: 4px;
+            background: #ffffff;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        /* Triangular Bunting Banner Top */
+        .bunting-container {
+            display: flex;
+            justify-content: space-between;
+            overflow: hidden;
+            width: 100%;
+            height: 28px;
+        }
+        .flag {
+            width: 0;
+            height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-top: 26px solid #ef4444;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+        }
+        .flag:nth-child(2n) { border-top-color: #3b82f6; }
+        .flag:nth-child(3n) { border-top-color: #eab308; }
+        .flag:nth-child(4n) { border-top-color: #10b981; }
+        .flag:nth-child(5n) { border-top-color: #a855f7; }
+
+        /* Golden Line Glow Animation for Bingo */
+        @keyframes goldenPulse {
+            0% { box-shadow: 0 0 10px #fbbf24, inset 0 0 10px #fbbf24; border-color: #f59e0b; }
+            50% { box-shadow: 0 0 25px #f59e0b, inset 0 0 20px #f59e0b; border-color: #fef08a; transform: scale(1.02); }
+            100% { box-shadow: 0 0 10px #fbbf24, inset 0 0 10px #fbbf24; border-color: #f59e0b; }
+        }
+
+        .bingo-winning-card {
+            animation: goldenPulse 1.5s infinite ease-in-out;
+            border: 4px solid #f59e0b !important;
+            z-index: 5;
+        }
+
+        /* Golden Star Stamp Effect */
+        .stamp-star {
+            animation: stampPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes stampPop {
+            0% { transform: scale(3) rotate(-20deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 0.95; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #d4a373; border-radius: 4px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-slate-800 antialiased selection:bg-amber-200">
+
+    <!-- Top Hanging Pennant Bunting -->
+    <div class="bunting-container bg-amber-100/50 pt-0.5 px-1 shadow-sm">
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div><div class="flag"></div>
+    </div>
+
+    <!-- Main Navigation / Status Bar -->
+    <header class="bg-amber-800 text-amber-50 px-3 py-2 sm:px-6 sm:py-3 shadow-lg border-b-4 border-amber-900 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            
+            <!-- App Main Title & Topic -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center text-amber-100 shadow-inner text-xl font-bold border border-amber-400">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 id="appHeaderTitle" class="text-lg sm:text-2xl font-bold tracking-wide font-cute text-amber-100 drop-shadow">
+                        WW5 Level 2: Speaking Task
+                    </h1>
+                    <p class="text-xs text-amber-200/90 flex items-center gap-1 font-medium">
+                        <span>Interactive 4x4 Bingo Board</span>
+                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                        <span id="clearedCountText">0/16 Cleared</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Sync Status Badge & Action Controls -->
+            <div class="flex items-center flex-wrap gap-2 text-xs sm:text-sm">
+                
+                <!-- Live PC & iPad Sync Status Button -->
+                <button id="syncStatusBtn" onclick="openSyncModal()" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/70 border border-emerald-400 text-emerald-200 hover:bg-emerald-900 transition shadow">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span id="syncPulsePing" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span id="syncDot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span id="syncBadgeText" class="font-semibold tracking-wide">🟢 PC & iPad Live Synced: <span id="currentRoomCodeDisplay" class="underline uppercase">MAIN</span></span>
+                    <i class="fa-solid fa-wifi text-xs text-emerald-300"></i>
+                </button>
+
+                <!-- Room Change Button -->
+                <button onclick="openSyncModal()" class="px-2.5 py-1.5 rounded-lg bg-amber-700 hover:bg-amber-600 border border-amber-500 text-amber-100 transition flex items-center gap-1.5 font-medium shadow-sm">
+                    <i class="fa-solid fa-door-open"></i>
+                    <span class="hidden sm:inline">Room</span>
+                </button>
+
+                <!-- Teacher Dashboard Button -->
+                <button onclick="openTeacherModal()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-amber-950 font-bold border border-amber-300 transition flex items-center gap-1.5 shadow">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Teacher Controls</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Classroom Bulletin Board Container -->
+    <main class="flex-grow max-w-6xl w-full mx-auto p-2 sm:p-4 md:p-6 my-2 sm:my-4">
+        
+        <!-- Wood Framed Corkboard Surface -->
+        <div class="wood-border corkboard-bg rounded-2xl p-3 sm:p-6 md:p-8 relative overflow-hidden min-h-[550px] flex flex-col justify-between">
+            
+            <!-- Classroom Doodles in Corkboard Background -->
+            <i class="fa-solid fa-pencil text-amber-900/15 text-5xl absolute top-4 left-6 -rotate-45 pointer-events-none"></i>
+            <i class="fa-solid fa-apple-whole text-amber-900/15 text-6xl absolute top-6 right-8 rotate-12 pointer-events-none"></i>
+            <i class="fa-solid fa-globe text-amber-900/15 text-6xl absolute bottom-6 left-8 rotate-12 pointer-events-none"></i>
+            <i class="fa-solid fa-ruler text-amber-900/15 text-5xl absolute bottom-6 right-8 -rotate-12 pointer-events-none"></i>
+            <i class="fa-solid fa-star text-amber-900/15 text-4xl absolute top-1/2 left-2 -rotate-12 pointer-events-none"></i>
+            <i class="fa-solid fa-book-open text-amber-900/15 text-4xl absolute top-1/2 right-2 rotate-12 pointer-events-none"></i>
+
+            <!-- Top Banner & Bingo Line Score Bar -->
+            <div class="bg-paper/95 backdrop-blur border-2 border-amber-800/30 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6 shadow-md flex flex-wrap items-center justify-between gap-3 relative z-10">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 rounded-xl bg-amber-500 text-white shadow">
+                        <i class="fa-solid fa-microphone-lines text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base sm:text-xl font-bold font-cute text-amber-950 flex items-center gap-2">
+                            <span>Bingo Speaking Challenge</span>
+                            <span class="text-xs bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-semibold">4x4 Grid</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-600 font-handwriting text-base">
+                            Tap any card, listen to model speech, and speak accurately (&ge; 80%) to score golden stars!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Live Bingo Line Counters -->
+                <div class="flex items-center gap-2 sm:gap-4 bg-amber-100/80 px-3 py-1.5 rounded-xl border border-amber-300">
+                    <div class="text-center">
+                        <span class="block text-[10px] uppercase font-bold text-amber-800">Bingo Lines</span>
+                        <span id="bingoLinesCount" class="text-lg sm:text-2xl font-black text-amber-600 font-cute">0</span>
+                    </div>
+                    <div class="w-px h-8 bg-amber-300"></div>
+                    <div class="text-center">
+                        <span class="block text-[10px] uppercase font-bold text-amber-800">Stars Earned</span>
+                        <span id="starsCount" class="text-lg sm:text-2xl font-black text-amber-500 font-cute flex items-center gap-1">
+                            0 <i class="fa-solid fa-star text-amber-400 text-base"></i>
+                        </span>
+                    </div>
+                    <button onclick="shuffleAndResetGrid()" class="ml-1 p-2 rounded-lg bg-amber-200 hover:bg-amber-300 text-amber-800 transition text-xs font-bold flex items-center gap-1 shadow-sm" title="Shuffle Cards">
+                        <i class="fa-solid fa-shuffle"></i>
+                        <span class="hidden sm:inline">Shuffle</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4x4 Bingo Cards Grid -->
+            <div id="bingoGridContainer" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 md:gap-5 relative z-10 my-auto">
+                <!-- 16 Flashcard tiles rendered dynamically via JS -->
+            </div>
+
+            <!-- Bottom Teacher Audio Unlock Alert for iOS Safari -->
+            <div id="iosAudioHint" class="mt-4 text-center text-xs text-amber-950/80 bg-amber-200/60 py-1.5 px-3 rounded-lg border border-amber-300/60 font-medium flex items-center justify-center gap-2">
+                <i class="fa-solid fa-mobile-screen-button text-amber-700"></i>
+                <span>iPad/Mobile Tip: Tapping any card unlocks audio speech playback automatically.</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- CARD SPEAKING TASK MODAL -->
+    <div id="speakingModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-amber-50 rounded-3xl max-w-lg w-full p-4 sm:p-6 border-4 border-amber-700 shadow-2xl relative overflow-hidden flex flex-col max-h-[92vh]">
+            
+            <!-- Red Pushpin Header Decorative -->
+            <div class="pushpin"></div>
+
+            <!-- Close Modal Cross -->
+            <button onclick="closeSpeakingModal()" class="absolute top-3 right-3 w-9 h-9 rounded-full bg-amber-200 hover:bg-amber-300 text-amber-900 font-bold flex items-center justify-center transition shadow">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <!-- Card Header info -->
+            <div class="flex items-center gap-3 border-b-2 border-amber-200 pb-3 mb-3 mt-1">
+                <div id="modalCardLetterBadge" class="badge-candy text-xl font-black w-10 h-10 rounded-full flex items-center justify-center shadow">
+                    A
+                </div>
+                <div>
+                    <span class="text-xs uppercase font-bold text-amber-700 tracking-wider">Target Speaking Sentence</span>
+                    <h3 class="text-sm sm:text-base font-bold text-slate-800">WW5 L2 Speaking Challenge</h3>
+                </div>
+            </div>
+
+            <!-- Target Sentence Notebook Display -->
+            <div class="lined-paper rounded-xl p-4 sm:p-5 border border-slate-300 mb-4 text-center relative">
+                <p id="modalTargetSentence" class="text-xl sm:text-2xl font-bold font-handwriting text-slate-900 leading-relaxed tracking-wide">
+                    Target sentence will load here...
+                </p>
+                <button id="ttsListenBtn" onclick="playTTSSpeech()" class="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm shadow transition active:scale-95">
+                    <i class="fa-solid fa-volume-high text-base"></i>
+                    <span>Listen to Model Voice</span>
+                </button>
+            </div>
+
+            <!-- Real-Time Speech Recording Section -->
+            <div class="bg-white rounded-2xl p-4 border-2 border-amber-200 shadow-inner flex flex-col items-center justify-center gap-3">
+                
+                <!-- Real-time Live Audio Waveform Canvas -->
+                <canvas id="waveformCanvas" class="w-full h-14 bg-slate-900 rounded-xl border border-slate-700 shadow-inner"></canvas>
+
+                <!-- Recording Status Indicator -->
+                <div class="flex items-center gap-2 text-xs font-semibold text-slate-600">
+                    <span id="recordPulseDot" class="w-3 h-3 rounded-full bg-slate-300"></span>
+                    <span id="recordStatusText">Tap button below and speak clearly</span>
+                </div>
+
+                <!-- Record Button Controls -->
+                <div class="flex items-center gap-3 w-full justify-center">
+                    <button id="toggleRecordBtn" onclick="toggleSpeechRecognition()" class="flex-1 py-3 px-6 rounded-2xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-bold text-base sm:text-lg shadow-lg flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-microphone text-xl"></i>
+                        <span id="recordBtnText">Record & Speak</span>
+                    </button>
+                </div>
+
+                <!-- Manual Text Input Fallback Toggle for non-mic devices -->
+                <details class="w-full text-xs text-slate-500 mt-1">
+                    <summary class="cursor-pointer hover:text-amber-700 text-center font-medium">No microphone? Click here for manual input</summary>
+                    <div class="mt-2 flex gap-2">
+                        <input type="text" id="manualTextInput" placeholder="Type what you said here..." class="flex-1 p-2 rounded-lg border border-slate-300 text-xs text-slate-800">
+                        <button onclick="evaluateManualText()" class="px-3 py-1.5 bg-amber-600 text-white font-bold rounded-lg hover:bg-amber-700">Submit</button>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Speech Evaluation Results Box -->
+            <div id="evaluationResultBox" class="mt-4 p-3 bg-amber-100/90 rounded-2xl border border-amber-300 hidden">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold uppercase text-amber-900">Accuracy Analysis</span>
+                    <span id="scoreBadge" class="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-500 text-white">
+                        0%
+                    </span>
+                </div>
+
+                <!-- Word-by-Word Highlight Breakdown -->
+                <div id="wordBreakdownContainer" class="flex flex-wrap gap-1.5 text-xs sm:text-sm font-handwriting font-bold mb-2">
+                    <!-- Color-coded words dynamically generated -->
+                </div>
+
+                <!-- Feedback Text -->
+                <p id="evalFeedbackText" class="text-xs font-medium text-amber-900">
+                    Listening...
+                </p>
+            </div>
+
+            <!-- Modal Action Footer -->
+            <div class="mt-4 flex items-center justify-between gap-3 pt-2 border-t border-amber-200">
+                <button onclick="closeSpeakingModal()" class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs sm:text-sm transition">
+                    Close
+                </button>
+                <button id="claimStarBtn" onclick="claimTileStar()" disabled class="px-5 py-2.5 rounded-xl bg-amber-400 text-amber-950 font-bold text-xs sm:text-sm shadow-md opacity-50 cursor-not-allowed flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-star"></i>
+                    <span>Claim Golden Star</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BINGO WIN CONGRATS MODAL -->
+    <div id="bingoWinModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-amber-50 rounded-3xl max-w-md w-full p-6 text-center border-4 border-amber-500 shadow-2xl relative overflow-hidden">
+            <div class="w-20 h-20 mx-auto mb-3 bg-amber-400 text-amber-950 rounded-full flex items-center justify-center text-4xl shadow-lg animate-bounce">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            <h3 class="text-2xl sm:text-3xl font-black font-cute text-amber-900 mb-2">
+                Congrats! You complete the Bingo task
+            </h3>
+            <p class="text-slate-700 font-handwriting text-lg mb-4">
+                You made a full 4-in-a-row Bingo line! Excellent speaking practice!
+            </p>
+            <div class="bg-amber-100 rounded-2xl p-3 border border-amber-300 mb-5 flex justify-around">
+                <div>
+                    <span class="text-xs uppercase font-bold text-amber-800 block">Total Lines</span>
+                    <span id="winModalLines" class="text-2xl font-black text-amber-600 font-cute">1</span>
+                </div>
+                <div class="w-px bg-amber-300"></div>
+                <div>
+                    <span class="text-xs uppercase font-bold text-amber-800 block">Total Stars</span>
+                    <span id="winModalStars" class="text-2xl font-black text-amber-500 font-cute">4</span>
+                </div>
+            </div>
+            <button onclick="closeWinModal()" class="w-full py-3 px-6 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-base shadow-lg transition">
+                Keep Playing
+            </button>
+        </div>
+    </div>
+
+    <!-- TEACHER DASHBOARD & CUSTOMIZER MODAL -->
+    <div id="teacherModal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-4 sm:p-6 border-4 border-amber-600 shadow-2xl relative flex flex-col max-h-[90vh]">
+            
+            <div class="flex items-center justify-between border-b pb-3 mb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="p-2 bg-amber-500 text-white rounded-xl">
+                        <i class="fa-solid fa-sliders text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 font-cute">Teacher's Customizer Dashboard</h3>
+                        <p class="text-xs text-slate-500">Edit sentences & broadcast instantly to all PC/iPad student screens</p>
+                    </div>
+                </div>
+                <button onclick="closeTeacherModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="overflow-y-auto space-y-4 pr-1 flex-1">
+                
+                <!-- Topic Title Editor -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Main Game Topic Title</label>
+                    <input type="text" id="teacherTopicTitleInput" value="WW5 Level 2: Speaking Task" class="w-full p-2.5 rounded-xl border border-slate-300 font-bold text-slate-800 focus:ring-2 focus:ring-amber-400 outline-none">
+                </div>
+
+                <!-- Room Code Config -->
+                <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <span class="block text-xs font-bold text-amber-900">Active Sync Room Code</span>
+                        <span id="teacherCurrentRoomLabel" class="text-lg font-black font-cute text-amber-700">MAIN</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="generateNewRandomRoom()" class="px-3 py-1.5 rounded-lg bg-amber-200 hover:bg-amber-300 text-amber-900 font-bold text-xs">
+                            <i class="fa-solid fa-rotate"></i> New Room Code
+                        </button>
+                        <button onclick="copyRoomShareLink()" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs">
+                            <i class="fa-solid fa-link"></i> Copy Room Link
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Target Sentences A-P Inputs (16 blocks) -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-bold uppercase text-slate-700">16 Target Sentences (Blocks A to P)</label>
+                        <button onclick="resetToWW5Defaults()" class="text-xs text-amber-600 hover:underline font-bold">
+                            Reset to WW5 Level 2 Defaults
+                        </button>
+                    </div>
+                    <div id="sentenceInputsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <!-- 16 Input fields injected via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer Action -->
+            <div class="mt-4 pt-3 border-t flex items-center justify-between gap-3">
+                <button onclick="closeTeacherModal()" class="px-4 py-2 rounded-xl bg-slate-200 text-slate-700 font-bold text-xs">
+                    Cancel
+                </button>
+                <button onclick="saveAndBroadcastTeacherData()" class="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm shadow-lg flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Save & Broadcast to PC & iPad</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REAL-TIME SYNC & ROOM MODAL -->
+    <div id="syncModal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-3xl max-w-md w-full p-5 border-4 border-amber-600 shadow-2xl relative">
+            <button onclick="closeSyncModal()" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center mb-4">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center text-2xl mb-2">
+                    <i class="fa-solid fa-network-wired"></i>
+                </div>
+                <h3 class="text-xl font-bold font-cute text-slate-800">PC & iPad Real-Time Sync</h3>
+                <p class="text-xs text-slate-500">Cross-device live listener & MQTT WebSocket fallback</p>
+            </div>
+
+            <!-- Join Room Form -->
+            <div class="space-y-3 mb-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Enter Room Code</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="roomCodeInput" placeholder="e.g. MAIN or ROOM123" class="flex-1 p-2.5 rounded-xl border border-slate-300 font-bold uppercase text-center text-slate-800 focus:ring-2 focus:ring-amber-400 outline-none">
+                        <button onclick="joinCustomRoom()" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow">
+                            Join Room
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Realtime Status Log -->
+            <div class="bg-slate-900 text-slate-200 p-3 rounded-xl text-xs font-mono space-y-1">
+                <div class="flex justify-between text-slate-400 border-b border-slate-800 pb-1 mb-1">
+                    <span>Engine</span>
+                    <span>Status</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Firebase Firestore:</span>
+                    <span id="firestoreStatusLog" class="text-emerald-400 font-bold">Connected</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>MQTT WebSockets:</span>
+                    <span id="mqttStatusLog" class="text-emerald-400 font-bold">Connected</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>iOS Touch Audio:</span>
+                    <span id="iosAudioStatusLog" class="text-amber-400">Ready on Touch</span>
+                </div>
+            </div>
+
+            <button onclick="forceReconnectSync()" class="w-full mt-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-2">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                <span>Force Reconnect & Refresh Listener</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- FIREBASE MODULE & MAIN JAVASCRIPT APP LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Default WW5 Level 2 Preset Target Sentences (A to P)
+        const DEFAULT_WW5_SENTENCES = [
+            "What do you want to be when you grow up?",
+            "I want to be a friendly firefighter.",
+            "She works at the busy hospital.",
+            "He helps people and keeps us safe.",
+            "Where does the teacher work every day?",
+            "The pilot flies a big airplane in the sky.",
+            "What is your favorite season of the year?",
+            "My favorite season is warm summer.",
+            "What do you wear in cold winter?",
+            "I wear a heavy coat and warm gloves.",
+            "They are playing soccer in the park.",
+            "Is she eating a delicious sandwich?",
+            "Yes, she is enjoying her lunch right now.",
+            "What time do you wake up every morning?",
+            "I wake up at seven o'clock every day.",
+            "Let's practice speaking English together!"
+        ];
+
+        const ALPHABET_LETTERS = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P"];
+
+        // Global State
+        window.appState = {
+            appId: typeof __app_id !== 'undefined' ? __app_id : 'ww5-l2-bingo',
+            roomCode: 'MAIN',
+            topicTitle: 'WW5 Level 2: Speaking Task',
+            sentences: [...DEFAULT_WW5_SENTENCES],
+            gridItems: [], // 16 items: { id, letter, sentence, cleared, isWinning }
+            selectedTileIndex: null,
+            starsEarned: 0,
+            bingoLinesCount: 0,
+            lastSyncTimestamp: 0
+        };
+
+        // Audio & Speech Contexts
+        let audioContext = null;
+        let mediaStream = null;
+        let audioAnalyser = null;
+        let audioAnimFrame = null;
+        let speechRecognizer = null;
+        let isRecording = false;
+        let currentRecognizedText = "";
+
+        // Sync Engines references
+        let db = null;
+        let auth = null;
+        let firestoreUnsubscribe = null;
+        let mqttClient = null;
+
+        // Initialize Firebase & Auth
+        async function initFirebaseSync() {
+            try {
+                const firebaseConfig = typeof __firebase_config !== 'undefined' 
+                    ? JSON.parse(__firebase_config) 
+                    : { apiKey: "demo-key", projectId: "demo-app", appId: "1:123:web:abc" };
+
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Check custom token or anonymous login
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                updateSyncLog('firestoreStatusLog', 'Connected', 'text-emerald-400');
+                attachFirestoreListener();
+            } catch (err) {
+                console.warn("Firestore sync fallback active:", err);
+                updateSyncLog('firestoreStatusLog', 'Offline / Fallback', 'text-amber-400');
+            }
+        }
+
+        // Attach Firestore Snapshot Listener
+        function attachFirestoreListener() {
+            if (!db) return;
+            if (firestoreUnsubscribe) firestoreUnsubscribe();
+
+            const docRef = doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'rooms', window.appState.roomCode);
+
+            firestoreUnsubscribe = onSnapshot(docRef, (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (data.updatedAt && data.updatedAt > window.appState.lastSyncTimestamp) {
+                        applyRemoteSyncData(data);
+                    }
+                }
+            }, (error) => {
+                console.error("Firestore snapshot error:", error);
+                updateSyncLog('firestoreStatusLog', 'Reconnecting...', 'text-amber-400');
+            });
+        }
+
+        // Initialize Secondary Real-time MQTT WebSockets channel for fast iPad fallback
+        function initMqttSync() {
+            try {
+                // Broker choice
+                const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
+                mqttClient = mqtt.connect(brokerUrl, {
+                    clientId: 'ww5_bingo_' + Math.random().toString(16).substring(2, 8),
+                    keepalive: 30,
+                    reconnectPeriod: 3000
+                });
+
+                mqttClient.on('connect', () => {
+                    updateSyncLog('mqttStatusLog', 'Connected (WebSocket)', 'text-emerald-400');
+                    subscribeMqttRoom();
+                });
+
+                mqttClient.on('message', (topic, message) => {
+                    try {
+                        const payload = JSON.parse(message.toString());
+                        if (payload.updatedAt && payload.updatedAt > window.appState.lastSyncTimestamp) {
+                            applyRemoteSyncData(payload);
+                        }
+                    } catch (e) {
+                        console.error("MQTT message parse error:", e);
+                    }
+                });
+
+                mqttClient.on('error', () => {
+                    updateSyncLog('mqttStatusLog', 'Retrying...', 'text-amber-400');
+                });
+            } catch (err) {
+                console.warn("MQTT init error:", err);
+            }
+        }
+
+        function subscribeMqttRoom() {
+            if (mqttClient && mqttClient.connected) {
+                const topic = `ww5bingo/room/${window.appState.roomCode}`;
+                mqttClient.subscribe(topic);
+            }
+        }
+
+        // Apply synchronized payload across PC & iPad
+        function applyRemoteSyncData(data) {
+            window.appState.lastSyncTimestamp = data.updatedAt || Date.now();
+            
+            if (data.topicTitle) {
+                window.appState.topicTitle = data.topicTitle;
+                document.getElementById('appHeaderTitle').innerText = data.topicTitle;
+                document.getElementById('teacherTopicTitleInput').value = data.topicTitle;
+            }
+
+            if (data.sentences && Array.isArray(data.sentences) && data.sentences.length === 16) {
+                window.appState.sentences = [...data.sentences];
+                // Re-populate sentences in current grid without losing cleared status if matching
+                window.appState.gridItems = window.appState.gridItems.map((item, idx) => ({
+                    ...item,
+                    sentence: window.appState.sentences[idx] || item.sentence
+                }));
+                renderBingoGrid();
+            }
+
+            showSyncToast("Live Sync updated from Teacher!");
+        }
+
+        // Save & Broadcast state to both Firestore and MQTT
+        window.saveAndBroadcastTeacherData = async function() {
+            const newTitle = document.getElementById('teacherTopicTitleInput').value.trim() || 'WW5 Level 2: Speaking Task';
+            const newSentences = [];
+
+            for (let i = 0; i < 16; i++) {
+                const val = document.getElementById(`teacherSentenceInput_${i}`).value.trim();
+                newSentences.push(val || DEFAULT_WW5_SENTENCES[i]);
+            }
+
+            const timestamp = Date.now();
+            const payload = {
+                topicTitle: newTitle,
+                sentences: newSentences,
+                updatedAt: timestamp,
+                roomCode: window.appState.roomCode
+            };
+
+            // Update local state first
+            applyRemoteSyncData(payload);
+
+            // Push to Firestore
+            if (db) {
+                try {
+                    const docRef = doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'rooms', window.appState.roomCode);
+                    await setDoc(docRef, payload, { merge: true });
+                } catch (e) {
+                    console.error("Error saving to Firestore:", e);
+                }
+            }
+
+            // Push to MQTT WebSocket Channel
+            if (mqttClient && mqttClient.connected) {
+                mqttClient.publish(`ww5bingo/room/${window.appState.roomCode}`, JSON.stringify(payload));
+            }
+
+            closeTeacherModal();
+            playChimeSound(600, 'sine', 0.15);
+        };
+
+        // iOS Safari Audio Unlock on first touch/tap
+        function unlockIosAudioContext() {
+            if (!audioContext) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) audioContext = new AudioCtx();
+            }
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            // Trigger silent SpeechSynthesis to unlock TTS voice on iPad
+            if ('speechSynthesis' in window) {
+                const dummyUtterance = new SpeechSynthesisUtterance('');
+                window.speechSynthesis.speak(dummyUtterance);
+            }
+            updateSyncLog('iosAudioStatusLog', 'Unlocked & Ready', 'text-emerald-400');
+            document.removeEventListener('touchstart', unlockIosAudioContext);
+            document.removeEventListener('click', unlockIosAudioContext);
+        }
+
+        document.addEventListener('touchstart', unlockIosAudioContext, { once: true });
+        document.addEventListener('click', unlockIosAudioContext, { once: true });
+
+        // Sound synthesizer helper for cute audio chimes
+        function playChimeSound(freq = 520, type = 'sine', duration = 0.2) {
+            try {
+                if (!audioContext) unlockIosAudioContext();
+                if (!audioContext) return;
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+                gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.start();
+                osc.stop(audioContext.currentTime + duration);
+            } catch (e) {
+                // Ignore audio errors
+            }
+        }
+
+        // Initialize 4x4 Grid
+        function initGrid() {
+            const items = [];
+            for (let i = 0; i < 16; i++) {
+                items.push({
+                    id: i,
+                    letter: ALPHABET_LETTERS[i],
+                    sentence: window.appState.sentences[i] || DEFAULT_WW5_SENTENCES[i],
+                    cleared: false,
+                    isWinning: false
+                });
+            }
+            window.appState.gridItems = items;
+            renderBingoGrid();
+            updateProgressCounters();
+        }
+
+        // Shuffle Grid Cards
+        window.shuffleAndResetGrid = function() {
+            window.appState.gridItems = window.appState.gridItems.sort(() => Math.random() - 0.5);
+            window.appState.gridItems.forEach(item => {
+                item.cleared = false;
+                item.isWinning = false;
+            });
+            window.appState.starsEarned = 0;
+            window.appState.bingoLinesCount = 0;
+            renderBingoGrid();
+            updateProgressCounters();
+            playChimeSound(400, 'triangle', 0.2);
+        };
+
+        // Render Bingo Cards into DOM
+        function renderBingoGrid() {
+            const container = document.getElementById('bingoGridContainer');
+            container.innerHTML = '';
+
+            window.appState.gridItems.forEach((item, index) => {
+                const card = document.createElement('div');
+                
+                // Card styling classes
+                const winClass = item.isWinning ? 'bingo-winning-card' : '';
+                const clearedBg = item.cleared ? 'bg-amber-100/90 border-amber-400' : 'bg-white border-slate-200';
+                
+                card.className = `lined-paper rounded-2xl p-3 sm:p-4 border-2 ${clearedBg} ${winClass} flex flex-col justify-between cursor-pointer relative select-none min-h-[110px] sm:min-h-[130px]`;
+                card.onclick = () => openSpeakingTaskModal(index);
+
+                // Candy badge color cycle
+                const candyVariant = index % 4 === 1 ? 'badge-candy-alt1' : index % 4 === 2 ? 'badge-candy-alt2' : index % 4 === 3 ? 'badge-candy-alt3' : 'badge-candy';
+
+                card.innerHTML = `
+                    <div class="pushpin"></div>
+                    <div class="flex items-center justify-between mb-2 mt-1">
+                        <div class="${candyVariant} font-black text-xs sm:text-sm px-2.5 py-0.5 rounded-full shadow-sm">
+                            ${item.letter}
+                        </div>
+                        ${item.cleared ? '<div class="text-amber-500 font-bold text-lg stamp-star"><i class="fa-solid fa-star"></i></div>' : '<div class="text-slate-300 text-xs"><i class="fa-regular fa-circle"></i></div>'}
+                    </div>
+                    <p class="font-handwriting text-slate-800 text-sm sm:text-base font-bold leading-tight line-clamp-3 my-auto">
+                        ${item.sentence}
+                    </p>
+                    <div class="mt-2 text-[10px] font-bold uppercase tracking-wider text-right ${item.cleared ? 'text-amber-700' : 'text-slate-400'}">
+                        ${item.cleared ? '✓ Cleared' : 'Tap to speak'}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Check 4-in-a-row lines (4 rows, 4 cols, 2 diagonals)
+        function checkBingoLines() {
+            const grid = window.appState.gridItems;
+            let totalLines = 0;
+            
+            // Reset winning status on items
+            grid.forEach(i => i.isWinning = false);
+
+            const lines = [
+                // Rows
+                [0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15],
+                // Columns
+                [0, 4, 8, 12], [1, 5, 9, 13], [2, 6, 10, 14], [3, 7, 11, 15],
+                // Diagonals
+                [0, 5, 10, 15], [3, 6, 9, 12]
+            ];
+
+            lines.forEach(line => {
+                const isComplete = line.every(idx => grid[idx] && grid[idx].cleared);
+                if (isComplete) {
+                    totalLines++;
+                    line.forEach(idx => grid[idx].isWinning = true);
+                }
+            });
+
+            const previousLines = window.appState.bingoLinesCount;
+            window.appState.bingoLinesCount = totalLines;
+
+            // Trigger Victory Confetti if a new line is completed
+            if (totalLines > previousLines) {
+                triggerVictoryConfetti();
+                openWinModal();
+            }
+
+            renderBingoGrid();
+            updateProgressCounters();
+        }
+
+        function updateProgressCounters() {
+            const clearedCount = window.appState.gridItems.filter(i => i.cleared).length;
+            window.appState.starsEarned = clearedCount;
+            
+            document.getElementById('clearedCountText').innerText = `${clearedCount}/16 Cleared`;
+            document.getElementById('starsCount').innerHTML = `${clearedCount} <i class="fa-solid fa-star text-amber-400 text-base"></i>`;
+            document.getElementById('bingoLinesCount').innerText = window.appState.bingoLinesCount;
+        }
+
+        function triggerVictoryConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+            playChimeSound(880, 'sine', 0.4);
+        }
+
+        // Open Speaking Task Modal
+        window.openSpeakingTaskModal = function(index) {
+            window.appState.selectedTileIndex = index;
+            const item = window.appState.gridItems[index];
+
+            document.getElementById('modalCardLetterBadge').innerText = item.letter;
+            document.getElementById('modalTargetSentence').innerText = item.sentence;
+
+            // Reset recording UI state
+            document.getElementById('evaluationResultBox').classList.add('hidden');
+            document.getElementById('claimStarBtn').disabled = true;
+            document.getElementById('claimStarBtn').classList.add('opacity-50', 'cursor-not-allowed');
+
+            const modal = document.getElementById('speakingModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+
+            initWaveformCanvas();
+        };
+
+        window.closeSpeakingModal = function() {
+            stopSpeechRecognition();
+            const modal = document.getElementById('speakingModal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        };
+
+        // Text-to-speech voice synthesis
+        window.playTTSSpeech = function() {
+            unlockIosAudioContext();
+            if (!('speechSynthesis' in window)) {
+                showSyncToast("Speech synthesis not supported on this browser.");
+                return;
+            }
+
+            window.speechSynthesis.cancel(); // Stop ongoing speech
+            const text = document.getElementById('modalTargetSentence').innerText;
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.88; // Slightly slower clear pace for young learners
+            utterance.pitch = 1.05;
+            utterance.lang = 'en-US';
+
+            window.speechSynthesis.speak(utterance);
+        };
+
+        // Web Speech Recognition Engine
+        window.toggleSpeechRecognition = function() {
+            if (isRecording) {
+                stopSpeechRecognition();
+            } else {
+                startSpeechRecognition();
+            }
+        };
+
+        function startSpeechRecognition() {
+            unlockIosAudioContext();
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            if (!SpeechRecognition) {
+                showSyncToast("Web Speech API not available on this device. Please use manual input below!");
+                return;
+            }
+
+            try {
+                speechRecognizer = new SpeechRecognition();
+                speechRecognizer.continuous = false;
+                speechRecognizer.interimResults = true;
+                speechRecognizer.lang = 'en-US';
+
+                speechRecognizer.onstart = () => {
+                    isRecording = true;
+                    currentRecognizedText = "";
+                    document.getElementById('recordBtnText').innerText = "Stop & Evaluate";
+                    document.getElementById('toggleRecordBtn').className = "flex-1 py-3 px-6 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-base sm:text-lg shadow-lg flex items-center justify-center gap-2 transition";
+                    document.getElementById('recordPulseDot').className = "w-3 h-3 rounded-full bg-rose-500 animate-ping";
+                    document.getElementById('recordStatusText').innerText = "Listening... Speak now!";
+                    startAudioStreamVisualizer();
+                };
+
+                speechRecognizer.onresult = (event) => {
+                    let transcript = "";
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        transcript += event.results[i][0].transcript;
+                    }
+                    currentRecognizedText = transcript;
+                };
+
+                speechRecognizer.onerror = (event) => {
+                    console.warn("Speech error:", event.error);
+                    stopSpeechRecognition();
+                };
+
+                speechRecognizer.onend = () => {
+                    stopSpeechRecognition();
+                    evaluateSpeechAccuracy(currentRecognizedText);
+                };
+
+                speechRecognizer.start();
+            } catch (err) {
+                console.error("Speech rec start failed:", err);
+            }
+        }
+
+        function stopSpeechRecognition() {
+            isRecording = false;
+            if (speechRecognizer) {
+                try { speechRecognizer.stop(); } catch(e) {}
+                speechRecognizer = null;
+            }
+            document.getElementById('recordBtnText').innerText = "Record & Speak";
+            document.getElementById('toggleRecordBtn').className = "flex-1 py-3 px-6 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-base sm:text-lg shadow-lg flex items-center justify-center gap-2 transition";
+            document.getElementById('recordPulseDot').className = "w-3 h-3 rounded-full bg-slate-300";
+            document.getElementById('recordStatusText').innerText = "Tap button to record again";
+            stopAudioStreamVisualizer();
+        }
+
+        // Evaluate Speech Accuracy against Target Sentence
+        function evaluateSpeechAccuracy(spokenText) {
+            const target = document.getElementById('modalTargetSentence').innerText.trim();
+            if (!spokenText || spokenText.trim().length === 0) {
+                showEvaluationResult(0, [], target.split(' '), "No speech detected. Please speak into microphone!");
+                return;
+            }
+
+            // Clean & Tokenize
+            const cleanTargetWords = target.replace(/[^\w\s]/gi, '').toLowerCase().split(/\s+/);
+            const cleanSpokenWords = spokenText.replace(/[^\w\s]/gi, '').toLowerCase().split(/\s+/);
+
+            let matchedCount = 0;
+            const targetWordsOriginal = target.split(/\s+/);
+
+            const wordBreakdownHtml = targetWordsOriginal.map((origWord) => {
+                const cleanWord = origWord.replace(/[^\w\s]/gi, '').toLowerCase();
+                const matched = cleanSpokenWords.includes(cleanWord);
+                if (matched) {
+                    matchedCount++;
+                    return `<span class="px-2 py-0.5 rounded-md bg-emerald-200 text-emerald-900 border border-emerald-400">✓ ${origWord}</span>`;
+                } else {
+                    return `<span class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 border border-rose-300">✗ ${origWord}</span>`;
+                }
+            });
+
+            const score = Math.min(100, Math.round((matchedCount / cleanTargetWords.length) * 100));
+            const feedback = score >= 80 
+                ? "Great pronunciation! Score >= 80%. Golden Star unlocked!" 
+                : "Good attempt! Keep practicing to get at least 80% accuracy.";
+
+            showEvaluationResult(score, wordBreakdownHtml, targetWordsOriginal, feedback);
+        }
+
+        window.evaluateManualText = function() {
+            const inputVal = document.getElementById('manualTextInput').value;
+            evaluateSpeechAccuracy(inputVal);
+        };
+
+        function showEvaluationResult(score, wordHtmlArray, originalWords, feedback) {
+            const box = document.getElementById('evaluationResultBox');
+            box.classList.remove('hidden');
+
+            const badge = document.getElementById('scoreBadge');
+            badge.innerText = `${score}%`;
+            badge.className = score >= 80 
+                ? "px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-500 text-white"
+                : "px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-500 text-white";
+
+            document.getElementById('wordBreakdownContainer').innerHTML = wordHtmlArray.join(' ');
+            document.getElementById('evalFeedbackText').innerText = feedback;
+
+            const claimBtn = document.getElementById('claimStarBtn');
+            if (score >= 80) {
+                claimBtn.disabled = false;
+                claimBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                playChimeSound(750, 'sine', 0.25);
+            } else {
+                claimBtn.disabled = true;
+                claimBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        window.claimTileStar = function() {
+            const idx = window.appState.selectedTileIndex;
+            if (idx !== null && window.appState.gridItems[idx]) {
+                window.appState.gridItems[idx].cleared = true;
+                checkBingoLines();
+                closeSpeakingModal();
+            }
+        };
+
+        // Canvas Live Audio Waveform Animation
+        function initWaveformCanvas() {
+            const canvas = document.getElementById('waveformCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        async function startAudioStreamVisualizer() {
+            try {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+                mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                if (!audioContext) unlockIosAudioContext();
+                
+                const source = audioContext.createMediaStreamSource(mediaStream);
+                audioAnalyser = audioContext.createAnalyser();
+                audioAnalyser.fftSize = 64;
+                source.connect(audioAnalyser);
+
+                drawWaveform();
+            } catch (err) {
+                console.warn("Microphone access for visualizer denied/unavailable:", err);
+            }
+        }
+
+        function drawWaveform() {
+            const canvas = document.getElementById('waveformCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const bufferLength = audioAnalyser ? audioAnalyser.frequencyBinCount : 32;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function animate() {
+                if (!isRecording) return;
+                audioAnimFrame = requestAnimationFrame(animate);
+                audioAnalyser.getByteFrequencyData(dataArray);
+
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const barWidth = (canvas.width / bufferLength) * 2;
+                let barHeight;
+                let x = 0;
+
+                for (let i = 0; i < bufferLength; i++) {
+                    barHeight = (dataArray[i] / 255) * canvas.height;
+                    ctx.fillStyle = `rgb(16, 185, 129)`;
+                    ctx.fillRect(x, canvas.height - barHeight, barWidth - 2, barHeight);
+                    x += barWidth;
+                }
+            }
+            animate();
+        }
+
+        function stopAudioStreamVisualizer() {
+            if (audioAnimFrame) cancelAnimationFrame(audioAnimFrame);
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
+            initWaveformCanvas();
+        }
+
+        // Modals & Teacher Controls
+        window.openTeacherModal = function() {
+            // Render 16 sentence inputs
+            const grid = document.getElementById('sentenceInputsGrid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < 16; i++) {
+                const letter = ALPHABET_LETTERS[i];
+                const currentVal = window.appState.sentences[i] || DEFAULT_WW5_SENTENCES[i];
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = "flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200";
+                wrapper.innerHTML = `
+                    <span class="badge-candy text-xs font-black w-6 h-6 rounded-full flex items-center justify-center shrink-0">
+                        ${letter}
+                    </span>
+                    <input type="text" id="teacherSentenceInput_${i}" value="${currentVal}" class="w-full text-xs font-medium text-slate-800 bg-transparent outline-none">
+                `;
+                grid.appendChild(wrapper);
+            }
+
+            document.getElementById('teacherTopicTitleInput').value = window.appState.topicTitle;
+            document.getElementById('teacherCurrentRoomLabel').innerText = window.appState.roomCode;
+
+            const modal = document.getElementById('teacherModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        };
+
+        window.closeTeacherModal = function() {
+            const modal = document.getElementById('teacherModal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        };
+
+        window.resetToWW5Defaults = function() {
+            for (let i = 0; i < 16; i++) {
+                const el = document.getElementById(`teacherSentenceInput_${i}`);
+                if (el) el.value = DEFAULT_WW5_SENTENCES[i];
+            }
+            document.getElementById('teacherTopicTitleInput').value = "WW5 Level 2: Speaking Task";
+        };
+
+        window.generateNewRandomRoom = function() {
+            const code = 'ROOM-' + Math.floor(1000 + Math.random() * 9000);
+            window.appState.roomCode = code;
+            document.getElementById('teacherCurrentRoomLabel').innerText = code;
+            document.getElementById('currentRoomCodeDisplay').innerText = code;
+            attachFirestoreListener();
+            subscribeMqttRoom();
+        };
+
+        window.copyRoomShareLink = function() {
+            const url = window.location.href.split('?')[0] + '?room=' + window.appState.roomCode;
+            navigator.clipboard.writeText(url).then(() => {
+                showSyncToast("Room link copied to clipboard!");
+            });
+        };
+
+        window.openSyncModal = function() {
+            document.getElementById('roomCodeInput').value = window.appState.roomCode;
+            const modal = document.getElementById('syncModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        };
+
+        window.closeSyncModal = function() {
+            const modal = document.getElementById('syncModal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        };
+
+        window.joinCustomRoom = function() {
+            const val = document.getElementById('roomCodeInput').value.trim().toUpperCase();
+            if (val) {
+                window.appState.roomCode = val;
+                document.getElementById('currentRoomCodeDisplay').innerText = val;
+                attachFirestoreListener();
+                subscribeMqttRoom();
+                closeSyncModal();
+                showSyncToast(`Joined sync room: ${val}`);
+            }
+        };
+
+        window.forceReconnectSync = function() {
+            attachFirestoreListener();
+            subscribeMqttRoom();
+            showSyncToast("Real-time listener refreshed!");
+            closeSyncModal();
+        };
+
+        window.openWinModal = function() {
+            document.getElementById('winModalLines').innerText = window.appState.bingoLinesCount;
+            document.getElementById('winModalStars').innerText = window.appState.starsEarned;
+            const modal = document.getElementById('bingoWinModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        };
+
+        window.closeWinModal = function() {
+            const modal = document.getElementById('bingoWinModal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        };
+
+        function updateSyncLog(id, text, colorClass) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.innerText = text;
+                el.className = colorClass;
+            }
+        }
+
+        function showSyncToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = "fixed bottom-4 right-4 bg-slate-900 text-amber-300 font-bold px-4 py-2 rounded-xl shadow-xl z-50 text-xs flex items-center gap-2 border border-amber-500/40 animate-bounce";
+            toast.innerHTML = `<i class="fa-solid fa-bell"></i> <span>${msg}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+
+        // On Load Setup
+        window.addEventListener('DOMContentLoaded', async () => {
+            // URL parameter room check
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('room')) {
+                window.appState.roomCode = params.get('room').toUpperCase();
+            }
+            document.getElementById('currentRoomCodeDisplay').innerText = window.appState.roomCode;
+
+            initGrid();
+            await initFirebaseSync();
+            initMqttSync();
+        });
+    </script>
+</body>
+</html>
