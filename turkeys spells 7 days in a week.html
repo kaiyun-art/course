@@ -1,0 +1,2146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Thanksgiving Turkey Listen & Spell</title>
+
+  <!-- Tailwind CSS for responsive layout and UI polish -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Kid-friendly rounded typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ==========================================================================
+       GLOBAL & IPAD TOUCH OPTIMIZATIONS
+       ========================================================================== */
+    :root {
+      --font-display: 'Fredoka', 'Nunito', sans-serif;
+      --font-body: 'Nunito', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      font-family: var(--font-display);
+      background-color: #78350f;
+      touch-action: manipulation;
+    }
+
+    /* ==========================================================================
+       ANIMATIONS FOR TURKEYS, LEAVES, BUTTONS & FEEDBACK
+       ========================================================================== */
+    @keyframes wingFlapLeft {
+      0%, 100% { transform: rotate(0deg) translateY(0px); }
+      50% { transform: rotate(-18deg) translateY(-3px); }
+    }
+
+    @keyframes wingFlapRight {
+      0%, 100% { transform: rotate(0deg) translateY(0px); }
+      50% { transform: rotate(18deg) translateY(-3px); }
+    }
+
+    @keyframes headBob {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(4deg); }
+    }
+
+    @keyframes legRunLeft {
+      0%, 100% { transform: rotate(-16deg); }
+      50% { transform: rotate(18deg); }
+    }
+
+    @keyframes legRunRight {
+      0%, 100% { transform: rotate(18deg); }
+      50% { transform: rotate(-16deg); }
+    }
+
+    @keyframes tailFan {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.04) rotate(2deg); }
+    }
+
+    @keyframes turkeyWiggle {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(-14deg) scale(0.95); }
+      40% { transform: rotate(14deg) scale(0.95); }
+      60% { transform: rotate(-10deg); }
+      80% { transform: rotate(10deg); }
+    }
+
+    @keyframes turkeyCatchPop {
+      0% { transform: scale(1); opacity: 1; }
+      45% { transform: scale(1.32) translateY(-18px); opacity: 1; }
+      100% { transform: scale(0.2) translateY(-70px); opacity: 0; }
+    }
+
+    @keyframes slotPop {
+      0% { transform: scale(0.5); }
+      65% { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes gentlePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
+    @keyframes soundWave {
+      0%, 100% { transform: scaleY(0.45); }
+      50% { transform: scaleY(1.25); }
+    }
+
+    @keyframes floatLeaf {
+      0% {
+        transform: translateY(-10vh) translateX(0px) rotate(0deg);
+        opacity: 0;
+      }
+      10% { opacity: 0.85; }
+      90% { opacity: 0.85; }
+      100% {
+        transform: translateY(110vh) translateX(65px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Turkey SVG sub-part classes */
+    .turkey-entity {
+      position: absolute;
+      top: 0;
+      left: 0;
+      will-change: transform;
+      cursor: pointer;
+      touch-action: manipulation;
+      z-index: 20;
+    }
+
+    .turkey-entity:active .turkey-visual {
+      transform: scale(0.93);
+    }
+
+    .turkey-visual {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transition: transform 0.12s ease;
+    }
+
+    .turkey-wiggle {
+      animation: turkeyWiggle 0.48s ease-in-out;
+    }
+
+    .turkey-caught {
+      pointer-events: none;
+      animation: turkeyCatchPop 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .svg-wing-left {
+      transform-origin: 36px 68px;
+      animation: wingFlapLeft 0.36s ease-in-out infinite;
+    }
+
+    .svg-wing-right {
+      transform-origin: 84px 68px;
+      animation: wingFlapRight 0.36s ease-in-out infinite;
+    }
+
+    .svg-head-group {
+      transform-origin: 60px 44px;
+      animation: headBob 0.42s ease-in-out infinite;
+    }
+
+    .svg-leg-left {
+      transform-origin: 48px 94px;
+      animation: legRunLeft 0.32s linear infinite;
+    }
+
+    .svg-leg-right {
+      transform-origin: 72px 94px;
+      animation: legRunRight 0.32s linear infinite;
+    }
+
+    .svg-tail {
+      transform-origin: 60px 72px;
+      animation: tailFan 0.6s ease-in-out infinite;
+    }
+
+    .slot-filled-anim {
+      animation: slotPop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .btn-3d {
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+    .btn-3d:active {
+      transform: translateY(3px);
+    }
+
+    .speaking-ring {
+      animation: gentlePulse 0.75s ease-in-out infinite;
+    }
+
+    /* Particle bursts when catching a turkey */
+    .particle-burst {
+      position: absolute;
+      pointer-events: none;
+      font-size: 24px;
+      z-index: 40;
+      transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s ease-out;
+    }
+
+    /* Custom scrollbar inside teacher modal if needed on small viewports */
+    .modal-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .modal-scroll::-webkit-scrollbar-thumb {
+      background-color: rgba(180, 83, 9, 0.4);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body class="relative w-screen h-[100dvh] overflow-hidden select-none">
+
+  <!-- ========================================================================
+       LAYER 1: BACKGROUND SCENE (DEFAULT THANKSGIVING FARM OR CUSTOM IMAGE)
+       ======================================================================== -->
+  <div id="background-layer" class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+    <!-- Custom Uploaded Picture Layer (Hidden until user uploads a photo) -->
+    <img
+      id="custom-bg-image"
+      src=""
+      alt="Custom Thanksgiving Farm Background"
+      class="hidden w-full h-full object-cover transition-all duration-300"
+    />
+
+    <!-- Default Hand-Crafted SVG Thanksgiving Farm Scene -->
+    <div id="default-farm-scene" class="w-full h-full relative">
+      <svg
+        viewBox="0 0 1440 900"
+        preserveAspectRatio="xMidYMid slice"
+        class="w-full h-full block"
+        aria-hidden="true"
+      >
+        <defs>
+          <!-- Warm Autumn Sunset Sky Gradient -->
+          <linearGradient id="autumnSky" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FDE68A" />
+            <stop offset="35%" stop-color="#FDBA74" />
+            <stop offset="68%" stop-color="#FB923C" />
+            <stop offset="100%" stop-color="#FEF3C7" />
+          </linearGradient>
+
+          <!-- Warm Sun Glow -->
+          <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFFBEB" stop-opacity="0.95" />
+            <stop offset="45%" stop-color="#FDE047" stop-opacity="0.45" />
+            <stop offset="100%" stop-color="#FB923C" stop-opacity="0" />
+          </radialGradient>
+
+          <!-- Distant Rolling Hill -->
+          <linearGradient id="farHill" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#D97706" />
+            <stop offset="100%" stop-color="#B45309" />
+          </linearGradient>
+
+          <!-- Midground Harvest Hill -->
+          <linearGradient id="midHill" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#84CC16" />
+            <stop offset="100%" stop-color="#4D7C0F" />
+          </linearGradient>
+
+          <!-- Foreground Farm Pasture -->
+          <linearGradient id="pastureGrass" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#A3E635" />
+            <stop offset="30%" stop-color="#65A30D" />
+            <stop offset="100%" stop-color="#3F6212" />
+          </linearGradient>
+
+          <!-- Barn Wood Gradient -->
+          <linearGradient id="barnRed" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#DC2626" />
+            <stop offset="100%" stop-color="#991B1B" />
+          </linearGradient>
+        </defs>
+
+        <!-- Sky -->
+        <rect width="1440" height="900" fill="url(#autumnSky)" />
+
+        <!-- Golden Harvest Sun -->
+        <circle cx="1120" cy="190" r="240" fill="url(#sunGlow)" />
+        <circle cx="1120" cy="190" r="68" fill="#FEF9C3" opacity="0.9" />
+
+        <!-- Soft Fluffy Clouds -->
+        <g fill="#FFFBEB" opacity="0.65">
+          <ellipse cx="260" cy="150" rx="95" ry="30" />
+          <ellipse cx="320" cy="140" rx="70" ry="26" />
+          <ellipse cx="210" cy="155" rx="60" ry="22" />
+
+          <ellipse cx="780" cy="125" rx="110" ry="28" />
+          <ellipse cx="845" cy="118" rx="75" ry="24" />
+        </g>
+
+        <!-- Distant Autumn Hills -->
+        <path d="M0,340 Q340,235 720,315 T1440,285 L1440,520 L0,520 Z" fill="url(#farHill)" opacity="0.85" />
+
+        <!-- Autumn Trees on Distant Ridge -->
+        <g>
+          <!-- Left Tree Cluster -->
+          <rect x="115" y="265" width="14" height="55" fill="#78350F" />
+          <circle cx="122" cy="245" r="44" fill="#EA580C" />
+          <circle cx="95" cy="260" r="32" fill="#F59E0B" />
+          <circle cx="148" cy="258" r="34" fill="#DC2626" />
+
+          <rect x="465" y="250" width="12" height="50" fill="#78350F" />
+          <circle cx="471" cy="232" r="38" fill="#F59E0B" />
+          <circle cx="445" cy="244" r="28" fill="#D97706" />
+
+          <!-- Right Tree Cluster -->
+          <rect x="1285" y="240" width="16" height="60" fill="#78350F" />
+          <circle cx="1293" cy="218" r="48" fill="#DC2626" />
+          <circle cx="1260" cy="235" r="36" fill="#F97316" />
+          <circle cx="1325" cy="232" r="35" fill="#FACC15" />
+        </g>
+
+        <!-- Classic Red Thanksgiving Barn & Silo (Left-Center Midground) -->
+        <g transform="translate(185, 195)">
+          <!-- Grain Silo -->
+          <rect x="178" y="38" width="54" height="145" rx="6" fill="#E5E7EB" stroke="#9CA3AF" stroke-width="3" />
+          <path d="M178,38 A27,26 0 0,1 232,38 Z" fill="#9CA3AF" />
+          <line x1="178" y1="74" x2="232" y2="74" stroke="#9CA3AF" stroke-width="3" />
+          <line x1="178" y1="112" x2="232" y2="112" stroke="#9CA3AF" stroke-width="3" />
+          <line x1="178" y1="150" x2="232" y2="150" stroke="#9CA3AF" stroke-width="3" />
+
+          <!-- Barn Main Body -->
+          <polygon points="15,92 98,28 181,92 181,185 15,185" fill="url(#barnRed)" stroke="#7F1D1D" stroke-width="3" />
+          <!-- Barn Gambrel Roof Trim -->
+          <polyline points="6,96 98,22 190,96" fill="none" stroke="#FFFBEB" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+          <!-- Hayloft Window -->
+          <rect x="80" y="58" width="36" height="32" rx="4" fill="#451A03" stroke="#FFFBEB" stroke-width="4" />
+          <!-- Barn Double Doors with White X -->
+          <rect x="58" y="114" width="80" height="71" fill="#7F1D1D" stroke="#FFFBEB" stroke-width="5" />
+          <line x1="98" y1="114" x2="98" y2="185" stroke="#FFFBEB" stroke-width="4" />
+          <line x1="58" y1="114" x2="98" y2="185" stroke="#FFFBEB" stroke-width="3.5" />
+          <line x1="98" y1="114" x2="58" y2="185" stroke="#FFFBEB" stroke-width="3.5" />
+          <line x1="98" y1="114" x2="138" y2="185" stroke="#FFFBEB" stroke-width="3.5" />
+          <line x1="138" y1="114" x2="98" y2="185" stroke="#FFFBEB" stroke-width="3.5" />
+        </g>
+
+        <!-- Midground Rolling Meadow -->
+        <path d="M0,385 Q460,335 920,380 T1440,360 L1440,900 L0,900 Z" fill="url(#midHill)" />
+
+        <!-- Foreground Farm Pasture where Turkeys Run -->
+        <path d="M0,435 Q540,395 1080,430 T1440,415 L1440,900 L0,900 Z" fill="url(#pastureGrass)" />
+
+        <!-- Wooden Split-Rail Fence along Pasture Edge -->
+        <g stroke="#78350F" stroke-linecap="round">
+          <!-- Horizontal Rails -->
+          <line x1="0" y1="398" x2="1440" y2="392" stroke="#92400E" stroke-width="8" />
+          <line x1="0" y1="420" x2="1440" y2="414" stroke="#78350F" stroke-width="8" />
+          <!-- Fence Posts -->
+          <g fill="#78350F" stroke="#451A03" stroke-width="2">
+            <rect x="60" y="378" width="14" height="58" rx="3" />
+            <rect x="240" y="376" width="14" height="58" rx="3" />
+            <rect x="420" y="375" width="14" height="58" rx="3" />
+            <rect x="600" y="374" width="14" height="58" rx="3" />
+            <rect x="780" y="373" width="14" height="58" rx="3" />
+            <rect x="960" y="372" width="14" height="58" rx="3" />
+            <rect x="1140" y="371" width="14" height="58" rx="3" />
+            <rect x="1320" y="370" width="14" height="58" rx="3" />
+          </g>
+        </g>
+
+        <!-- Golden Hay Bales & Harvest Pumpkins (Decorative Corner Props) -->
+        <!-- Left Hay Bale + Pumpkins -->
+        <g transform="translate(45, 755)">
+          <rect x="0" y="20" width="115" height="68" rx="12" fill="#FACC15" stroke="#CA8A04" stroke-width="4" />
+          <line x1="28" y1="20" x2="28" y2="88" stroke="#A16207" stroke-width="3" />
+          <line x1="86" y1="20" x2="86" y2="88" stroke="#A16207" stroke-width="3" />
+          <!-- Cute Pumpkin -->
+          <ellipse cx="122" cy="68" rx="28" ry="22" fill="#EA580C" stroke="#9A3412" stroke-width="3" />
+          <ellipse cx="122" cy="68" rx="13" ry="22" fill="#F97316" />
+          <path d="M120,46 Q124,35 131,37" fill="none" stroke="#3F6212" stroke-width="5" stroke-linecap="round" />
+        </g>
+
+        <!-- Right Hay Bale + Pumpkins -->
+        <g transform="translate(1255, 760)">
+          <rect x="25" y="18" width="110" height="65" rx="12" fill="#FACC15" stroke="#CA8A04" stroke-width="4" />
+          <line x1="55" y1="18" x2="55" y2="83" stroke="#A16207" stroke-width="3" />
+          <line x1="108" y1="18" x2="108" y2="83" stroke="#A16207" stroke-width="3" />
+          <!-- Cute Pumpkin -->
+          <ellipse cx="18" cy="66" rx="26" ry="20" fill="#EA580C" stroke="#9A3412" stroke-width="3" />
+          <ellipse cx="18" cy="66" rx="12" ry="20" fill="#F97316" />
+          <path d="M16,46 Q13,35 7,37" fill="none" stroke="#3F6212" stroke-width="5" stroke-linecap="round" />
+        </g>
+      </svg>
+    </div>
+
+    <!-- Configurable Tint Overlay for High Contrast Readability -->
+    <div
+      id="bg-tint-overlay"
+      class="absolute inset-0 bg-amber-950 transition-opacity duration-200"
+      style="opacity: 0;"
+    ></div>
+
+    <!-- Ambient Drifting Autumn Leaves Container -->
+    <div id="ambient-leaves" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
+  </div>
+
+  <!-- ========================================================================
+       LAYER 2: TOP HUD BAR (STAGE INFO, LISTEN BUTTON, SPELLING BOXES, SETTINGS)
+       ======================================================================== -->
+  <header
+    id="game-hud"
+    class="relative z-30 w-full px-2 sm:px-4 pt-2 pb-1.5 flex flex-wrap items-center justify-between gap-2 bg-amber-50/90 backdrop-blur-md border-b-4 border-amber-700/30 shadow-lg"
+  >
+    <!-- Left: Stage Indicator & Progress Stars -->
+    <div class="flex items-center gap-2 shrink-0">
+      <div class="bg-amber-700 text-amber-50 px-3 py-1.5 rounded-2xl shadow-inner flex items-center gap-1.5 border-2 border-amber-900/30">
+        <span class="text-lg sm:text-xl">🦃</span>
+        <div class="leading-tight">
+          <div class="text-[10px] sm:text-xs uppercase tracking-wider text-amber-200 font-bold">Stage</div>
+          <div id="hud-stage-text" class="text-sm sm:text-lg font-extrabold">1 / 7</div>
+        </div>
+      </div>
+
+      <!-- 7 Stage Mini Dots (Hidden on very narrow screens, shown on iPad) -->
+      <div id="stage-dots" class="hidden md:flex items-center gap-1.5 bg-amber-100/90 px-2.5 py-2 rounded-2xl border border-amber-300">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Center: Listen Again Button + Letter Spelling Boxes -->
+    <div class="order-3 lg:order-2 w-full lg:w-auto flex-1 flex items-center justify-center gap-2 sm:gap-3 py-0.5">
+      <!-- Listen / Replay Pronunciation Button -->
+      <button
+        id="btn-listen-again"
+        type="button"
+        aria-label="Listen to the word again"
+        class="btn-3d shrink-0 flex items-center gap-1.5 sm:gap-2 bg-gradient-to-b from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white font-extrabold px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-2xl shadow-[0_4px_0_#9a3412] border-2 border-orange-200 text-sm sm:text-base md:text-lg"
+      >
+        <span id="speaker-icon" class="text-xl sm:text-2xl">🔊</span>
+        <span>Listen</span>
+        <!-- Animated Sound Bars shown while speaking -->
+        <span id="sound-bars" class="hidden items-end gap-0.5 h-4 ml-0.5">
+          <span class="w-1 h-2 bg-yellow-200 rounded-full animate-[soundWave_0.45s_ease-in-out_infinite]"></span>
+          <span class="w-1 h-4 bg-white rounded-full animate-[soundWave_0.45s_ease-in-out_0.15s_infinite]"></span>
+          <span class="w-1 h-2.5 bg-yellow-200 rounded-full animate-[soundWave_0.45s_ease-in-out_0.3s_infinite]"></span>
+        </span>
+      </button>
+
+      <!-- Target Word Letter Boxes -->
+      <div
+        id="spelling-slots-container"
+        class="flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 bg-amber-900/15 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl border-2 border-amber-800/20"
+        aria-label="Word spelling slots"
+      >
+        <!-- Letter boxes dynamically generated for current word -->
+      </div>
+    </div>
+
+    <!-- Right: Sound Toggle & Teacher Background Dashboard Button -->
+    <div class="order-2 lg:order-3 flex items-center gap-2 shrink-0">
+      <button
+        id="btn-toggle-sfx"
+        type="button"
+        aria-label="Toggle Sound Effects"
+        class="btn-3d bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold p-2.5 sm:p-3 rounded-2xl border-2 border-amber-400 shadow-[0_3px_0_#d97706] text-lg sm:text-xl"
+        title="Toggle Sound Effects"
+      >
+        🔔
+      </button>
+
+      <button
+        id="btn-open-dashboard"
+        type="button"
+        class="btn-3d flex items-center gap-1.5 bg-gradient-to-b from-amber-600 to-amber-800 hover:from-amber-700 hover:to-amber-900 text-amber-50 font-bold px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl border-2 border-amber-300/60 shadow-[0_4px_0_#451a03] text-xs sm:text-sm md:text-base"
+      >
+        <span class="text-base sm:text-lg">🖼️</span>
+        <span>Dashboard</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       LAYER 3: INTERACTIVE FARM ARENA (WHERE TURKEYS RUN)
+       ======================================================================== -->
+  <main
+    id="farm-arena"
+    class="relative z-10 w-full flex-1 overflow-hidden"
+    style="height: calc(100dvh - 84px);"
+  >
+    <!-- Subtle Helper Banner at bottom of pasture -->
+    <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+      <div
+        id="helper-toast"
+        class="bg-amber-950/75 text-amber-50 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs sm:text-sm md:text-base font-bold tracking-wide shadow-md border border-amber-300/30 whitespace-nowrap transition-all duration-300"
+      >
+        Listen to the day of the week and tap the turkeys in order!
+      </div>
+    </div>
+
+    <!-- Running Turkeys are dynamically injected and animated inside here -->
+    <div id="turkeys-container" class="relative w-full h-full"></div>
+  </main>
+
+  <!-- ========================================================================
+       OVERLAY 1: WELCOME / START SCREEN (UNLOCKS IPAD SAFARI SPEECH & AUDIO)
+       ======================================================================== -->
+  <div
+    id="start-overlay"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-amber-950/60 backdrop-blur-sm"
+  >
+    <div class="bg-gradient-to-b from-amber-50 to-orange-100 border-4 border-amber-600 rounded-3xl max-w-lg w-full p-6 sm:p-8 text-center shadow-2xl">
+      <div class="text-6xl sm:text-7xl mb-2 animate-bounce">🦃</div>
+      <div class="inline-block bg-orange-600 text-white text-xs sm:text-sm font-extrabold uppercase tracking-widest px-3 py-1 rounded-full mb-2">
+        Thanksgiving Farm Activity
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-amber-950 mb-3 leading-tight">
+        Turkey Listen &amp; Spell!
+      </h1>
+      <p class="text-amber-900 text-base sm:text-lg font-semibold mb-6 leading-relaxed">
+        Listen carefully to each <span class="text-orange-700 font-extrabold">Day of the Week</span>, then catch the running turkeys with the right letters in order!
+      </p>
+
+      <button
+        id="btn-start-game"
+        type="button"
+        class="btn-3d w-full py-4 px-6 rounded-2xl bg-gradient-to-b from-lime-500 to-green-600 hover:from-lime-600 hover:to-green-700 text-white font-extrabold text-xl sm:text-2xl shadow-[0_6px_0_#166534] border-2 border-lime-200 flex items-center justify-center gap-3"
+      >
+        <span>🔊</span>
+        <span>Tap to Start Game</span>
+      </button>
+
+      <p class="mt-4 text-xs sm:text-sm text-amber-800/80 font-semibold">
+        Turn up your iPad volume so you can hear every word!
+      </p>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       OVERLAY 2: STAGE CLEAR CELEBRATION MODAL
+       (INCLUDES EXACT REQUIRED BUTTON TEXT:
+        "Congratulations! Let's catch more turkeys!")
+       ======================================================================== -->
+  <div
+    id="stage-clear-overlay"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-amber-950/55 backdrop-blur-sm"
+  >
+    <div class="bg-gradient-to-b from-yellow-50 via-amber-50 to-orange-100 border-4 border-amber-500 rounded-3xl max-w-xl w-full p-6 sm:p-8 text-center shadow-2xl transform transition-all">
+      <div class="flex justify-center gap-2 text-4xl sm:text-5xl mb-2">
+        <span>🍂</span>
+        <span class="animate-bounce">🦃</span>
+        <span>🍁</span>
+      </div>
+
+      <div id="clear-stage-badge" class="inline-block bg-amber-700 text-amber-100 text-xs sm:text-sm font-extrabold uppercase tracking-wider px-3.5 py-1 rounded-full mb-2">
+        Stage 1 Complete!
+      </div>
+
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-950 mb-2">
+        Awesome Spelling!
+      </h2>
+
+      <!-- Display the Completed Spelled Word -->
+      <div
+        id="completed-word-display"
+        class="my-4 py-3 px-5 bg-white/90 border-2 border-amber-300 rounded-2xl inline-flex items-center justify-center gap-1.5 shadow-inner"
+      >
+        <!-- Filled dynamically with golden letter tiles -->
+      </div>
+
+      <div class="mt-4">
+        <button
+          id="btn-next-stage"
+          type="button"
+          class="btn-3d w-full py-4 px-5 rounded-2xl bg-gradient-to-b from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-extrabold text-lg sm:text-2xl shadow-[0_6px_0_#7f1d1d] border-2 border-yellow-200 leading-snug"
+        >
+          Congratulations! Let's catch more turkeys!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       OVERLAY 3: GRAND THANKSGIVING CHAMPION (AFTER STAGE 7)
+       ======================================================================== -->
+  <div
+    id="victory-overlay"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-amber-950/65 backdrop-blur-sm"
+  >
+    <div class="bg-gradient-to-b from-amber-50 via-yellow-50 to-orange-100 border-4 border-yellow-500 rounded-3xl max-w-xl w-full p-6 sm:p-8 text-center shadow-2xl">
+      <div class="text-6xl sm:text-7xl mb-2">🏆🦃🎉</div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-amber-950 mb-2">
+        Thanksgiving Spelling Champion!
+      </h2>
+      <p class="text-amber-900 text-base sm:text-lg font-bold mb-4">
+        You caught all the turkeys and spelled all 7 days of the week!
+      </p>
+
+      <!-- All 7 Mastered Days Summary -->
+      <div id="mastered-words-grid" class="flex flex-wrap justify-center gap-2 mb-6">
+        <!-- Populated dynamically -->
+      </div>
+
+      <button
+        id="btn-play-again"
+        type="button"
+        class="btn-3d w-full py-4 px-6 rounded-2xl bg-gradient-to-b from-lime-500 to-green-600 hover:from-lime-600 hover:to-green-700 text-white font-extrabold text-xl sm:text-2xl shadow-[0_6px_0_#166534] border-2 border-lime-200"
+      >
+        🔄 Play Again
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       OVERLAY 4: TEACHER / CUSTOM BACKGROUND UPLOAD DASHBOARD MODAL
+       ======================================================================== -->
+  <div
+    id="dashboard-modal"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="dashboard-title"
+  >
+    <div class="bg-amber-50 border-4 border-amber-700 rounded-3xl max-w-2xl w-full max-h-[90dvh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="bg-amber-800 text-amber-50 px-5 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🖼️</span>
+          <h3 id="dashboard-title" class="text-xl sm:text-2xl font-extrabold">
+            Farm Background &amp; Teacher Dashboard
+          </h3>
+        </div>
+        <button
+          id="btn-close-dashboard"
+          type="button"
+          aria-label="Close Dashboard"
+          class="bg-amber-950/60 hover:bg-amber-950 text-amber-100 w-10 h-10 rounded-xl font-extrabold text-xl flex items-center justify-center"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Modal Scrollable Body -->
+      <div class="p-5 sm:p-6 overflow-y-auto modal-scroll space-y-6 text-amber-950">
+        <!-- Status Banner inside Modal (replaces browser alert) -->
+        <div id="dashboard-status-msg" class="hidden px-4 py-2.5 rounded-xl text-sm font-bold border"></div>
+
+        <!-- Section 1: Upload Custom Background Picture -->
+        <section class="bg-white p-4 sm:p-5 rounded-2xl border-2 border-amber-200 shadow-sm">
+          <h4 class="text-lg font-extrabold text-amber-900 mb-1 flex items-center gap-2">
+            <span>📸</span>
+            <span>Upload Background Picture</span>
+          </h4>
+          <p class="text-xs sm:text-sm text-amber-800/80 font-semibold mb-4">
+            Choose a farm, classroom, or Thanksgiving photo from your iPad Photo Library or Files.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+            <!-- Upload Dropzone / iPad File Picker -->
+            <label
+              for="bg-file-input"
+              id="upload-dropzone"
+              class="flex flex-col items-center justify-center p-5 border-3 border-dashed border-orange-400 hover:border-orange-600 bg-orange-50/70 hover:bg-orange-100/70 rounded-2xl cursor-pointer text-center transition-colors"
+            >
+              <span class="text-4xl mb-2">📁</span>
+              <span class="font-extrabold text-orange-800 text-sm sm:text-base">
+                Tap to Choose Picture
+              </span>
+              <span class="text-xs text-amber-700 mt-1">
+                JPG, PNG, WEBP supported
+              </span>
+              <input
+                id="bg-file-input"
+                type="file"
+                accept="image/*"
+                class="hidden"
+              />
+            </label>
+
+            <!-- Live Thumbnail Preview -->
+            <div class="space-y-2">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-amber-700">
+                Current Active Background
+              </div>
+              <div class="relative w-full h-32 rounded-2xl overflow-hidden border-2 border-amber-300 bg-amber-100 flex items-center justify-center">
+                <img
+                  id="dashboard-preview-img"
+                  src=""
+                  alt="Preview"
+                  class="hidden w-full h-full object-cover"
+                />
+                <div id="dashboard-preview-default" class="text-center p-3">
+                  <div class="text-2xl">🏡🦃🍂</div>
+                  <div class="text-xs font-bold text-amber-800 mt-1">Default Thanksgiving Farm</div>
+                </div>
+              </div>
+              <button
+                id="btn-reset-bg"
+                type="button"
+                class="w-full py-2 px-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs sm:text-sm border border-amber-300 transition-colors"
+              >
+                🔄 Reset to Default Thanksgiving Farm
+              </button>
+            </div>
+          </div>
+
+          <!-- Background Visual Adjustments -->
+          <div class="mt-5 pt-4 border-t border-amber-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Tint / Readability Slider -->
+            <div>
+              <div class="flex justify-between text-xs sm:text-sm font-bold text-amber-900 mb-1.5">
+                <label for="tint-slider">Background Dim / Contrast Tint</label>
+                <span id="tint-value-label">0%</span>
+              </div>
+              <input
+                id="tint-slider"
+                type="range"
+                min="0"
+                max="70"
+                value="0"
+                class="w-full accent-orange-600 h-2.5 bg-amber-200 rounded-lg cursor-pointer"
+              />
+              <p class="text-[11px] text-amber-700 mt-1">
+                Increase tint if a bright photo makes letters hard to read.
+              </p>
+            </div>
+
+            <!-- Image Fit Mode -->
+            <div>
+              <div class="text-xs sm:text-sm font-bold text-amber-900 mb-1.5">
+                Picture Fit Mode
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  id="btn-fit-cover"
+                  type="button"
+                  class="py-2 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 bg-orange-600 text-white border-orange-700"
+                >
+                  Fill Screen (Cover)
+                </button>
+                <button
+                  id="btn-fit-contain"
+                  type="button"
+                  class="py-2 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 bg-amber-100 text-amber-900 border-amber-300"
+                >
+                  Fit Whole (Contain)
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 2: Turkey Squawk & Click Sound Controls -->
+        <section class="bg-white p-4 sm:p-5 rounded-2xl border-2 border-amber-200 shadow-sm space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h4 class="text-lg font-extrabold text-amber-900 flex items-center gap-2">
+                <span>🦃</span>
+                <span>Turkey Squawk Click Sound</span>
+              </h4>
+              <p class="text-xs sm:text-sm text-amber-800/80 font-semibold">
+                Active Sound: <span id="squawk-active-label" class="text-orange-700 font-extrabold">Built-in Turkey Squawk</span>
+              </p>
+            </div>
+            <button
+              id="btn-test-squawk"
+              type="button"
+              class="btn-3d bg-gradient-to-b from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white font-extrabold px-4 py-2.5 rounded-xl shadow-[0_3px_0_#9a3412] border border-orange-200 text-xs sm:text-sm flex items-center gap-1.5"
+            >
+              <span>🔊</span>
+              <span>Test Turkey Squawk</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            <label
+              for="squawk-file-input"
+              class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border-2 border-dashed border-orange-400 hover:border-orange-600 bg-orange-50/70 hover:bg-orange-100/70 text-orange-900 font-extrabold text-xs sm:text-sm cursor-pointer transition-colors"
+            >
+              <span>🎵</span>
+              <span>Upload Custom Audio (.mp3/.wav)</span>
+              <input
+                id="squawk-file-input"
+                type="file"
+                accept="audio/*,.mp3,.wav,.m4a"
+                class="hidden"
+              />
+            </label>
+
+            <button
+              id="btn-reset-squawk"
+              type="button"
+              class="py-2.5 px-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs sm:text-sm border border-amber-300 transition-colors"
+            >
+              🔄 Reset to Turkey Squawk
+            </button>
+          </div>
+        </section>
+
+        <!-- Section 3: Teacher Classroom Controls (Voice Speed & Stage Jump) -->
+        <section class="bg-white p-4 sm:p-5 rounded-2xl border-2 border-amber-200 shadow-sm space-y-4">
+          <h4 class="text-lg font-extrabold text-amber-900 flex items-center gap-2">
+            <span>👩‍🏫</span>
+            <span>Classroom &amp; Stage Controls</span>
+          </h4>
+
+          <!-- Voice Pronunciation Speed -->
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div class="text-sm font-extrabold text-amber-900">Pronunciation Speed</div>
+              <div class="text-xs text-amber-700">Slow mode helps younger learners hear every syllable</div>
+            </div>
+            <div class="flex gap-2">
+              <button
+                id="btn-speed-normal"
+                type="button"
+                class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm border-2 bg-orange-600 text-white border-orange-700"
+              >
+                Normal (1.0x)
+              </button>
+              <button
+                id="btn-speed-slow"
+                type="button"
+                class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm border-2 bg-amber-100 text-amber-900 border-amber-300"
+              >
+                Slow (0.75x)
+              </button>
+            </div>
+          </div>
+
+          <!-- Jump to Stage Selector -->
+          <div class="pt-3 border-t border-amber-100">
+            <div class="text-sm font-extrabold text-amber-900 mb-2">Jump Directly to Stage:</div>
+            <div id="dashboard-stage-buttons" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <!-- Populated dynamically for Stages 1-7 -->
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="bg-amber-100 px-5 py-3.5 border-t-2 border-amber-200 flex justify-end">
+        <button
+          id="btn-save-close-dashboard"
+          type="button"
+          class="btn-3d bg-gradient-to-b from-lime-500 to-green-600 text-white font-extrabold px-6 py-2.5 rounded-2xl shadow-[0_4px_0_#166534] border border-lime-200 text-base"
+        >
+          Done &amp; Return to Farm
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       GAME LOGIC, AUDIO SYNTHESIS, SPEECH & ANIMATION ENGINE
+       ======================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ----------------------------------------------------------------------
+         1. EXACT 7-STAGE CURRICULUM CONFIGURATION
+         ---------------------------------------------------------------------- */
+      const STAGES = [
+        { stage: 1, word: 'Monday' },
+        { stage: 2, word: 'Tuesday' },
+        { stage: 3, word: 'Wednesday' },
+        { stage: 4, word: 'Sunday' },
+        { stage: 5, word: 'Saturday' },
+        { stage: 6, word: 'Thursday' },
+        { stage: 7, word: 'Friday' }
+      ];
+
+      // Distractor letter pools (both uppercase and lowercase so learners pay attention)
+      const UPPERCASE_POOL = ['M', 'T', 'W', 'S', 'F', 'B', 'C', 'D', 'P', 'R'];
+      const LOWERCASE_POOL = [
+        'a', 'e', 'i', 'o', 'u', 'n', 'd', 'y', 's', 'r', 't', 'h', 'w', 'l', 'm', 'c', 'g', 'p'
+      ];
+
+      // Distinct playful feather color palettes for visual variety across turkeys
+      const TURKEY_PALETTES = [
+        { tail1: '#DC2626', tail2: '#F97316', tail3: '#FACC15', body: '#78350F', belly: '#92400E' },
+        { tail1: '#B91C1C', tail2: '#EA580C', tail3: '#FDE047', body: '#713F12', belly: '#854D0E' },
+        { tail1: '#9A3412', tail2: '#F59E0B', tail3: '#FEF08A', body: '#6B3410', belly: '#854D0E' },
+        { tail1: '#BE123C', tail2: '#FB923C', tail3: '#FACC15', body: '#78350F', belly: '#9A3412' }
+      ];
+
+      /* ----------------------------------------------------------------------
+         2. APPLICATION STATE
+         ---------------------------------------------------------------------- */
+      const state = {
+        started: false,
+        paused: false,
+        currentStageIndex: 0, // 0 to 6
+        currentLetterIndex: 0, // Index within current word
+        turkeys: [], // Active turkey objects on the field
+        nextTurkeyId: 1,
+        sfxEnabled: true,
+        speechRate: 0.92, // 0.92 normal, 0.72 slow
+        isSpeaking: false,
+        customSquawkDataUrl: '',
+        customSquawkAudio: null,
+        lastFrameTime: 0,
+        arenaWidth: 1024,
+        arenaHeight: 600,
+        bgSettings: {
+          customImage: '',
+          tintOpacity: 0,
+          fitMode: 'cover' // 'cover' or 'contain'
+        }
+      };
+
+      /* ----------------------------------------------------------------------
+         3. DOM ELEMENT REFERENCES
+         ---------------------------------------------------------------------- */
+      const dom = {
+        customBgImage: document.getElementById('custom-bg-image'),
+        defaultFarmScene: document.getElementById('default-farm-scene'),
+        bgTintOverlay: document.getElementById('bg-tint-overlay'),
+        ambientLeaves: document.getElementById('ambient-leaves'),
+
+        gameHud: document.getElementById('game-hud'),
+        hudStageText: document.getElementById('hud-stage-text'),
+        stageDots: document.getElementById('stage-dots'),
+        btnListenAgain: document.getElementById('btn-listen-again'),
+        soundBars: document.getElementById('sound-bars'),
+        spellingSlotsContainer: document.getElementById('spelling-slots-container'),
+        btnToggleSfx: document.getElementById('btn-toggle-sfx'),
+        btnOpenDashboard: document.getElementById('btn-open-dashboard'),
+
+        farmArena: document.getElementById('farm-arena'),
+        turkeysContainer: document.getElementById('turkeys-container'),
+        helperToast: document.getElementById('helper-toast'),
+
+        startOverlay: document.getElementById('start-overlay'),
+        btnStartGame: document.getElementById('btn-start-game'),
+
+        stageClearOverlay: document.getElementById('stage-clear-overlay'),
+        clearStageBadge: document.getElementById('clear-stage-badge'),
+        completedWordDisplay: document.getElementById('completed-word-display'),
+        btnNextStage: document.getElementById('btn-next-stage'),
+
+        victoryOverlay: document.getElementById('victory-overlay'),
+        masteredWordsGrid: document.getElementById('mastered-words-grid'),
+        btnPlayAgain: document.getElementById('btn-play-again'),
+
+        dashboardModal: document.getElementById('dashboard-modal'),
+        btnCloseDashboard: document.getElementById('btn-close-dashboard'),
+        btnSaveCloseDashboard: document.getElementById('btn-save-close-dashboard'),
+        dashboardStatusMsg: document.getElementById('dashboard-status-msg'),
+        bgFileInput: document.getElementById('bg-file-input'),
+        dashboardPreviewImg: document.getElementById('dashboard-preview-img'),
+        dashboardPreviewDefault: document.getElementById('dashboard-preview-default'),
+        btnResetBg: document.getElementById('btn-reset-bg'),
+        tintSlider: document.getElementById('tint-slider'),
+        tintValueLabel: document.getElementById('tint-value-label'),
+        btnFitCover: document.getElementById('btn-fit-cover'),
+        btnFitContain: document.getElementById('btn-fit-contain'),
+        squawkActiveLabel: document.getElementById('squawk-active-label'),
+        btnTestSquawk: document.getElementById('btn-test-squawk'),
+        squawkFileInput: document.getElementById('squawk-file-input'),
+        btnResetSquawk: document.getElementById('btn-reset-squawk'),
+        btnSpeedNormal: document.getElementById('btn-speed-normal'),
+        btnSpeedSlow: document.getElementById('btn-speed-slow'),
+        dashboardStageButtons: document.getElementById('dashboard-stage-buttons')
+      };
+
+      /* ----------------------------------------------------------------------
+         4. WEB AUDIO API SOUND EFFECTS & IPAD SPEECH SYNTHESIS
+         ---------------------------------------------------------------------- */
+      let audioCtx = null;
+      let preferredVoice = null;
+
+      function initAudioContext() {
+        try {
+          if (!audioCtx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) {
+              audioCtx = new AudioContextClass();
+            }
+          }
+          if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+          }
+        } catch (err) {
+          console.warn('Web Audio init warning:', err);
+        }
+      }
+
+      // Select the clearest English voice available on iPad / Desktop
+      function loadVoices() {
+        if (!('speechSynthesis' in window)) return;
+        const voices = window.speechSynthesis.getVoices();
+        if (!voices || voices.length === 0) return;
+
+        // Prioritize natural iOS / English voices
+        preferredVoice =
+          voices.find(v => v.lang === 'en-US' && (v.name.includes('Samantha') || v.name.includes('Alex') || v.name.includes('Google'))) ||
+          voices.find(v => v.lang.startsWith('en-US')) ||
+          voices.find(v => v.lang.startsWith('en')) ||
+          voices[0];
+      }
+
+      if ('speechSynthesis' in window) {
+        loadVoices();
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+      }
+
+      /**
+       * Synthesizes a realistic, expressive farm turkey squawk/gobble using Web Audio API.
+       * Uses a rapid 32 Hz vibrato LFO modulating a sawtooth/triangle vocal tract routed
+       * through a resonant bandpass formant filter, plus a second nasal squawk burst at 0.08s.
+       */
+      function playTurkeySquawk(isCorrect = true) {
+        if (!state.sfxEnabled) return;
+
+        // If the teacher uploaded a custom audio clip, play that first
+        if (state.customSquawkAudio) {
+          try {
+            state.customSquawkAudio.currentTime = 0;
+            state.customSquawkAudio.play().catch(() => {});
+          } catch (err) {
+            console.warn('Custom audio playback warning:', err);
+          }
+          return;
+        }
+
+        initAudioContext();
+        if (!audioCtx) return;
+
+        const now = audioCtx.currentTime;
+        const duration = isCorrect ? 0.32 : 0.36;
+
+        // 1. Primary vocal cord sawtooth + sub-triangle body resonance
+        const mainOsc = audioCtx.createOscillator();
+        const subOsc = audioCtx.createOscillator();
+        mainOsc.type = 'sawtooth';
+        subOsc.type = 'triangle';
+
+        const startFreq = isCorrect ? 415 : 365;
+        const peakFreq = isCorrect ? 445 : 340;
+        const endFreq = isCorrect ? 175 : 128; // Comical downward pitch drop on wrong tap
+
+        mainOsc.frequency.setValueAtTime(startFreq, now);
+        mainOsc.frequency.linearRampToValueAtTime(peakFreq, now + 0.04);
+        mainOsc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
+
+        subOsc.frequency.setValueAtTime(startFreq * 0.5, now);
+        subOsc.frequency.exponentialRampToValueAtTime(endFreq * 0.5, now + duration);
+
+        // 2. Rapid 32 Hz gobble/squawk vibrato LFO (modulation depth ~65 Hz)
+        const lfoOsc = audioCtx.createOscillator();
+        const lfoGain = audioCtx.createGain();
+        lfoOsc.type = 'sine';
+        lfoOsc.frequency.setValueAtTime(32, now);
+        lfoGain.gain.setValueAtTime(65, now);
+
+        lfoOsc.connect(lfoGain);
+        lfoGain.connect(mainOsc.frequency);
+        lfoGain.connect(subOsc.frequency);
+
+        // 3. Resonant bandpass vocal-formant filter (~750 Hz, Q ~4.5)
+        const formantFilter = audioCtx.createBiquadFilter();
+        formantFilter.type = 'bandpass';
+        formantFilter.frequency.setValueAtTime(isCorrect ? 840 : 720, now);
+        formantFilter.frequency.exponentialRampToValueAtTime(isCorrect ? 680 : 520, now + duration);
+        formantFilter.Q.setValueAtTime(4.5, now);
+
+        // Master envelope for primary squawk
+        const mainGain = audioCtx.createGain();
+        const subGain = audioCtx.createGain();
+        subGain.gain.setValueAtTime(0.45, now);
+
+        mainGain.gain.setValueAtTime(0.001, now);
+        mainGain.gain.exponentialRampToValueAtTime(0.26, now + 0.025);
+        mainGain.gain.setValueAtTime(0.22, now + duration * 0.65);
+        mainGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        mainOsc.connect(formantFilter);
+        subOsc.connect(subGain);
+        subGain.connect(formantFilter);
+        formantFilter.connect(mainGain);
+        mainGain.connect(audioCtx.destination);
+
+        lfoOsc.start(now);
+        mainOsc.start(now);
+        subOsc.start(now);
+        lfoOsc.stop(now + duration + 0.02);
+        mainOsc.stop(now + duration + 0.02);
+        subOsc.stop(now + duration + 0.02);
+
+        // 4. Second short nasal cluck/squawk harmonic burst 0.08s after initial attack
+        const cluckStart = now + 0.08;
+        const cluckDur = 0.14;
+        const cluckOsc = audioCtx.createOscillator();
+        const cluckFilter = audioCtx.createBiquadFilter();
+        const cluckGain = audioCtx.createGain();
+
+        cluckOsc.type = 'sawtooth';
+        cluckOsc.frequency.setValueAtTime(isCorrect ? 495 : 330, cluckStart);
+        cluckOsc.frequency.exponentialRampToValueAtTime(isCorrect ? 225 : 145, cluckStart + cluckDur);
+
+        cluckFilter.type = 'bandpass';
+        cluckFilter.frequency.setValueAtTime(920, cluckStart);
+        cluckFilter.Q.setValueAtTime(5.2, cluckStart);
+
+        cluckGain.gain.setValueAtTime(0.001, cluckStart);
+        cluckGain.gain.exponentialRampToValueAtTime(0.2, cluckStart + 0.02);
+        cluckGain.gain.exponentialRampToValueAtTime(0.001, cluckStart + cluckDur);
+
+        cluckOsc.connect(cluckFilter);
+        cluckFilter.connect(cluckGain);
+        cluckGain.connect(audioCtx.destination);
+
+        cluckOsc.start(cluckStart);
+        cluckOsc.stop(cluckStart + cluckDur + 0.02);
+      }
+
+      /**
+       * Plays the excited turkey squawk followed by a crisp happy bell chime
+       */
+      function playCorrectCatchSound() {
+        if (!state.sfxEnabled) return;
+        initAudioContext();
+
+        // Trigger the expressive turkey squawk immediately on tap
+        playTurkeySquawk(true);
+
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime + 0.12;
+
+        // Crisp ascending bell chime (C5 -> E5 -> G5 -> C6)
+        const notes = [523.25, 659.25, 783.99, 1046.5];
+        notes.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+
+          gain.gain.setValueAtTime(0.001, now + idx * 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.16, now + idx * 0.05 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.22);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + idx * 0.05);
+          osc.stop(now + idx * 0.05 + 0.24);
+        });
+      }
+
+      /**
+       * Plays a comical downward-pitch turkey squawk when a wrong letter is tapped
+       */
+      function playWrongTapSound() {
+        if (!state.sfxEnabled) return;
+        playTurkeySquawk(false);
+      }
+
+      /**
+       * Speaks the target day of the week using Web Speech API (iPad Safari safe)
+       */
+      function speakText(text, onComplete = null) {
+        if (!('speechSynthesis' in window)) {
+          if (onComplete) onComplete();
+          return;
+        }
+
+        try {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          if (preferredVoice) {
+            utterance.voice = preferredVoice;
+          }
+          utterance.lang = 'en-US';
+          utterance.rate = state.speechRate;
+          utterance.pitch = 1.08;
+          utterance.volume = 1.0;
+
+          utterance.onstart = () => {
+            state.isSpeaking = true;
+            dom.btnListenAgain.classList.add('speaking-ring');
+            dom.soundBars.classList.remove('hidden');
+            dom.soundBars.classList.add('inline-flex');
+          };
+
+          const cleanupSpeechUI = () => {
+            state.isSpeaking = false;
+            dom.btnListenAgain.classList.remove('speaking-ring');
+            dom.soundBars.classList.add('hidden');
+            dom.soundBars.classList.remove('inline-flex');
+            if (onComplete) onComplete();
+          };
+
+          utterance.onend = cleanupSpeechUI;
+          utterance.onerror = cleanupSpeechUI;
+
+          window.speechSynthesis.speak(utterance);
+        } catch (err) {
+          console.warn('Speech synthesis error:', err);
+          if (onComplete) onComplete();
+        }
+      }
+
+      /**
+       * Festive Harvest Fanfare when completing a stage word
+       */
+      function playStageClearFanfare() {
+        if (!state.sfxEnabled) return;
+        initAudioContext();
+        if (!audioCtx) return;
+
+        const now = audioCtx.currentTime;
+        const melody = [
+          { f: 523.25, t: 0.0, d: 0.14 },  // C5
+          { f: 659.25, t: 0.13, d: 0.14 }, // E5
+          { f: 783.99, t: 0.26, d: 0.14 }, // G5
+          { f: 1046.5, t: 0.40, d: 0.42 }  // C6
+        ];
+
+        melody.forEach(note => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(note.f, now + note.t);
+
+          gain.gain.setValueAtTime(0.001, now + note.t);
+          gain.gain.exponentialRampToValueAtTime(0.22, now + note.t + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + note.t + note.d);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + note.t);
+          osc.stop(now + note.t + note.d + 0.02);
+        });
+      }
+
+      /* ----------------------------------------------------------------------
+         5. AMBIENT FALLING LEAVES & PARTICLE EFFECTS
+         ---------------------------------------------------------------------- */
+      function initAmbientLeaves() {
+        const leafEmojis = ['🍁', '🍂', '🍃'];
+        dom.ambientLeaves.innerHTML = '';
+        for (let i = 0; i < 12; i++) {
+          const leaf = document.createElement('div');
+          leaf.textContent = leafEmojis[i % leafEmojis.length];
+          leaf.style.position = 'absolute';
+          leaf.style.left = `${Math.random() * 100}%`;
+          leaf.style.top = '-40px';
+          leaf.style.fontSize = `${18 + Math.random() * 14}px`;
+          leaf.style.opacity = '0';
+          leaf.style.animation = `floatLeaf ${11 + Math.random() * 9}s linear ${Math.random() * 10}s infinite`;
+          dom.ambientLeaves.appendChild(leaf);
+        }
+      }
+
+      function spawnCatchBurst(x, y) {
+        const items = ['🍂', '🍁', '⭐', '✨', '🌾'];
+        for (let i = 0; i < 8; i++) {
+          const p = document.createElement('div');
+          p.className = 'particle-burst';
+          p.textContent = items[i % items.length];
+          p.style.left = `${x}px`;
+          p.style.top = `${y}px`;
+          dom.turkeysContainer.appendChild(p);
+
+          const angle = (Math.PI * 2 * i) / 8 + (Math.random() * 0.4 - 0.2);
+          const dist = 55 + Math.random() * 45;
+          const dx = Math.cos(angle) * dist;
+          const dy = Math.sin(angle) * dist - 20;
+
+          requestAnimationFrame(() => {
+            p.style.transform = `translate(${dx}px, ${dy}px) scale(1.25) rotate(${Math.random() * 180}deg)`;
+            p.style.opacity = '0';
+          });
+
+          setTimeout(() => {
+            if (p.parentNode) p.parentNode.removeChild(p);
+          }, 700);
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         6. HUD & SPELLING BOX RENDERING
+         ---------------------------------------------------------------------- */
+      function renderStageIndicators() {
+        const stageObj = STAGES[state.currentStageIndex];
+        dom.hudStageText.textContent = `${stageObj.stage} / ${STAGES.length}`;
+
+        // Update mini stage progress pills
+        dom.stageDots.innerHTML = '';
+        STAGES.forEach((s, idx) => {
+          const dot = document.createElement('div');
+          const isCompleted = idx < state.currentStageIndex;
+          const isCurrent = idx === state.currentStageIndex;
+
+          dot.className = `w-6 h-6 rounded-full flex items-center justify-center text-xs font-extrabold transition-all ${
+            isCompleted
+              ? 'bg-lime-500 text-white shadow-sm'
+              : isCurrent
+              ? 'bg-orange-500 text-white ring-2 ring-orange-300 scale-110'
+              : 'bg-amber-200/80 text-amber-800'
+          }`;
+          dot.textContent = isCompleted ? '✓' : s.stage;
+          dom.stageDots.appendChild(dot);
+        });
+      }
+
+      function renderSpellingSlots() {
+        const targetWord = STAGES[state.currentStageIndex].word;
+        dom.spellingSlotsContainer.innerHTML = '';
+
+        // Adapt tile size gracefully for longer words like "Wednesday" (9 letters) on narrow screens
+        const isLongWord = targetWord.length >= 8;
+        const sizeClasses = isLongWord
+          ? 'w-8 h-10 sm:w-11 sm:h-12 md:w-12 md:h-14 text-lg sm:text-2xl md:text-3xl'
+          : 'w-9 h-11 sm:w-12 sm:h-14 md:w-14 md:h-16 text-xl sm:text-2xl md:text-3xl';
+
+        for (let i = 0; i < targetWord.length; i++) {
+          const char = targetWord[i];
+          const isFilled = i < state.currentLetterIndex;
+          const isNext = i === state.currentLetterIndex;
+
+          const slot = document.createElement('div');
+          slot.id = `letter-slot-${i}`;
+          slot.className = `${sizeClasses} rounded-xl sm:rounded-2xl flex items-center justify-center font-extrabold transition-all duration-200 ${
+            isFilled
+              ? 'bg-gradient-to-b from-yellow-300 to-amber-400 text-amber-950 border-2 border-amber-700 shadow-md slot-filled-anim'
+              : isNext
+              ? 'bg-white/95 text-amber-900/20 border-3 border-dashed border-orange-500 ring-2 ring-orange-300/70'
+              : 'bg-amber-50/75 text-transparent border-2 border-dashed border-amber-700/35'
+          }`;
+
+          slot.textContent = isFilled ? char : '_';
+          dom.spellingSlotsContainer.appendChild(slot);
+        }
+      }
+
+      function highlightNextSlotHint() {
+        const nextSlot = document.getElementById(`letter-slot-${state.currentLetterIndex}`);
+        if (!nextSlot) return;
+        nextSlot.classList.add('bg-orange-100', 'scale-110');
+        setTimeout(() => {
+          nextSlot.classList.remove('bg-orange-100', 'scale-110');
+        }, 450);
+      }
+
+      /* ----------------------------------------------------------------------
+         7. TURKEY ENTITY CREATION, SVG ARTWORK & SMART SPAWNING
+         ---------------------------------------------------------------------- */
+      function getTurkeySize() {
+        // Responsive size: comfortably large for iPad tapping while leaving plenty of farm room
+        const minDim = Math.min(state.arenaWidth, state.arenaHeight);
+        if (minDim < 500) return 96;
+        if (minDim < 768) return 110;
+        return 122;
+      }
+
+      function createTurkeySVG(letter, palette) {
+        return `
+          <svg viewBox="0 0 120 120" class="w-full h-full overflow-visible drop-shadow-md" aria-hidden="true">
+            <!-- Fan of Colorful Autumn Tail Feathers -->
+            <g class="svg-tail">
+              <ellipse cx="60" cy="40" rx="11" ry="30" fill="${palette.tail1}" stroke="#451A03" stroke-width="2" />
+              <ellipse cx="42" cy="45" rx="11" ry="29" transform="rotate(-24 42 45)" fill="${palette.tail2}" stroke="#451A03" stroke-width="2" />
+              <ellipse cx="78" cy="45" rx="11" ry="29" transform="rotate(24 78 45)" fill="${palette.tail2}" stroke="#451A03" stroke-width="2" />
+              <ellipse cx="27" cy="56" rx="10" ry="26" transform="rotate(-48 27 56)" fill="${palette.tail3}" stroke="#451A03" stroke-width="2" />
+              <ellipse cx="93" cy="56" rx="10" ry="26" transform="rotate(48 93 56)" fill="${palette.tail3}" stroke="#451A03" stroke-width="2" />
+              <ellipse cx="19" cy="70" rx="9" ry="22" transform="rotate(-68 19 70)" fill="${palette.tail1}" stroke="#451A03" stroke-width="2" />
+              <ellipse cx="101" cy="70" rx="9" ry="22" transform="rotate(68 101 70)" fill="${palette.tail1}" stroke="#451A03" stroke-width="2" />
+            </g>
+
+            <!-- Running Orange Feet -->
+            <g class="svg-leg-left">
+              <line x1="48" y1="92" x2="45" y2="110" stroke="#EA580C" stroke-width="4.5" stroke-linecap="round" />
+              <path d="M38,110 L45,110 L52,110 M45,110 L42,114" stroke="#EA580C" stroke-width="3.5" stroke-linecap="round" />
+            </g>
+            <g class="svg-leg-right">
+              <line x1="72" y1="92" x2="75" y2="110" stroke="#EA580C" stroke-width="4.5" stroke-linecap="round" />
+              <path d="M68,110 L75,110 L82,110 M75,110 L78,114" stroke="#EA580C" stroke-width="3.5" stroke-linecap="round" />
+            </g>
+
+            <!-- Plump Turkey Body -->
+            <ellipse cx="60" cy="74" rx="31" ry="27" fill="${palette.body}" stroke="#451A03" stroke-width="2.5" />
+
+            <!-- Flapping Left & Right Wings -->
+            <ellipse class="svg-wing-left" cx="29" cy="72" rx="9" ry="18" transform="rotate(14 29 72)" fill="${palette.belly}" stroke="#451A03" stroke-width="2" />
+            <ellipse class="svg-wing-right" cx="91" cy="72" rx="9" ry="18" transform="rotate(-14 91 72)" fill="${palette.belly}" stroke="#451A03" stroke-width="2" />
+
+            <!-- Bobbing Head, Eyes, Beak & Red Wattle -->
+            <g class="svg-head-group">
+              <!-- Neck & Head -->
+              <circle cx="60" cy="36" r="15" fill="${palette.body}" stroke="#451A03" stroke-width="2.5" />
+              <!-- Cute Pilgrim Hat Accent -->
+              <rect x="46" y="21" width="28" height="4" rx="2" fill="#292524" />
+              <rect x="51" y="11" width="18" height="11" rx="2" fill="#292524" />
+              <rect x="51" y="18" width="18" height="3" fill="#FACC15" />
+              <!-- Big Expressive Eyes -->
+              <circle cx="54" cy="34" r="3.6" fill="#FFFFFF" />
+              <circle cx="66" cy="34" r="3.6" fill="#FFFFFF" />
+              <circle cx="54.8" cy="34" r="1.9" fill="#1C1917" />
+              <circle cx="66.8" cy="34" r="1.9" fill="#1C1917" />
+              <!-- Red Snood / Wattle -->
+              <path d="M64,39 Q69,45 65,50 Q61,48 62,42 Z" fill="#EF4444" stroke="#991B1B" stroke-width="1" />
+              <!-- Yellow-Orange Beak -->
+              <polygon points="56,38 64,38 60,45" fill="#F59E0B" stroke="#92400E" stroke-width="1.2" stroke-linejoin="round" />
+            </g>
+
+            <!-- High-Contrast Parchment Letter Badge on Turkey Belly -->
+            <circle cx="60" cy="76" r="22" fill="#FFFBEB" stroke="#B45309" stroke-width="3.5" />
+            <circle cx="60" cy="76" r="18.5" fill="none" stroke="#FDE68A" stroke-width="1.5" />
+          </svg>
+        `;
+      }
+
+      /**
+       * Picks a distractor letter that is not equal to the currently required letter
+       */
+      function getRandomDistractorLetter(neededLetter, targetWord) {
+        const isNeededUpper = neededLetter === neededLetter.toUpperCase();
+        // Mix letters from other days and general alphabet matching case
+        const pool = isNeededUpper ? UPPERCASE_POOL : LOWERCASE_POOL;
+        const candidates = pool.filter(ch => ch !== neededLetter);
+        return candidates[Math.floor(Math.random() * candidates.length)];
+      }
+
+      /**
+       * Spawns a single running turkey on the pasture
+       */
+      function spawnTurkey(letter, spawnFromEdge = false) {
+        const size = getTurkeySize();
+        const pad = 16;
+        const maxX = Math.max(pad + 10, state.arenaWidth - size - pad);
+        const maxY = Math.max(pad + 10, state.arenaHeight - size - 48); // Leave room for bottom toast
+
+        let x, y;
+        if (spawnFromEdge) {
+          // Enter smoothly from left or right edge of farm
+          const fromLeft = Math.random() < 0.5;
+          x = fromLeft ? pad : maxX;
+          y = pad + Math.random() * Math.max(20, maxY - pad);
+        } else {
+          // Spread nicely across the field without overlapping existing turkeys
+          x = pad + Math.random() * Math.max(20, maxX - pad);
+          y = pad + Math.random() * Math.max(20, maxY - pad);
+          for (let attempt = 0; attempt < 15; attempt++) {
+            const candX = pad + Math.random() * Math.max(20, maxX - pad);
+            const candY = pad + Math.random() * Math.max(20, maxY - pad);
+            const tooClose = state.turkeys.some(t => Math.hypot(t.x - candX, t.y - candY) < size * 0.95);
+            if (!tooClose) {
+              x = candX;
+              y = candY;
+              break;
+            }
+          }
+        }
+
+        // Gentle, kid-friendly running velocity
+        const baseSpeed = state.arenaWidth < 600 ? 62 : 82;
+        const speed = baseSpeed + Math.random() * 28;
+        const angle = Math.random() * Math.PI * 2;
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * speed;
+
+        const palette = TURKEY_PALETTES[Math.floor(Math.random() * TURKEY_PALETTES.length)];
+        const id = state.nextTurkeyId++;
+
+        const el = document.createElement('div');
+        el.className = 'turkey-entity';
+        el.style.width = `${size}px`;
+        el.style.height = `${size}px`;
+        el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        el.setAttribute('role', 'button');
+        el.setAttribute('aria-label', `Turkey with letter ${letter}`);
+
+        const visualWrapper = document.createElement('div');
+        visualWrapper.className = 'turkey-visual';
+        visualWrapper.innerHTML = createTurkeySVG(letter, palette);
+
+        // Crisp upright HTML letter overlay centered on the belly badge
+        const letterLabel = document.createElement('div');
+        letterLabel.className = 'turkey-letter-label absolute inset-0 flex items-center justify-center font-extrabold text-amber-950 pointer-events-none';
+        letterLabel.style.paddingTop = `${Math.round(size * 0.26)}px`;
+        letterLabel.style.fontSize = `${Math.round(size * 0.31)}px`;
+        letterLabel.textContent = letter;
+
+        el.appendChild(visualWrapper);
+        el.appendChild(letterLabel);
+
+        const turkeyObj = {
+          id,
+          letter,
+          x,
+          y,
+          vx,
+          vy,
+          size,
+          caught: false,
+          wanderTimer: 1.5 + Math.random() * 2.5,
+          el,
+          visualWrapper,
+          letterLabel
+        };
+
+        // Instant responsive tap/click handler for iPad & Mouse
+        el.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleTurkeyTap(turkeyObj);
+        });
+
+        dom.turkeysContainer.appendChild(el);
+        state.turkeys.push(turkeyObj);
+        return turkeyObj;
+      }
+
+      /**
+       * Populates the farm with 8 turkeys, guaranteeing at least 2 carry the next needed letter
+       */
+      function populateTurkeysForCurrentLetter(isInitialStageSpawn = false) {
+        const targetWord = STAGES[state.currentStageIndex].word;
+        if (state.currentLetterIndex >= targetWord.length) return;
+
+        const neededLetter = targetWord[state.currentLetterIndex];
+        const desiredCount = state.arenaWidth < 600 ? 7 : 8;
+
+        if (isInitialStageSpawn) {
+          // Clear previous turkeys
+          dom.turkeysContainer.innerHTML = '';
+          state.turkeys = [];
+
+          // Spawn 2 turkeys with the exact needed letter + remaining distractors
+          const lettersToSpawn = [neededLetter, neededLetter];
+          while (lettersToSpawn.length < desiredCount) {
+            lettersToSpawn.push(getRandomDistractorLetter(neededLetter, targetWord));
+          }
+
+          // Shuffle spawn order
+          for (let i = lettersToSpawn.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [lettersToSpawn[i], lettersToSpawn[j]] = [lettersToSpawn[j], lettersToSpawn[i]];
+          }
+
+          lettersToSpawn.forEach(ch => spawnTurkey(ch, false));
+          return;
+        }
+
+        // Mid-word update after catching a turkey:
+        // Ensure active turkeys stay around desiredCount and at least 2 have the NEW neededLetter
+        let activeTurkeys = state.turkeys.filter(t => !t.caught);
+        let matchingCount = activeTurkeys.filter(t => t.letter === neededLetter).length;
+
+        // Top up active turkeys from the farm edges if below desiredCount
+        while (activeTurkeys.length < desiredCount) {
+          const letterToGive = matchingCount < 2
+            ? neededLetter
+            : getRandomDistractorLetter(neededLetter, targetWord);
+          const newT = spawnTurkey(letterToGive, true);
+          activeTurkeys.push(newT);
+          if (letterToGive === neededLetter) matchingCount++;
+        }
+
+        // If we still have fewer than 2 turkeys with neededLetter, convert 1-2 distractor turkeys smoothly
+        for (let i = 0; i < activeTurkeys.length && matchingCount < 2; i++) {
+          const t = activeTurkeys[i];
+          if (t.letter !== neededLetter) {
+            t.letter = neededLetter;
+            t.letterLabel.textContent = neededLetter;
+            t.el.setAttribute('aria-label', `Turkey with letter ${neededLetter}`);
+            matchingCount++;
+          }
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         8. GAMEPLAY INTERACTION: TAPPING A TURKEY
+         ---------------------------------------------------------------------- */
+      function handleTurkeyTap(turkey) {
+        if (!state.started || state.paused || turkey.caught) return;
+
+        const targetWord = STAGES[state.currentStageIndex].word;
+        const neededLetter = targetWord[state.currentLetterIndex];
+
+        if (turkey.letter === neededLetter) {
+          // CORRECT LETTER CAUGHT!
+          turkey.caught = true;
+          playCorrectCatchSound();
+
+          // Visual burst at turkey center
+          spawnCatchBurst(turkey.x + turkey.size * 0.4, turkey.y + turkey.size * 0.4);
+          turkey.visualWrapper.classList.add('turkey-caught');
+
+          // Advance spelling progress
+          state.currentLetterIndex++;
+          renderSpellingSlots();
+
+          // Remove caught turkey element after pop animation
+          setTimeout(() => {
+            if (turkey.el.parentNode) {
+              turkey.el.parentNode.removeChild(turkey.el);
+            }
+            state.turkeys = state.turkeys.filter(t => t.id !== turkey.id);
+          }, 440);
+
+          // Check if the entire word is now spelled!
+          if (state.currentLetterIndex >= targetWord.length) {
+            dom.helperToast.textContent = `🎉 You spelled ${targetWord}!`;
+            setTimeout(() => {
+              showStageClearCelebration();
+            }, 460);
+          } else {
+            dom.helperToast.textContent = `Great catch! Keep spelling the word!`;
+            populateTurkeysForCurrentLetter(false);
+          }
+        } else {
+          // WRONG LETTER TAPPED: Gentle feedback without penalty
+          playWrongTapSound();
+          turkey.visualWrapper.classList.remove('turkey-wiggle');
+          void turkey.visualWrapper.offsetWidth; // Force reflow to restart wiggle
+          turkey.visualWrapper.classList.add('turkey-wiggle');
+
+          // Bounce turkey slightly away
+          turkey.vx = -turkey.vx;
+          turkey.vy = -turkey.vy;
+
+          highlightNextSlotHint();
+          dom.helperToast.textContent = `Oops, that's "${turkey.letter}". Listen again and find the next letter!`;
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         9. STAGE PROGRESSION & CELEBRATION FLOW
+         ---------------------------------------------------------------------- */
+      function loadStage(stageIndex, autoSpeak = true) {
+        state.currentStageIndex = stageIndex;
+        state.currentLetterIndex = 0;
+        state.paused = false;
+
+        const stageObj = STAGES[state.currentStageIndex];
+
+        // Hide modals
+        dom.stageClearOverlay.classList.add('hidden');
+        dom.victoryOverlay.classList.add('hidden');
+
+        // Update HUD & Field
+        updateArenaDimensions();
+        renderStageIndicators();
+        renderSpellingSlots();
+        populateTurkeysForCurrentLetter(true);
+
+        dom.helperToast.textContent = `Stage ${stageObj.stage}: Listen carefully and catch the letters!`;
+
+        if (autoSpeak && state.started) {
+          setTimeout(() => {
+            speakText(stageObj.word);
+          }, 260);
+        }
+      }
+
+      function showStageClearCelebration() {
+        state.paused = true;
+        const stageObj = STAGES[state.currentStageIndex];
+
+        playStageClearFanfare();
+
+        dom.clearStageBadge.textContent = `Stage ${stageObj.stage} of ${STAGES.length} Complete!`;
+
+        // Render completed golden word tiles
+        dom.completedWordDisplay.innerHTML = '';
+        stageObj.word.split('').forEach(ch => {
+          const tile = document.createElement('span');
+          tile.className =
+            'w-9 h-11 sm:w-12 sm:h-14 rounded-xl bg-gradient-to-b from-yellow-300 to-amber-400 border-2 border-amber-700 flex items-center justify-center text-xl sm:text-3xl font-extrabold text-amber-950 shadow';
+          tile.textContent = ch;
+          dom.completedWordDisplay.appendChild(tile);
+        });
+
+        // Ensure exact required button label on every stage completion
+        dom.btnNextStage.textContent = "Congratulations! Let's catch more turkeys!";
+
+        dom.stageClearOverlay.classList.remove('hidden');
+
+        // Speak celebratory confirmation of the spelled word
+        setTimeout(() => {
+          speakText(stageObj.word);
+        }, 350);
+      }
+
+      function handleAdvanceFromStageClear() {
+        initAudioContext();
+        if (state.currentStageIndex < STAGES.length - 1) {
+          // Move to next stage (1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7) and auto-play audio
+          loadStage(state.currentStageIndex + 1, true);
+        } else {
+          // Completed all 7 stages! Show Grand Champion celebration
+          dom.stageClearOverlay.classList.add('hidden');
+          showGrandVictoryScreen();
+        }
+      }
+
+      function showGrandVictoryScreen() {
+        state.paused = true;
+        playStageClearFanfare();
+
+        dom.masteredWordsGrid.innerHTML = '';
+        STAGES.forEach(s => {
+          const pill = document.createElement('div');
+          pill.className =
+            'bg-white border-2 border-amber-400 px-3.5 py-2 rounded-2xl text-amber-950 font-extrabold text-sm sm:text-base shadow-sm flex items-center gap-1.5';
+          pill.innerHTML = `<span class="text-lime-600">⭐</span><span>${s.word}</span>`;
+          dom.masteredWordsGrid.appendChild(pill);
+        });
+
+        dom.victoryOverlay.classList.remove('hidden');
+        speakText('Congratulations! You are a Thanksgiving Spelling Champion!');
+      }
+
+      /* ----------------------------------------------------------------------
+         10. SMOOTH 60FPS ANIMATION LOOP FOR RUNNING TURKEYS
+         ---------------------------------------------------------------------- */
+      function updateArenaDimensions() {
+        const hudRect = dom.gameHud.getBoundingClientRect();
+        const availableHeight = Math.max(260, window.innerHeight - hudRect.height);
+        dom.farmArena.style.height = `${availableHeight}px`;
+
+        state.arenaWidth = dom.farmArena.clientWidth || window.innerWidth;
+        state.arenaHeight = availableHeight;
+      }
+
+      function gameLoop(timestamp) {
+        if (!state.lastFrameTime) state.lastFrameTime = timestamp;
+        const dt = Math.min(0.05, (timestamp - state.lastFrameTime) / 1000);
+        state.lastFrameTime = timestamp;
+
+        if (state.started && !state.paused) {
+          const pad = 12;
+          const bottomMargin = 46; // Keep clear of bottom helper pill
+
+          for (let i = 0; i < state.turkeys.length; i++) {
+            const t = state.turkeys[i];
+            if (t.caught) continue;
+
+            // Gentle wandering direction adjustments so turkeys look lively
+            t.wanderTimer -= dt;
+            if (t.wanderTimer <= 0) {
+              t.wanderTimer = 1.6 + Math.random() * 2.4;
+              const speed = Math.hypot(t.vx, t.vy);
+              const currentAngle = Math.atan2(t.vy, t.vx);
+              const newAngle = currentAngle + (Math.random() * 1.2 - 0.6);
+              t.vx = Math.cos(newAngle) * speed;
+              t.vy = Math.sin(newAngle) * speed;
+            }
+
+            // Soft separation steering so turkeys don't overlap each other's letters
+            for (let j = i + 1; j < state.turkeys.length; j++) {
+              const other = state.turkeys[j];
+              if (other.caught) continue;
+              const dx = t.x - other.x;
+              const dy = t.y - other.y;
+              const dist = Math.hypot(dx, dy);
+              const minDist = t.size * 0.88;
+              if (dist > 0 && dist < minDist) {
+                const push = ((minDist - dist) / minDist) * 55 * dt;
+                const nx = dx / dist;
+                const ny = dy / dist;
+                t.x += nx * push;
+                t.y += ny * push;
+                other.x -= nx * push;
+                other.y -= ny * push;
+              }
+            }
+
+            // Integrate position
+            t.x += t.vx * dt;
+            t.y += t.vy * dt;
+
+            // Bounce smoothly inside pasture boundaries
+            const maxX = Math.max(pad, state.arenaWidth - t.size - pad);
+            const maxY = Math.max(pad, state.arenaHeight - t.size - bottomMargin);
+
+            if (t.x < pad) {
+              t.x = pad;
+              t.vx = Math.abs(t.vx);
+            } else if (t.x > maxX) {
+              t.x = maxX;
+              t.vx = -Math.abs(t.vx);
+            }
+
+            if (t.y < pad) {
+              t.y = pad;
+              t.vy = Math.abs(t.vy);
+            } else if (t.y > maxY) {
+              t.y = maxY;
+              t.vy = -Math.abs(t.vy);
+            }
+
+            // Apply hardware-accelerated position
+            t.el.style.transform = `translate3d(${t.x.toFixed(1)}px, ${t.y.toFixed(1)}px, 0)`;
+
+            // Flip turkey SVG horizontally to face running direction (letter badge stays upright!)
+            const svgEl = t.visualWrapper.querySelector('svg');
+            if (svgEl) {
+              svgEl.style.transform = t.vx < 0 ? 'scaleX(-1)' : 'scaleX(1)';
+            }
+          }
+        }
+
+        requestAnimationFrame(gameLoop);
+      }
+
+      /* ----------------------------------------------------------------------
+         11. BACKGROUND UPLOAD DASHBOARD & LOCALSTORAGE PERSISTENCE
+         ---------------------------------------------------------------------- */
+      const STORAGE_KEY = 'thanksgiving_turkey_spelling_bg_v1';
+      const AUDIO_STORAGE_KEY = 'thanksgiving_turkey_squawk_audio_v1';
+
+      function showDashboardStatus(message, isError = false) {
+        dom.dashboardStatusMsg.textContent = message;
+        dom.dashboardStatusMsg.classList.remove(
+          'hidden',
+          'bg-red-100', 'text-red-900', 'border-red-300',
+          'bg-lime-100', 'text-lime-900', 'border-lime-300'
+        );
+        if (isError) {
+          dom.dashboardStatusMsg.classList.add('bg-red-100', 'text-red-900', 'border-red-300');
+        } else {
+          dom.dashboardStatusMsg.classList.add('bg-lime-100', 'text-lime-900', 'border-lime-300');
+        }
+      }
+
+      function applyBackgroundSettings() {
+        const { customImage, tintOpacity, fitMode } = state.bgSettings;
+
+        if (customImage) {
+          dom.customBgImage.src = customImage;
+          dom.customBgImage.classList.remove('hidden');
+          dom.customBgImage.style.objectFit = fitMode === 'contain' ? 'contain' : 'cover';
+          dom.defaultFarmScene.classList.add('hidden');
+
+          dom.dashboardPreviewImg.src = customImage;
+          dom.dashboardPreviewImg.classList.remove('hidden');
+          dom.dashboardPreviewDefault.classList.add('hidden');
+        } else {
+          dom.customBgImage.src = '';
+          dom.customBgImage.classList.add('hidden');
+          dom.defaultFarmScene.classList.remove('hidden');
+
+          dom.dashboardPreviewImg.src = '';
+          dom.dashboardPreviewImg.classList.add('hidden');
+          dom.dashboardPreviewDefault.classList.remove('hidden');
+        }
+
+        dom.bgTintOverlay.style.opacity = String((tintOpacity || 0) / 100);
+        dom.tintSlider.value = String(tintOpacity || 0);
+        dom.tintValueLabel.textContent = `${tintOpacity || 0}%`;
+
+        if (fitMode === 'contain') {
+          dom.btnFitContain.className = 'py-2 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 bg-orange-600 text-white border-orange-700';
+          dom.btnFitCover.className = 'py-2 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 bg-amber-100 text-amber-900 border-amber-300';
+        } else {
+          dom.btnFitCover.className = 'py-2 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 bg-orange-600 text-white border-orange-700';
+          dom.btnFitContain.className = 'py-2 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 bg-amber-100 text-amber-900 border-amber-300';
+        }
+      }
+
+      function saveBackgroundSettings() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.bgSettings));
+        } catch (err) {
+          console.warn('Could not save background settings to localStorage:', err);
+          showDashboardStatus('Background applied for this session (image is too large to store permanently).', false);
+        }
+      }
+
+      function loadSavedBackgroundSettings() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+              state.bgSettings = {
+                customImage: parsed.customImage || '',
+                tintOpacity: Number(parsed.tintOpacity) || 0,
+                fitMode: parsed.fitMode === 'contain' ? 'contain' : 'cover'
+              };
+            }
+          }
+        } catch (err) {
+          console.warn('Failed to load saved background settings:', err);
+        }
+        applyBackgroundSettings();
+      }
+
+      function processUploadedImageFile(file) {
+        if (!file || !file.type.startsWith('image/')) {
+          showDashboardStatus('Please choose a valid image file (JPG, PNG, or WEBP).', true);
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          state.bgSettings.customImage = event.target.result;
+          applyBackgroundSettings();
+          saveBackgroundSettings();
+          showDashboardStatus('Custom farm background updated!', false);
+        };
+        reader.onerror = () => {
+          showDashboardStatus('Could not read that image file. Please try another photo.', true);
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function updateSquawkAudioUI() {
+        if (state.customSquawkAudio) {
+          dom.squawkActiveLabel.textContent = 'Custom Uploaded Audio';
+        } else {
+          dom.squawkActiveLabel.textContent = 'Built-in Turkey Squawk';
+        }
+      }
+
+      function loadSavedSquawkAudio() {
+        try {
+          const savedDataUrl = localStorage.getItem(AUDIO_STORAGE_KEY);
+          if (savedDataUrl) {
+            state.customSquawkDataUrl = savedDataUrl;
+            state.customSquawkAudio = new Audio(savedDataUrl);
+            state.customSquawkAudio.preload = 'auto';
+          }
+        } catch (err) {
+          console.warn('Failed to load saved custom squawk audio:', err);
+        }
+        updateSquawkAudioUI();
+      }
+
+      function processUploadedAudioFile(file) {
+        if (!file || !file.type.startsWith('audio/')) {
+          showDashboardStatus('Please select a valid audio file (.mp3, .wav, or .m4a).', true);
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataUrl = event.target.result;
+          const audioEl = new Audio(dataUrl);
+          audioEl.preload = 'auto';
+
+          state.customSquawkDataUrl = dataUrl;
+          state.customSquawkAudio = audioEl;
+          updateSquawkAudioUI();
+
+          try {
+            localStorage.setItem(AUDIO_STORAGE_KEY, dataUrl);
+            showDashboardStatus('Custom turkey click sound saved!', false);
+          } catch (err) {
+            console.warn('Audio clip too large for localStorage; active for this session:', err);
+            showDashboardStatus('Custom sound active for this session (clip too large to save permanently).', false);
+          }
+
+          playTurkeySquawk(true);
+        };
+        reader.onerror = () => {
+          showDashboardStatus('Could not load that audio file. Please try another clip.', true);
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function renderDashboardStageJumpButtons() {
+        dom.dashboardStageButtons.innerHTML = '';
+        STAGES.forEach((s, idx) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className =
+            'py-2 px-2.5 rounded-xl bg-amber-100 hover:bg-orange-500 hover:text-white text-amber-950 font-bold text-xs sm:text-sm border border-amber-300 transition-colors text-left';
+          btn.textContent = `${s.stage}. ${s.word}`;
+          btn.addEventListener('click', () => {
+            closeDashboardModal();
+            if (!state.started) {
+              state.started = true;
+              dom.startOverlay.classList.add('hidden');
+            }
+            loadStage(idx, true);
+          });
+          dom.dashboardStageButtons.appendChild(btn);
+        });
+      }
+
+      function openDashboardModal() {
+        state.paused = true;
+        renderDashboardStageJumpButtons();
+        dom.dashboardModal.classList.remove('hidden');
+      }
+
+      function closeDashboardModal() {
+        dom.dashboardModal.classList.add('hidden');
+        // Resume gameplay only if no other modal overlay is active
+        if (
+          state.started &&
+          dom.startOverlay.classList.contains('hidden') &&
+          dom.stageClearOverlay.classList.contains('hidden') &&
+          dom.victoryOverlay.classList.contains('hidden')
+        ) {
+          state.paused = false;
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         12. EVENT LISTENERS & INITIALIZATION
+         ---------------------------------------------------------------------- */
+      function bindEvents() {
+        // Start Game button (unlocks iPad Safari AudioContext & SpeechSynthesis)
+        dom.btnStartGame.addEventListener('click', () => {
+          initAudioContext();
+          loadVoices();
+          state.started = true;
+          dom.startOverlay.classList.add('hidden');
+          loadStage(0, true); // Starts Stage 1 and automatically plays "Monday"
+        });
+
+        // Listen Again button
+        dom.btnListenAgain.addEventListener('click', () => {
+          initAudioContext();
+          const currentWord = STAGES[state.currentStageIndex].word;
+          speakText(currentWord);
+        });
+
+        // Toggle Sound Effects
+        dom.btnToggleSfx.addEventListener('click', () => {
+          state.sfxEnabled = !state.sfxEnabled;
+          dom.btnToggleSfx.textContent = state.sfxEnabled ? '🔔' : '🔕';
+          if (state.sfxEnabled) {
+            initAudioContext();
+            playCorrectCatchSound();
+          }
+        });
+
+        // Next Stage / Celebration Button ("Congratulations! Let's catch more turkeys!")
+        dom.btnNextStage.addEventListener('click', handleAdvanceFromStageClear);
+
+        // Play Again from Grand Victory screen
+        dom.btnPlayAgain.addEventListener('click', () => {
+          initAudioContext();
+          loadStage(0, true);
+        });
+
+        // Background Dashboard Modal Open / Close
+        dom.btnOpenDashboard.addEventListener('click', openDashboardModal);
+        dom.btnCloseDashboard.addEventListener('click', closeDashboardModal);
+        dom.btnSaveCloseDashboard.addEventListener('click', closeDashboardModal);
+
+        // File Input Change for Background Upload
+        dom.bgFileInput.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) {
+            processUploadedImageFile(e.target.files[0]);
+            e.target.value = ''; // Allow re-selecting same file
+          }
+        });
+
+        // Reset to Default Thanksgiving Farm
+        dom.btnResetBg.addEventListener('click', () => {
+          state.bgSettings.customImage = '';
+          state.bgSettings.tintOpacity = 0;
+          applyBackgroundSettings();
+          saveBackgroundSettings();
+          showDashboardStatus('Restored default Thanksgiving farm background!', false);
+        });
+
+        // Tint Overlay Slider
+        dom.tintSlider.addEventListener('input', (e) => {
+          state.bgSettings.tintOpacity = Number(e.target.value);
+          applyBackgroundSettings();
+          saveBackgroundSettings();
+        });
+
+        // Fit Mode Buttons
+        dom.btnFitCover.addEventListener('click', () => {
+          state.bgSettings.fitMode = 'cover';
+          applyBackgroundSettings();
+          saveBackgroundSettings();
+        });
+
+        dom.btnFitContain.addEventListener('click', () => {
+          state.bgSettings.fitMode = 'contain';
+          applyBackgroundSettings();
+          saveBackgroundSettings();
+        });
+
+        // Turkey Squawk Test, Custom Audio Upload & Reset Controls
+        dom.btnTestSquawk.addEventListener('click', () => {
+          initAudioContext();
+          playTurkeySquawk(true);
+        });
+
+        dom.squawkFileInput.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) {
+            processUploadedAudioFile(e.target.files[0]);
+            e.target.value = '';
+          }
+        });
+
+        dom.btnResetSquawk.addEventListener('click', () => {
+          state.customSquawkDataUrl = '';
+          state.customSquawkAudio = null;
+          try {
+            localStorage.removeItem(AUDIO_STORAGE_KEY);
+          } catch (err) {
+            console.warn('Could not clear saved audio:', err);
+          }
+          updateSquawkAudioUI();
+          showDashboardStatus('Restored built-in turkey squawk sound!', false);
+          playTurkeySquawk(true);
+        });
+
+        // Voice Speed Controls
+        dom.btnSpeedNormal.addEventListener('click', () => {
+          state.speechRate = 0.92;
+          dom.btnSpeedNormal.className = 'px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm border-2 bg-orange-600 text-white border-orange-700';
+          dom.btnSpeedSlow.className = 'px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm border-2 bg-amber-100 text-amber-900 border-amber-300';
+          speakText(STAGES[state.currentStageIndex].word);
+        });
+
+        dom.btnSpeedSlow.addEventListener('click', () => {
+          state.speechRate = 0.72;
+          dom.btnSpeedSlow.className = 'px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm border-2 bg-orange-600 text-white border-orange-700';
+          dom.btnSpeedNormal.className = 'px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm border-2 bg-amber-100 text-amber-900 border-amber-300';
+          speakText(STAGES[state.currentStageIndex].word);
+        });
+
+        // Responsive iPad Orientation / Window Resize Handler
+        window.addEventListener('resize', () => {
+          updateArenaDimensions();
+        });
+        window.addEventListener('orientationchange', () => {
+          setTimeout(updateArenaDimensions, 150);
+        });
+      }
+
+      // Bootstrap the application on window load
+      window.addEventListener('load', () => {
+        loadSavedBackgroundSettings();
+        loadSavedSquawkAudio();
+        initAmbientLeaves();
+        updateArenaDimensions();
+        renderStageIndicators();
+        renderSpellingSlots();
+        bindEvents();
+        requestAnimationFrame(gameLoop);
+      });
+    })();
+  </script>
+</body>
+</html>
