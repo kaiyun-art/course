@@ -917,9 +917,14 @@
       function initAudioContext() {
         try {
           if (!audioCtx) {
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            if (AudioContextClass) {
-              audioCtx = new AudioContextClass();
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+// Paste your audio file here (replace 'your-sound-file.mp3' with your actual filename):
+const myClickSound = new Audio('your-sound-file.mp3');
+myClickSound.preload = 'auto';
+            myClickSound.currentTime = 0;
+myClickSound.play().catch(() => {});
             }
           }
           if (audioCtx && audioCtx.state === 'suspended') {
