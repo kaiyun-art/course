@@ -755,7 +755,7 @@
                 <span>Turkey Squawk Click Sound</span>
               </h4>
               <p class="text-xs sm:text-sm text-amber-800/80 font-semibold">
-                Active Sound: <span id="squawk-active-label" class="text-orange-700 font-extrabold">Built-in Turkey Squawk</span>
+                Active Sound: <span id="squawk-active-label" class="text-orange-700 font-extrabold">turkeysound.mp3</span>
               </p>
             </div>
             <button
@@ -884,6 +884,14 @@
       /* ----------------------------------------------------------------------
          2. APPLICATION STATE
          ---------------------------------------------------------------------- */
+      const DEFAULT_SQUAWK_FILENAME = 'turkeysound.mp3';
+      let defaultSquawkAvailable = true;
+      const defaultSquawkAudio = new Audio(DEFAULT_SQUAWK_FILENAME);
+      defaultSquawkAudio.preload = 'auto';
+      defaultSquawkAudio.addEventListener('error', () => {
+        defaultSquawkAvailable = false;
+      });
+
       const state = {
         started: false,
         paused: false,
@@ -1003,24 +1011,46 @@
       }
 
       /**
-       * Synthesizes a realistic, expressive farm turkey squawk/gobble using Web Audio API.
-       * Uses a rapid 32 Hz vibrato LFO modulating a sawtooth/triangle vocal tract routed
-       * through a resonant bandpass formant filter, plus a second nasal squawk burst at 0.08s.
+       * Plays the turkey click sound using custom uploaded audio, 'turkeysound.mp3',
+       * or falls back automatically to the built-in Web Audio turkey squawk.
        */
       function playTurkeySquawk(isCorrect = true) {
         if (!state.sfxEnabled) return;
 
-        // If the teacher uploaded a custom audio clip, play that first
+        // 1. If the teacher uploaded a custom audio clip via the dashboard, play it
         if (state.customSquawkAudio) {
           try {
             state.customSquawkAudio.currentTime = 0;
-            state.customSquawkAudio.play().catch(() => {});
+            state.customSquawkAudio.play().catch(() => {
+              playSynthesizedTurkeySquawk(isCorrect);
+            });
           } catch (err) {
-            console.warn('Custom audio playback warning:', err);
+            playSynthesizedTurkeySquawk(isCorrect);
           }
           return;
         }
 
+        // 2. Otherwise play 'turkeysound.mp3' from the game folder
+        if (defaultSquawkAvailable) {
+          try {
+            defaultSquawkAudio.currentTime = 0;
+            defaultSquawkAudio.play().catch(() => {
+              playSynthesizedTurkeySquawk(isCorrect);
+            });
+            return;
+          } catch (err) {
+            // Fall through to synthesized squawk
+          }
+        }
+
+        // 3. Built-in Web Audio API turkey squawk fallback
+        playSynthesizedTurkeySquawk(isCorrect);
+      }
+
+      /**
+       * Synthesizes a realistic farm turkey squawk/gobble using Web Audio API.
+       */
+      function playSynthesizedTurkeySquawk(isCorrect = true) {
         initAudioContext();
         if (!audioCtx) return;
 
@@ -1909,7 +1939,7 @@
         if (state.customSquawkAudio) {
           dom.squawkActiveLabel.textContent = 'Custom Uploaded Audio';
         } else {
-          dom.squawkActiveLabel.textContent = 'Built-in Turkey Squawk';
+          dom.squawkActiveLabel.textContent = DEFAULT_SQUAWK_FILENAME;
         }
       }
 
@@ -2101,7 +2131,7 @@
             console.warn('Could not clear saved audio:', err);
           }
           updateSquawkAudioUI();
-          showDashboardStatus('Restored built-in turkey squawk sound!', false);
+          showDashboardStatus(`Restored default sound (${DEFAULT_SQUAWK_FILENAME})!`, false);
           playTurkeySquawk(true);
         });
 
