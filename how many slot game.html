@@ -1,0 +1,2753 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>CASINO GRAMMAR SLOTS • Live ESL Speaking Game</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Casino & Kid-Friendly Display Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&family=Orbitron:wght@700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-obsidian: #06040e;
+      --bg-velvet: #0c071b;
+      --bg-plum: #150c2e;
+      --neon-magenta: #ff2a85;
+      --neon-cyan: #00f5d4;
+      --neon-purple: #b5179e;
+      --neon-gold: #ffd166;
+      --neon-emerald: #00ff87;
+      --font-casino: 'Orbitron', sans-serif;
+      --font-display: 'Fredoka', cursive, sans-serif;
+      --font-body: 'Nunito', sans-serif;
+    }
+
+    * {
+      touch-action: manipulation;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-obsidian);
+      background-image:
+        radial-gradient(circle at 16% 14%, rgba(255, 42, 133, 0.24) 0%, transparent 42%),
+        radial-gradient(circle at 84% 18%, rgba(0, 245, 212, 0.2) 0%, transparent 42%),
+        radial-gradient(circle at 50% 90%, rgba(181, 23, 158, 0.26) 0%, transparent 52%),
+        linear-gradient(165deg, #06040e 0%, #0c071b 48%, #150c2e 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Art-Deco Casino Diamond Lattice Overlay */
+    .casino-diamond-bg {
+      background-image:
+        linear-gradient(45deg, rgba(255, 209, 102, 0.04) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255, 209, 102, 0.04) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(0, 245, 212, 0.035) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255, 42, 133, 0.035) 75%);
+      background-size: 56px 56px;
+      background-position: 0 0, 0 28px, 28px -28px, -28px 0;
+    }
+
+    .font-casino { font-family: var(--font-casino); }
+    .font-display { font-family: var(--font-display); }
+
+    /* Ambient Neon Tubes & Bokeh Light Orbs */
+    @keyframes neonFloatSlow {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.55; }
+      50% { transform: translate3d(18px, -22px, 0) scale(1.08); opacity: 0.88; }
+    }
+
+    @keyframes neonFlicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        text-shadow:
+          0 0 8px rgba(255, 42, 133, 0.92),
+          0 0 22px rgba(255, 42, 133, 0.72),
+          0 0 40px rgba(181, 23, 158, 0.65);
+      }
+      20%, 24%, 55% {
+        text-shadow:
+          0 0 3px rgba(255, 42, 133, 0.4),
+          0 0 8px rgba(255, 42, 133, 0.3);
+      }
+    }
+
+    .neon-sign-title {
+      animation: neonFlicker 6s infinite alternate;
+    }
+
+    .ambient-orb {
+      animation: neonFloatSlow 9s ease-in-out infinite;
+    }
+
+    /* Chasing Casino Marquee Bulbs */
+    @keyframes bulbChaseA {
+      0%, 49% {
+        background-color: #ffd166;
+        box-shadow: 0 0 8px #ffd166, 0 0 18px #ff2a85;
+        transform: scale(1.14);
+      }
+      50%, 100% {
+        background-color: #4c1d95;
+        box-shadow: none;
+        transform: scale(0.9);
+      }
+    }
+
+    @keyframes bulbChaseB {
+      0%, 49% {
+        background-color: #00f5d4;
+        box-shadow: 0 0 8px #00f5d4, 0 0 18px #00ff87;
+        transform: scale(0.9);
+      }
+      50%, 100% {
+        background-color: #ffd166;
+        box-shadow: 0 0 10px #ffd166, 0 0 18px #ff2a85;
+        transform: scale(1.14);
+      }
+    }
+
+    .marquee-bulb-a { animation: bulbChaseA 1.1s infinite; }
+    .marquee-bulb-b { animation: bulbChaseB 1.1s infinite; }
+
+    /* Luxury Dark Metallic & Gold Slot Cabinet */
+    .casino-cabinet {
+      background: linear-gradient(160deg, #1b1138 0%, #0c071b 55%, #190e33 100%);
+      border: 3px solid #ffd166;
+      box-shadow:
+        0 0 0 2px #451a03,
+        0 0 34px rgba(255, 42, 133, 0.34),
+        0 0 62px rgba(0, 245, 212, 0.18),
+        inset 0 2px 14px rgba(255, 209, 102, 0.25);
+    }
+
+    /* Prevent accidental iPad scrolling when dragging reels */
+    .slot-reel-touch {
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: grab;
+    }
+    .slot-reel-touch:active {
+      cursor: grabbing;
+    }
+
+    /* 3D Cylindrical Glass Reel Window */
+    .reel-cylinder {
+      height: 234px; /* 3 visible slots * 78px */
+      background: linear-gradient(
+        180deg,
+        #070510 0%,
+        #181230 18%,
+        #221944 50%,
+        #181230 82%,
+        #070510 100%
+      );
+      box-shadow:
+        inset 0 22px 24px -10px rgba(0, 0, 0, 0.92),
+        inset 0 -22px 24px -10px rgba(0, 0, 0, 0.92),
+        inset 0 0 18px rgba(0, 245, 212, 0.12);
+    }
+
+    .reel-item {
+      height: 78px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s ease, opacity 0.1s ease;
+    }
+
+    /* Active Unlocked Reel Neon Pulse */
+    @keyframes activeReelNeon {
+      0%, 100% {
+        box-shadow: 0 0 0 2px #00f5d4, 0 0 22px rgba(0, 245, 212, 0.65);
+      }
+      50% {
+        box-shadow: 0 0 0 3px #ffd166, 0 0 28px rgba(255, 209, 102, 0.8);
+      }
+    }
+
+    .reel-unlocked-glow {
+      animation: activeReelNeon 1.6s infinite ease-in-out;
+    }
+
+    /* Interactive Casino Pull Lever */
+    .casino-lever-track {
+      background: linear-gradient(180deg, #070510 0%, #1c123b 50%, #070510 100%);
+      border: 2px solid #ffd166;
+      box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.9), 0 0 18px rgba(255, 42, 133, 0.35);
+    }
+
+    .casino-lever-shaft {
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-origin: bottom center;
+    }
+
+    .casino-lever-ball {
+      background: radial-gradient(circle at 32% 30%, #ff85b8 0%, #ff2a85 45%, #881337 100%);
+      box-shadow: 0 0 18px rgba(255, 42, 133, 0.85), inset 0 -4px 8px rgba(0, 0, 0, 0.45);
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .lever-pulled .casino-lever-shaft {
+      transform: scaleY(0.32);
+    }
+
+    .lever-pulled .casino-lever-ball {
+      transform: translateY(84px) scale(1.08);
+    }
+
+    @keyframes gentleShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    .animate-shake {
+      animation: gentleShake 0.38s ease-in-out;
+    }
+
+    @keyframes popSpring {
+      0% { transform: scale(0.72); opacity: 0; }
+      70% { transform: scale(1.04); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pop {
+      animation: popSpring 0.34s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    /* Live Neon Recording Soundwave */
+    @keyframes neonWave {
+      0%, 100% { transform: scaleY(0.28); }
+      50% { transform: scaleY(1); }
+    }
+    .wave-bar {
+      animation: neonWave 0.65s infinite ease-in-out;
+      transform-origin: center;
+    }
+
+    /* Custom Dark Scrollbars */
+    .casino-scroll::-webkit-scrollbar { width: 6px; }
+    .casino-scroll::-webkit-scrollbar-track {
+      background: rgba(12, 7, 27, 0.7);
+      border-radius: 9999px;
+    }
+    .casino-scroll::-webkit-scrollbar-thumb {
+      background: rgba(181, 23, 158, 0.6);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="casino-diamond-bg antialiased selection:bg-pink-500 selection:text-white">
+
+  <!-- ======================================================================= -->
+  <!-- AMBIENT CASINO NEON LIGHTS BACKGROUND LAYER                             -->
+  <!-- ======================================================================= -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
+    <!-- Glowing Diagonal Neon Tubes -->
+    <div class="absolute -top-16 -left-20 w-96 h-1.5 rotate-45 bg-gradient-to-r from-transparent via-[#ff2a85] to-transparent opacity-65 blur-[1px] shadow-[0_0_22px_#ff2a85]"></div>
+    <div class="absolute top-28 -right-24 w-[440px] h-1.5 -rotate-45 bg-gradient-to-r from-transparent via-[#00f5d4] to-transparent opacity-60 blur-[1px] shadow-[0_0_22px_#00f5d4]"></div>
+    <div class="absolute bottom-24 left-10 w-80 h-1 rotate-12 bg-gradient-to-r from-transparent via-[#ffd166] to-transparent opacity-50 shadow-[0_0_16px_#ffd166]"></div>
+    <div class="absolute top-1/2 -right-16 w-72 h-1 -rotate-12 bg-gradient-to-r from-transparent via-[#b5179e] to-transparent opacity-50 shadow-[0_0_18px_#b5179e]"></div>
+
+    <!-- Floating Ambient Bokeh Orbs -->
+    <div class="ambient-orb absolute top-1/4 left-10 w-56 h-56 rounded-full bg-[#ff2a85]/15 blur-3xl"></div>
+    <div class="ambient-orb absolute bottom-1/4 right-12 w-72 h-72 rounded-full bg-[#00f5d4]/15 blur-3xl" style="animation-delay: -3s;"></div>
+    <div class="ambient-orb absolute top-2/3 left-1/3 w-64 h-64 rounded-full bg-[#b5179e]/20 blur-3xl" style="animation-delay: -6s;"></div>
+  </div>
+
+  <!-- Confetti Overlay -->
+  <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+  <!-- Inline Neon Toast Banner (Never uses alert/confirm) -->
+  <div id="toastBanner" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 hidden">
+    <div class="px-5 py-3 rounded-2xl bg-[#150c2e]/95 border-2 border-[#00f5d4] text-white font-extrabold shadow-[0_0_25px_rgba(0,245,212,0.45)] flex items-center gap-2.5 text-sm sm:text-base">
+      <span id="toastIcon">✨</span>
+      <span id="toastMessage">Ready</span>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- PRE-GAME CASINO CHECK-IN MODAL (STUDENT NAME & CLASS/SEAT)              -->
+  <!-- ======================================================================= -->
+  <div id="startModal" class="fixed inset-0 z-40 bg-[#06040e]/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div id="startCard" class="w-full max-w-lg rounded-3xl p-6 sm:p-8 bg-gradient-to-b from-[#1a1038] to-[#0c071b] border-2 border-[#ffd166] shadow-[0_0_50px_rgba(255,42,133,0.45)] animate-pop text-center relative overflow-hidden">
+      <!-- Top Neon Light Bar -->
+      <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-[#ff2a85] via-[#ffd166] to-[#00f5d4]"></div>
+
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#ffd166] via-[#ff2a85] to-[#b5179e] p-1 shadow-[0_0_25px_rgba(255,209,102,0.6)] mb-3 mt-1">
+        <div class="w-full h-full rounded-full bg-[#0c071b] flex items-center justify-center text-4xl">
+          🎰
+        </div>
+      </div>
+
+      <h1 class="font-casino text-2xl sm:text-3xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-[#ffd166] via-[#ff2a85] to-[#00f5d4] neon-sign-title">
+        CASINO GRAMMAR SLOTS
+      </h1>
+      <p class="font-display text-base sm:text-lg font-semibold text-[#00f5d4] mt-1">
+        How Many? &amp; How Much? Speaking Lounge
+      </p>
+      <p class="text-slate-300 text-xs sm:text-sm mt-2 max-w-md mx-auto">
+        Spin the 3 neon reels in order (1 ➔ 2 ➔ 3), speak your question aloud, and answer to climb the live classroom leaderboard!
+      </p>
+
+      <form id="startForm" class="mt-5 space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
+          <div class="sm:col-span-2">
+            <label for="studentNameInput" class="block text-xs font-extrabold uppercase tracking-widest text-[#ffd166] mb-1.5">
+              Student Name (Required):
+            </label>
+            <input
+              id="studentNameInput"
+              type="text"
+              maxlength="24"
+              autocomplete="off"
+              autocapitalize="words"
+              placeholder="Type your name (e.g., Emma)..."
+              class="w-full min-h-[52px] px-4 py-3 text-base sm:text-lg font-bold rounded-2xl border-2 border-[#b5179e] focus:border-[#00f5d4] focus:ring-4 focus:ring-[#00f5d4]/25 outline-none transition bg-[#06040e] text-white placeholder:text-slate-500"
+            />
+          </div>
+          <div>
+            <label for="studentSeatInput" class="block text-xs font-extrabold uppercase tracking-widest text-[#00f5d4] mb-1.5">
+              Class / Seat:
+            </label>
+            <input
+              id="studentSeatInput"
+              type="text"
+              maxlength="14"
+              autocomplete="off"
+              placeholder="Optional (A3)"
+              class="w-full min-h-[52px] px-3.5 py-3 text-base sm:text-lg font-bold rounded-2xl border-2 border-slate-700 focus:border-[#00f5d4] focus:ring-4 focus:ring-[#00f5d4]/25 outline-none transition bg-[#06040e] text-white placeholder:text-slate-500"
+            />
+          </div>
+        </div>
+        <p id="nameErrorHint" class="text-left text-[#ff2a85] font-bold text-xs sm:text-sm -mt-2 hidden">
+          Please enter your name before entering the casino!
+        </p>
+
+        <!-- Lucky Chip Avatar Selector -->
+        <div class="text-left">
+          <span class="block text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-2">
+            Choose Your Lucky Chip:
+          </span>
+          <div id="chipSelector" class="grid grid-cols-6 gap-2">
+            <button type="button" data-chip="🎰" class="chip-btn min-h-[48px] rounded-2xl bg-[#24164a] border-2 border-[#00f5d4] text-2xl flex items-center justify-center shadow-[0_0_12px_rgba(0,245,212,0.4)] cursor-pointer">🎰</button>
+            <button type="button" data-chip="🎲" class="chip-btn min-h-[48px] rounded-2xl bg-[#130b29] border-2 border-slate-700 hover:border-[#ffd166] text-2xl flex items-center justify-center cursor-pointer">🎲</button>
+            <button type="button" data-chip="💎" class="chip-btn min-h-[48px] rounded-2xl bg-[#130b29] border-2 border-slate-700 hover:border-[#ffd166] text-2xl flex items-center justify-center cursor-pointer">💎</button>
+            <button type="button" data-chip="👑" class="chip-btn min-h-[48px] rounded-2xl bg-[#130b29] border-2 border-slate-700 hover:border-[#ffd166] text-2xl flex items-center justify-center cursor-pointer">👑</button>
+            <button type="button" data-chip="🍀" class="chip-btn min-h-[48px] rounded-2xl bg-[#130b29] border-2 border-slate-700 hover:border-[#ffd166] text-2xl flex items-center justify-center cursor-pointer">🍀</button>
+            <button type="button" data-chip="🔥" class="chip-btn min-h-[48px] rounded-2xl bg-[#130b29] border-2 border-slate-700 hover:border-[#ffd166] text-2xl flex items-center justify-center cursor-pointer">🔥</button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full min-h-[56px] py-4 px-6 rounded-2xl bg-gradient-to-r from-[#ff2a85] via-[#b5179e] to-[#00f5d4] hover:brightness-110 active:scale-[0.98] text-white font-casino text-base sm:text-lg font-black tracking-wider shadow-[0_0_25px_rgba(255,42,133,0.55)] transition flex items-center justify-center gap-2.5 cursor-pointer"
+        >
+          <span>ENTER CASINO &amp; PLAY</span>
+          <span>🎲</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- TEACHER FIREBASE REALTIME DATABASE SETTINGS & DIAGNOSTICS MODAL         -->
+  <!-- ======================================================================= -->
+  <div id="firebaseModal" class="fixed inset-0 z-50 bg-[#06040e]/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="w-full max-w-lg rounded-3xl p-6 bg-[#130b29] border-2 border-[#00f5d4] shadow-[0_0_40px_rgba(0,245,212,0.3)] animate-pop">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-casino text-base sm:text-lg font-bold text-[#00f5d4] flex items-center gap-2">
+          <span>⚙️</span>
+          <span>Teacher Firebase Live Controls</span>
+        </h3>
+        <button id="closeFirebaseModalBtn" type="button" class="w-12 h-12 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold cursor-pointer">✕</button>
+      </div>
+      <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+        Connected live to Firebase Realtime Database (<code class="text-[#ffd166]">/casino_grammar</code>). All student iPads sync automatically in real time.
+      </p>
+
+      <div class="mt-4 space-y-3">
+        <div>
+          <label for="firebaseUrlInput" class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
+            Active Firebase Realtime Database URL:
+          </label>
+          <input
+            id="firebaseUrlInput"
+            type="url"
+            placeholder="https://kate-98c3e-default-rtdb.firebaseio.com"
+            class="w-full min-h-[48px] px-4 py-2.5 rounded-xl bg-[#06040e] border-2 border-slate-700 focus:border-[#00f5d4] text-white text-xs sm:text-sm font-mono outline-none"
+          />
+        </div>
+
+        <!-- Inline Connection Test Status Pill -->
+        <div id="firebaseTestResult" class="hidden px-3.5 py-2.5 rounded-xl bg-[#06040e] border border-white/15 text-xs font-bold text-slate-200">
+          Testing connection...
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+          <button id="testFirebaseBtn" type="button" class="min-h-[48px] px-4 py-2.5 rounded-xl bg-[#1e1442] hover:bg-[#2a1c5c] border border-[#00f5d4]/60 text-[#00f5d4] font-extrabold text-xs sm:text-sm cursor-pointer">
+            🔌 Test Connection
+          </button>
+
+          <div class="flex flex-wrap gap-2">
+            <button id="resetDefaultFirebaseBtn" type="button" class="min-h-[48px] px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs cursor-pointer">
+              Default URL
+            </button>
+            <button id="saveFirebaseBtn" type="button" class="min-h-[48px] px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#00f5d4] to-[#00ff87] text-slate-950 font-extrabold text-xs sm:text-sm shadow cursor-pointer">
+              Save &amp; Sync
+            </button>
+          </div>
+        </div>
+
+        <!-- Teacher Period Reset (Two-Step Inline Confirmation — No confirm()/alert()) -->
+        <div class="mt-4 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+          <span class="text-xs text-slate-400 font-semibold">Starting a new class period?</span>
+          <div class="flex items-center gap-2">
+            <button id="armClearBoardBtn" type="button" class="min-h-[48px] px-4 py-2.5 rounded-xl bg-[#ff2a85]/20 hover:bg-[#ff2a85]/30 border border-[#ff2a85]/60 text-[#ff85b8] font-extrabold text-xs cursor-pointer">
+              🗑️ Reset Classroom Board
+            </button>
+            <button id="confirmClearBoardBtn" type="button" class="hidden min-h-[48px] px-4 py-2.5 rounded-xl bg-[#ff2a85] text-white font-extrabold text-xs shadow-[0_0_16px_rgba(255,42,133,0.6)] cursor-pointer">
+              ⚠️ Confirm Clear All
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- AI SPEECH ANALYSIS POP-UP MODAL (GREEN / YELLOW / ORANGE)               -->
+  <!-- ======================================================================= -->
+  <div id="analysisModal" class="fixed inset-0 z-50 bg-[#06040e]/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div id="analysisBox" class="w-full max-w-md rounded-3xl p-6 sm:p-7 shadow-2xl border-4 text-center animate-pop bg-emerald-500 border-emerald-200 text-white">
+      <div id="analysisEmoji" class="text-6xl mb-2 drop-shadow">🏆</div>
+
+      <!-- Exact Rating Headline: "Excellent +3", "Good job +2", or "Keep practicing" -->
+      <h2 id="analysisHeadline" class="font-display text-3xl sm:text-4xl font-bold tracking-tight drop-shadow-sm">
+        Excellent +3
+      </h2>
+
+      <!-- Accuracy Percentage Pill -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/25 font-extrabold text-sm sm:text-base mt-2.5">
+        <span>AI Speech Accuracy:</span>
+        <span id="analysisPercent">92%</span>
+      </div>
+
+      <!-- Word-by-Word Highlight Chips & Target Comparison -->
+      <div class="mt-4 bg-[#0c071b]/95 text-white rounded-2xl p-4 text-left border border-white/15 space-y-3">
+        <div>
+          <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Target Sentence:</span>
+          <p id="analysisTargetText" class="font-bold text-white text-base sm:text-lg mt-0.5">
+            How many eggs do you need?
+          </p>
+        </div>
+        <div class="border-t border-white/10 pt-2.5">
+          <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Word Match Breakdown:</span>
+          <div id="analysisWordChips" class="flex flex-wrap gap-1.5 mt-1.5">
+            <!-- Word-by-word highlight chips -->
+          </div>
+          <p id="analysisHeardRaw" class="text-xs text-slate-400 italic mt-2">
+            Heard: "How many eggs do you need"
+          </p>
+        </div>
+      </div>
+
+      <!-- Pop-up Action Buttons -->
+      <div id="analysisActions" class="mt-5 flex flex-col sm:flex-row gap-3 justify-center">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- TOP CASINO NAVIGATION & PLAYER HUD                                      -->
+  <!-- ======================================================================= -->
+  <header class="sticky top-0 z-30 bg-[#090616]/90 backdrop-blur-md border-b border-[#ffd166]/30 shadow-[0_4px_24px_rgba(0,0,0,0.65)]">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
+      <!-- Neon Brand Logo -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#ff2a85] to-[#ffd166] p-0.5 shadow-[0_0_15px_rgba(255,42,133,0.5)]">
+          <div class="w-full h-full rounded-[14px] bg-[#0c071b] flex items-center justify-center text-xl">
+            🎰
+          </div>
+        </div>
+        <div>
+          <h1 class="font-casino text-sm sm:text-lg md:text-xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-[#ffd166] via-[#ff2a85] to-[#00f5d4]">
+            CASINO GRAMMAR SLOTS
+          </h1>
+          <p class="text-[11px] font-bold text-slate-400 hidden sm:block">
+            How Many / How Much Interactive Speaking Lounge
+          </p>
+        </div>
+      </div>
+
+      <!-- Player Chip, Score & Controls (All tap targets >= 48px) -->
+      <div class="flex items-center gap-2">
+        <!-- Student Name, Seat, Round Counter & Neon Gold Chip Balance -->
+        <div class="min-h-[48px] flex items-center gap-2 bg-[#160e33] border border-[#00f5d4]/50 px-3 py-1.5 rounded-2xl shadow-[0_0_15px_rgba(0,245,212,0.18)]">
+          <span id="headerChipIcon" class="text-lg">🎰</span>
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span id="headerStudentName" class="font-extrabold text-white text-xs sm:text-sm max-w-[95px] sm:max-w-[140px] truncate">
+              Player
+            </span>
+            <span id="headerStudentSeat" class="hidden px-1.5 py-0.5 rounded-md bg-white/10 text-[#00f5d4] text-[10px] font-extrabold">
+              A1
+            </span>
+          </div>
+          <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-xl bg-[#b5179e]/25 border border-[#b5179e]/50 text-[#f5d0fe] font-extrabold text-xs">
+            🎯 <span id="headerRoundsCount" class="ml-1">0</span>
+          </span>
+          <span class="px-2.5 py-0.5 rounded-xl bg-gradient-to-r from-[#ffd166] to-[#f59e0b] text-slate-950 font-casino font-black text-xs sm:text-sm shadow">
+            🪙 <span id="headerStudentScore">0</span>
+          </span>
+        </div>
+
+        <!-- Mute Toggle -->
+        <button
+          id="muteToggleBtn"
+          type="button"
+          title="Mute / Unmute Sound Effects"
+          class="w-12 h-12 rounded-2xl bg-[#160e33] hover:bg-[#22164d] border border-white/15 text-white flex items-center justify-center active:scale-95 transition cursor-pointer"
+        >
+          <span id="muteIcon" class="text-lg">🔊</span>
+        </button>
+
+        <!-- Teacher Firebase Controls Button -->
+        <button
+          id="openFirebaseModalBtn"
+          type="button"
+          title="Teacher Firebase Controls"
+          class="w-12 h-12 rounded-2xl bg-[#160e33] hover:bg-[#22164d] border border-white/15 text-[#00f5d4] flex items-center justify-center active:scale-95 transition cursor-pointer"
+        >
+          <span class="text-lg">⚙️</span>
+        </button>
+
+        <!-- Switch Student Button -->
+        <button
+          id="switchStudentBtn"
+          type="button"
+          class="min-h-[48px] px-3.5 rounded-2xl bg-[#ff2a85]/20 hover:bg-[#ff2a85]/30 border border-[#ff2a85]/60 text-[#ff85b8] font-extrabold text-xs sm:text-sm active:scale-95 transition cursor-pointer"
+        >
+          👤 Switch
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================= -->
+  <!-- MAIN IPAD LANDSCAPE / PORTRAIT CASINO FLOOR                             -->
+  <!-- ======================================================================= -->
+  <main class="relative z-10 max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+
+      <!-- =================================================================== -->
+      <!-- LEFT COLUMN (7 COLS): 3-REEL CASINO SLOT MACHINE + RECORDING STAGES -->
+      <!-- =================================================================== -->
+      <section class="lg:col-span-7 space-y-5">
+
+        <!-- LUXURY 3-REEL NEON CASINO SLOT MACHINE CABINET -->
+        <div class="casino-cabinet rounded-3xl p-3.5 sm:p-5 relative">
+
+          <!-- Top Marquee Lights Strip -->
+          <div class="flex items-center justify-between px-2 mb-3" aria-hidden="true">
+            <span class="w-2.5 h-2.5 rounded-full marquee-bulb-a"></span>
+            <span class="w-2.5 h-2.5 rounded-full marquee-bulb-b"></span>
+            <span class="w-2.5 h-2.5 rounded-full marquee-bulb-a"></span>
+            <span class="w-2.5 h-2.5 rounded-full marquee-bulb-b"></span>
+            <span class="w-2.5 h-2.5 rounded-full marquee-bulb-a"></span>
+            <span class="font-casino text-[11px] sm:text-xs font-black tracking-widest text-[#ffd166] uppercase">
+              ★ SPIN IN ORDER: 1 ➔ 2 ➔ 3 ★
+            </span>
+            <span class="w-2.5 h-2.5 rounded-full marquee-bulb-a"></span>
+            <span class="w-2.5 h-2.5 rounded-full marquee-bulb-b"></span>
+            <span class="w-2.5 h-2.5 rounded-full marquee-bulb-a"></span>
+            <span class="w-2.5 h-2.5 rounded-full marquee-bulb-b"></span>
+            <span class="w-2.5 h-2.5 rounded-full marquee-bulb-a"></span>
+          </div>
+
+          <!-- Step Progress Pills + Reset Spin Button -->
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3 px-1">
+            <div class="flex items-center gap-1.5 text-xs font-extrabold">
+              <span id="stepPill1" class="px-2.5 py-1 rounded-xl bg-[#00f5d4] text-slate-950 transition">1. Starter</span>
+              <span class="text-slate-500">➔</span>
+              <span id="stepPill2" class="px-2.5 py-1 rounded-xl bg-white/10 text-slate-400 transition">2. Food</span>
+              <span class="text-slate-500">➔</span>
+              <span id="stepPill3" class="px-2.5 py-1 rounded-xl bg-white/10 text-slate-400 transition">3. Ending</span>
+            </div>
+
+            <button
+              id="resetMachineBtn"
+              type="button"
+              class="min-h-[48px] px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-[#ffd166] text-xs font-extrabold tracking-wide transition cursor-pointer"
+            >
+              🔄 Reset Spin
+            </button>
+          </div>
+
+          <!-- 3-Reel Inner Metallic Housing + Interactive Right-Side Casino Pull Lever -->
+          <div class="flex items-stretch gap-2.5 sm:gap-3.5">
+            <div class="flex-1 bg-[#070511] p-2.5 sm:p-4 rounded-3xl border-2 border-[#ffd166]/60 shadow-inner">
+              <div class="grid grid-cols-3 gap-2 sm:gap-3">
+
+                <!-- ==================== REEL 1: STARTER ==================== -->
+                <div class="flex flex-col">
+                  <div id="reel1Badge" class="text-center py-1.5 px-1.5 rounded-t-2xl bg-gradient-to-r from-[#00f5d4] to-[#00bb9e] text-slate-950 font-display font-bold text-[11px] sm:text-xs">
+                    SWIPE / TAP
+                  </div>
+                  <div
+                    id="reel1Container"
+                    data-reel="1"
+                    class="reel-cylinder slot-reel-touch reel-unlocked-glow relative rounded-b-2xl overflow-hidden border-2 border-[#00f5d4]"
+                  >
+                    <!-- Neon Gold Payline Selection Frame -->
+                    <div class="pointer-events-none absolute inset-x-1 top-[78px] h-[78px] rounded-xl border-2 border-[#ffd166] bg-[#ffd166]/10 shadow-[inset_0_0_14px_rgba(255,209,102,0.3)] z-10 flex items-center justify-between px-1">
+                      <span class="text-[#ffd166] text-xs font-black">▶</span>
+                      <span class="text-[#ffd166] text-xs font-black">◀</span>
+                    </div>
+
+                    <div id="reel1Track" class="relative z-0"></div>
+
+                    <!-- Re-spin Reel 1 Badge after Reel 1 locks -->
+                    <button
+                      id="reel1ReopenBtn"
+                      type="button"
+                      title="Tap to re-spin Reel 1"
+                      class="hidden absolute top-1.5 right-1.5 z-20 bg-[#00ff87] text-slate-950 text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-full shadow cursor-pointer"
+                    >
+                      ↻ Re-spin
+                    </button>
+                  </div>
+                </div>
+
+                <!-- ==================== REEL 2: FOOD NOUN ==================== -->
+                <div class="flex flex-col">
+                  <div id="reel2Badge" class="text-center py-1.5 px-1.5 rounded-t-2xl bg-slate-800 text-slate-400 font-display font-bold text-[11px] sm:text-xs">
+                    🔒 Locked
+                  </div>
+                  <div
+                    id="reel2Container"
+                    data-reel="2"
+                    class="reel-cylinder slot-reel-touch relative rounded-b-2xl overflow-hidden border-2 border-slate-700"
+                  >
+                    <!-- Neon Gold Payline Selection Frame -->
+                    <div class="pointer-events-none absolute inset-x-1 top-[78px] h-[78px] rounded-xl border-2 border-[#ffd166] bg-[#ffd166]/10 shadow-[inset_0_0_14px_rgba(255,209,102,0.3)] z-10 flex items-center justify-between px-1">
+                      <span class="text-[#ffd166] text-xs font-black">▶</span>
+                      <span class="text-[#ffd166] text-xs font-black">◀</span>
+                    </div>
+
+                    <div id="reel2Track" class="relative z-0"></div>
+
+                    <!-- Padlock Overlay -->
+                    <div id="reel2LockScreen" class="absolute inset-0 z-20 bg-[#06040e]/85 backdrop-blur-[2px] flex flex-col items-center justify-center p-2 text-center">
+                      <span class="text-2xl sm:text-3xl mb-1 drop-shadow-[0_0_10px_rgba(255,42,133,0.8)]">🔒</span>
+                      <span class="text-[#ffd166] font-extrabold text-[11px] sm:text-xs leading-tight">
+                        Spin Reel 1 First
+                      </span>
+                    </div>
+
+                    <div id="reel2LockedBadge" class="hidden pointer-events-none absolute top-1.5 right-1.5 z-20 bg-[#00ff87] text-slate-950 text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-full shadow">
+                      ✓ Set
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ==================== REEL 3: ENDING CLAUSE ==================== -->
+                <div class="flex flex-col">
+                  <div id="reel3Badge" class="text-center py-1.5 px-1.5 rounded-t-2xl bg-slate-800 text-slate-400 font-display font-bold text-[11px] sm:text-xs">
+                    🔒 Locked
+                  </div>
+                  <div
+                    id="reel3Container"
+                    data-reel="3"
+                    class="reel-cylinder slot-reel-touch relative rounded-b-2xl overflow-hidden border-2 border-slate-700"
+                  >
+                    <!-- Neon Gold Payline Selection Frame -->
+                    <div class="pointer-events-none absolute inset-x-1 top-[78px] h-[78px] rounded-xl border-2 border-[#ffd166] bg-[#ffd166]/10 shadow-[inset_0_0_14px_rgba(255,209,102,0.3)] z-10 flex items-center justify-between px-1">
+                      <span class="text-[#ffd166] text-xs font-black">▶</span>
+                      <span class="text-[#ffd166] text-xs font-black">◀</span>
+                    </div>
+
+                    <div id="reel3Track" class="relative z-0"></div>
+
+                    <!-- Padlock Overlay -->
+                    <div id="reel3LockScreen" class="absolute inset-0 z-20 bg-[#06040e]/85 backdrop-blur-[2px] flex flex-col items-center justify-center p-2 text-center">
+                      <span class="text-2xl sm:text-3xl mb-1 drop-shadow-[0_0_10px_rgba(255,42,133,0.8)]">🔒</span>
+                      <span class="text-[#ffd166] font-extrabold text-[11px] sm:text-xs leading-tight">
+                        Spin Reel 2 First
+                      </span>
+                    </div>
+
+                    <div id="reel3LockedBadge" class="hidden pointer-events-none absolute top-1.5 right-1.5 z-20 bg-[#00ff87] text-slate-950 text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-full shadow">
+                      ✓ Set
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Interactive Red & Gold Casino Pull Lever -->
+            <button
+              id="casinoLeverBtn"
+              type="button"
+              aria-label="Pull Casino Lever to Spin Active Reel"
+              class="w-14 sm:w-16 min-h-[48px] rounded-3xl casino-lever-track p-2 flex flex-col items-center justify-between active:scale-95 transition cursor-pointer shrink-0 select-none"
+            >
+              <span class="font-casino text-[9px] sm:text-[10px] font-black tracking-widest text-[#ffd166] uppercase">
+                PULL
+              </span>
+
+              <div class="relative w-full flex-1 my-1.5 flex flex-col items-center justify-start">
+                <!-- Vertical Slot Groove -->
+                <div class="w-2.5 h-full rounded-full bg-black/80 border border-[#ffd166]/30"></div>
+                <!-- Metallic Shaft -->
+                <div class="casino-lever-shaft absolute bottom-4 w-2 h-24 rounded-full bg-gradient-to-r from-slate-300 via-white to-slate-400"></div>
+                <!-- Glowing Red & Gold Knob -->
+                <div class="casino-lever-ball absolute top-1 w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-[#ffd166] flex items-center justify-center text-xs font-black text-white">
+                  ★
+                </div>
+              </div>
+
+              <span id="leverStepLabel" class="px-1.5 py-0.5 rounded-lg bg-[#ff2a85] text-white font-casino text-[10px] font-black">
+                R1
+              </span>
+            </button>
+          </div>
+
+          <!-- Primary Touch Spin Button & Dynamic Instruction Banner -->
+          <div class="mt-3.5 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+            <div id="machineInstructionBar" class="text-center sm:text-left text-[#00f5d4] font-extrabold text-xs sm:text-sm tracking-wide">
+              👆 Swipe/tap Reel 1 or pull the lever — it spins for 1s and stops randomly!
+            </div>
+
+            <button
+              id="spinActiveReelBtn"
+              type="button"
+              class="w-full sm:w-auto min-h-[52px] px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#00f5d4] via-[#00ff87] to-[#ffd166] hover:brightness-110 active:scale-95 text-slate-950 font-casino text-xs sm:text-sm font-black tracking-wider shadow-[0_0_20px_rgba(0,245,212,0.45)] transition flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+            >
+              <span>🎰</span>
+              <span id="spinActiveReelBtnLabel">SPIN REEL 1 (1s)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- STAGE 1 SPEAKING CONSOLE: COMPOSED QUESTION + RECORD BUTTON       -->
+        <!-- ================================================================= -->
+        <div id="questionSpeakingCard" class="hidden rounded-3xl p-5 sm:p-6 bg-[#120b29]/95 border-2 border-[#00f5d4] shadow-[0_0_32px_rgba(0,245,212,0.28)] animate-pop">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <span class="px-3 py-1 rounded-full bg-[#00f5d4]/15 border border-[#00f5d4]/50 text-[#00f5d4] font-extrabold text-xs uppercase tracking-wider">
+              🎤 Stage 1 of 2 • Ask the Question
+            </span>
+            <button
+              id="listenQuestionBtn"
+              type="button"
+              class="min-h-[48px] px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>🔊</span>
+              <span>Listen</span>
+            </button>
+          </div>
+
+          <!-- Composed Question Neon Display Box -->
+          <div class="bg-[#070512] border-2 border-[#ff2a85]/60 rounded-2xl p-4 sm:p-5 text-center shadow-[inset_0_0_20px_rgba(255,42,133,0.18)]">
+            <p class="text-[11px] font-extrabold uppercase tracking-widest text-[#ff85b8] mb-1">
+              Composed Question:
+            </p>
+            <p id="composedQuestionText" class="font-display text-2xl sm:text-3xl font-bold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+              How many eggs do you need?
+            </p>
+            <div id="questionGrammarTags" class="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs font-extrabold">
+              <!-- Grammar tags -->
+            </div>
+          </div>
+
+          <!-- Primary Record & Backup Practice Buttons -->
+          <div class="mt-4 flex flex-col items-center gap-2.5">
+            <div class="flex flex-wrap items-center justify-center gap-3 w-full">
+              <button
+                id="recordQuestionBtn"
+                type="button"
+                class="min-h-[56px] min-w-[220px] py-3.5 px-8 rounded-2xl bg-gradient-to-r from-[#ff2a85] to-[#e11d48] hover:brightness-110 active:scale-95 text-white font-casino text-lg sm:text-xl font-black tracking-wide shadow-[0_0_24px_rgba(255,42,133,0.55)] transition flex items-center justify-center gap-3 cursor-pointer"
+              >
+                <span id="recordQuestionIcon" class="text-2xl">🎙️</span>
+                <span id="recordQuestionLabel">Record</span>
+              </button>
+
+              <!-- Backup Mic-Check / Simulated Practice Button if iPad/Sandbox blocks mic -->
+              <button
+                id="backupQuestionPracticeBtn"
+                type="button"
+                title="Use if browser blocks microphone access"
+                class="hidden min-h-[56px] px-4 py-3 rounded-2xl bg-[#1f1542] hover:bg-[#2b1d5c] border border-[#ffd166]/60 text-[#ffd166] font-extrabold text-xs sm:text-sm transition cursor-pointer"
+              >
+                🎧 Practice / Mic Check
+              </button>
+            </div>
+
+            <!-- Live Neon Recording Soundwave & Interim Transcript -->
+            <div id="questionRecordingStatus" class="hidden mt-2 flex flex-col items-center gap-2">
+              <div class="flex items-center gap-1.5 h-8">
+                <span class="w-1.5 h-6 bg-[#ff2a85] rounded-full wave-bar" style="animation-delay: 0s"></span>
+                <span class="w-1.5 h-8 bg-[#ffd166] rounded-full wave-bar" style="animation-delay: 0.12s"></span>
+                <span class="w-1.5 h-5 bg-[#00ff87] rounded-full wave-bar" style="animation-delay: 0.24s"></span>
+                <span class="w-1.5 h-8 bg-[#00f5d4] rounded-full wave-bar" style="animation-delay: 0.36s"></span>
+                <span class="w-1.5 h-6 bg-[#b5179e] rounded-full wave-bar" style="animation-delay: 0.48s"></span>
+              </div>
+              <p id="questionLiveStatusText" class="text-sm font-extrabold text-[#00f5d4]">
+                Listening... Speak your question clearly!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- STAGE 2 SPEAKING CONSOLE: 3-BLANK ANSWER PATTERN + RECORD BUTTON  -->
+        <!-- ================================================================= -->
+        <div id="answerSpeakingCard" class="hidden rounded-3xl p-5 sm:p-6 bg-[#120b29]/95 border-2 border-[#00ff87] shadow-[0_0_32px_rgba(0,255,135,0.28)] animate-pop">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <span class="px-3 py-1 rounded-full bg-[#00ff87]/15 border border-[#00ff87]/50 text-[#00ff87] font-extrabold text-xs uppercase tracking-wider">
+              🗣️ Stage 2 of 2 • Speak the Answer
+            </span>
+            <button
+              id="listenAnswerBtn"
+              type="button"
+              class="min-h-[48px] px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>🔊</span>
+              <span>Listen</span>
+            </button>
+          </div>
+
+          <!-- 3-Blank Answer Pattern Box -->
+          <div class="bg-[#070512] border-2 border-[#00ff87]/60 rounded-2xl p-4 sm:p-5 text-center shadow-[inset_0_0_20px_rgba(0,255,135,0.16)]">
+            <p id="answerPatternRuleHint" class="text-xs font-extrabold uppercase tracking-wider text-[#00ff87] mb-3">
+              Pattern: (1) Subject + need/needs + (2) Number + (3) Food
+            </p>
+
+            <!-- Structured Numbered Blanks -->
+            <div id="answerBlankBadges" class="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 text-lg sm:text-2xl font-display font-bold text-white">
+              <!-- Populated dynamically -->
+            </div>
+
+            <!-- Full Target Answer Preview -->
+            <p id="composedAnswerText" class="mt-3 text-base sm:text-lg font-extrabold text-[#ffd166]">
+              "I need 4 eggs."
+            </p>
+          </div>
+
+          <!-- Primary Record & Backup Practice Buttons -->
+          <div class="mt-4 flex flex-col items-center gap-2.5">
+            <div class="flex flex-wrap items-center justify-center gap-3 w-full">
+              <button
+                id="recordAnswerBtn"
+                type="button"
+                class="min-h-[56px] min-w-[220px] py-3.5 px-8 rounded-2xl bg-gradient-to-r from-[#00ff87] to-[#00f5d4] hover:brightness-110 active:scale-95 text-slate-950 font-casino text-lg sm:text-xl font-black tracking-wide shadow-[0_0_24px_rgba(0,255,135,0.5)] transition flex items-center justify-center gap-3 cursor-pointer"
+              >
+                <span id="recordAnswerIcon" class="text-2xl">🎙️</span>
+                <span id="recordAnswerLabel">Record</span>
+              </button>
+
+              <button
+                id="backupAnswerPracticeBtn"
+                type="button"
+                title="Use if browser blocks microphone access"
+                class="hidden min-h-[56px] px-4 py-3 rounded-2xl bg-[#1f1542] hover:bg-[#2b1d5c] border border-[#ffd166]/60 text-[#ffd166] font-extrabold text-xs sm:text-sm transition cursor-pointer"
+              >
+                🎧 Practice / Mic Check
+              </button>
+            </div>
+
+            <!-- Live Neon Recording Soundwave & Interim Transcript -->
+            <div id="answerRecordingStatus" class="hidden mt-2 flex flex-col items-center gap-2">
+              <div class="flex items-center gap-1.5 h-8">
+                <span class="w-1.5 h-6 bg-[#00ff87] rounded-full wave-bar" style="animation-delay: 0s"></span>
+                <span class="w-1.5 h-8 bg-[#00f5d4] rounded-full wave-bar" style="animation-delay: 0.12s"></span>
+                <span class="w-1.5 h-5 bg-[#ffd166] rounded-full wave-bar" style="animation-delay: 0.24s"></span>
+                <span class="w-1.5 h-8 bg-[#ff2a85] rounded-full wave-bar" style="animation-delay: 0.36s"></span>
+                <span class="w-1.5 h-6 bg-[#b5179e] rounded-full wave-bar" style="animation-delay: 0.48s"></span>
+              </div>
+              <p id="answerLiveStatusText" class="text-sm font-extrabold text-[#00ff87]">
+                Listening... Speak your answer clearly!
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- RIGHT COLUMN (5 COLS): LIVE FIREBASE RANKING & CONVERSATION FEED    -->
+      <!-- =================================================================== -->
+      <aside class="lg:col-span-5">
+        <div class="rounded-3xl p-5 bg-[#110a26]/95 border-2 border-[#b5179e]/75 shadow-[0_0_32px_rgba(181,23,158,0.3)]">
+          <!-- Dashboard Header -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-white/10">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">🏆</span>
+              <h2 class="font-casino text-sm sm:text-base font-black tracking-wide text-[#ffd166]">
+                LIVE CLASSROOM RANKING
+              </h2>
+            </div>
+
+            <span id="syncStatusBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00f5d4]/15 border border-[#00f5d4]/45 text-[#00f5d4] text-[11px] font-extrabold">
+              <span id="syncStatusDot" class="w-2 h-2 rounded-full bg-[#00ff87] animate-ping"></span>
+              <span id="syncStatusText">LIVE: kate-98c3e</span>
+            </span>
+          </div>
+
+          <!-- Leaderboard List -->
+          <div class="mt-4">
+            <div class="flex items-center justify-between mb-2.5">
+              <h3 class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">
+                High Rollers Leaderboard
+              </h3>
+              <span id="playerCountBadge" class="text-[11px] font-bold text-[#ffd166]">0 players</span>
+            </div>
+            <div id="leaderboardList" class="space-y-2.5 max-h-[290px] overflow-y-auto casino-scroll pr-1">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Live Classroom Conversation Feed -->
+          <div class="mt-5 pt-4 border-t border-white/10">
+            <div class="flex items-center justify-between mb-2.5">
+              <h3 class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">
+                💬 Live Student Conversations
+              </h3>
+              <span id="feedCountBadge" class="text-xs font-bold text-[#00f5d4]">0 dialogues</span>
+            </div>
+            <div id="conversationFeedList" class="space-y-2.5 max-h-[300px] overflow-y-auto casino-scroll pr-1">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- ======================================================================= -->
+  <!-- JAVASCRIPT: LIVE FIREBASE RTDB, SLOT ENGINE & IPAD AI SPEECH ENGINE     -->
+  <!-- ======================================================================= -->
+  <script>
+    // =========================================================================
+    // LIVE FIREBASE REALTIME DATABASE CONFIGURATION (PRE-CONNECTED)
+    // =========================================================================
+    const FIREBASE_DB_URL = "https://kate-98c3e-default-rtdb.firebaseio.com";
+
+    // =========================================================================
+    // 1. CURRICULUM DATA DEFINITIONS
+    // =========================================================================
+    const REEL1_OPTIONS = [
+      { value: "How many", label: "How many", icon: "🔢", tag: "Countable" },
+      { value: "How much", label: "How much", icon: "⚖️", tag: "Uncountable" }
+    ];
+
+    const COUNTABLE_FOODS = [
+      { plural: "eggs", icon: "🥚" },
+      { plural: "oranges", icon: "🍊" },
+      { plural: "strawberries", icon: "🍓" },
+      { plural: "watermelons", icon: "🍉" },
+      { plural: "hamburgers", icon: "🍔" }
+    ];
+
+    const UNCOUNTABLE_FOODS = [
+      { word: "rice", icon: "🍚" },
+      { word: "milk", icon: "🥛" },
+      { word: "oil", icon: "🫒" },
+      { word: "chocolate", icon: "🍫" },
+      { word: "juice", icon: "🧃" },
+      { word: "chicken", icon: "🍗" }
+    ];
+
+    const REEL3_OPTIONS = [
+      { value: "do you need?", subject: "I", verb: "need", icon: "🙋" },
+      { value: "do they need?", subject: "They", verb: "need", icon: "👫" },
+      { value: "does he need?", subject: "He", verb: "needs", icon: "👦" },
+      { value: "does she need?", subject: "She", verb: "needs", icon: "👧" }
+    ];
+
+    // =========================================================================
+    // 2. SYNTHESIZED WEB AUDIO CASINO SOUND EFFECTS (ISOLATED FROM <audio>)
+    // =========================================================================
+    class CasinoSoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+
+      unlock() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === "suspended") {
+          this.ctx.resume().catch(() => {});
+        }
+      }
+
+      tone(freq, dur = 0.11, type = "sine", vol = 0.16, delay = 0) {
+        if (this.muted) return;
+        this.unlock();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime + delay;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(vol, now + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + dur + 0.02);
+      }
+
+      playRatchetClick() {
+        this.tone(620, 0.04, "triangle", 0.11);
+      }
+
+      playNeonLock() {
+        this.tone(587.33, 0.09, "sine", 0.18, 0);
+        this.tone(880.0, 0.16, "triangle", 0.2, 0.06);
+      }
+
+      playMicCue() {
+        this.tone(523.25, 0.08, "sine", 0.14, 0);
+        this.tone(783.99, 0.12, "sine", 0.15, 0.07);
+      }
+
+      playJackpot() {
+        const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5];
+        notes.forEach((n, i) => {
+          this.tone(n, 0.16, "triangle", 0.2, i * 0.075);
+        });
+      }
+
+      playGoodJob() {
+        this.tone(523.25, 0.13, "sine", 0.18, 0);
+        this.tone(659.25, 0.22, "sine", 0.2, 0.1);
+      }
+
+      playTryAgain() {
+        this.tone(369.99, 0.15, "sine", 0.15, 0);
+        this.tone(329.63, 0.22, "sine", 0.15, 0.13);
+      }
+    }
+
+    const sfx = new CasinoSoundEngine();
+
+    // =========================================================================
+    // 3. APPLICATION STATE & STORAGE KEYS
+    // =========================================================================
+    const STORAGE_KEY_STUDENTS = "casino_grammar_slots_students_v2";
+    const STORAGE_KEY_FEED = "casino_grammar_slots_feed_v2";
+    const STORAGE_KEY_FB_URL = "casino_grammar_slots_firebase_url_v2";
+
+    const state = {
+      studentName: "",
+      studentSeat: "",
+      studentChip: "🎰",
+      studentScore: 0,
+      roundsCompleted: 0,
+      lastAccuracy: 0,
+      // Sequential Slot Machine State
+      unlockedStep: 1, // 1, 2, 3, or 4 (ready to speak)
+      isSpinning: false,
+      reels: {
+        1: { index: 0, locked: false, items: REEL1_OPTIONS },
+        2: { index: 0, locked: false, items: COUNTABLE_FOODS },
+        3: { index: 0, locked: false, items: REEL3_OPTIONS }
+      },
+      // Current Round Sentences
+      currentQuestion: "",
+      questionAccuracy: 0,
+      questionLabel: "",
+      questionPoints: 0,
+      currentAnswer: "",
+      answerParts: null,
+      answerAccuracy: 0,
+      answerLabel: "",
+      answerPoints: 0,
+      // Recording State
+      isRecording: false,
+      activeStep: null, // 'question' | 'answer'
+      // Classroom Ranking & Feed
+      studentsMap: {},
+      conversations: [],
+      firebaseUrl: FIREBASE_DB_URL
+    };
+
+    // =========================================================================
+    // 4. TOAST & CONFETTI HELPERS
+    // =========================================================================
+    let toastTimer = null;
+    function showToast(message, icon = "✨") {
+      const banner = document.getElementById("toastBanner");
+      document.getElementById("toastMessage").textContent = message;
+      document.getElementById("toastIcon").textContent = icon;
+      banner.classList.remove("hidden");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => banner.classList.add("hidden"), 2800);
+    }
+
+    function launchConfetti() {
+      const canvas = document.getElementById("confettiCanvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const colors = ["#ffd166", "#ff2a85", "#00f5d4", "#00ff87", "#b5179e"];
+      const particles = Array.from({ length: 80 }, () => ({
+        x: Math.random() * canvas.width,
+        y: -20 - Math.random() * 120,
+        size: 7 + Math.random() * 7,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vx: (Math.random() - 0.5) * 5.5,
+        vy: 3.2 + Math.random() * 5.2,
+        rot: Math.random() * 360,
+        vRot: (Math.random() - 0.5) * 11
+      }));
+
+      let frames = 0;
+      function animate() {
+        frames++;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vRot;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rot * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+          ctx.restore();
+        });
+        if (frames < 95) {
+          requestAnimationFrame(animate);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    // =========================================================================
+    // 5. SEQUENTIAL 3-REEL CASINO SLOT MACHINE ENGINE (1.0s AUTO-SPIN)
+    // =========================================================================
+    const ITEM_HEIGHT = 78;
+
+    function wrapIndex(idx, len) {
+      return ((idx % len) + len) % len;
+    }
+
+    function renderReel(reelNum, dragOffsetPx = 0) {
+      const reel = state.reels[reelNum];
+      const track = document.getElementById(`reel${reelNum}Track`);
+      const items = reel.items;
+      const len = items.length;
+
+      const baseTop = -ITEM_HEIGHT + dragOffsetPx;
+      track.style.transform = `translateY(${baseTop}px)`;
+
+      let html = "";
+      for (let offset = -2; offset <= 2; offset++) {
+        const idx = wrapIndex(reel.index + offset, len);
+        const item = items[idx];
+        const isCenter = offset === 0 && Math.abs(dragOffsetPx) < ITEM_HEIGHT * 0.4;
+
+        let mainText = "";
+        let subText = "";
+        const icon = item.icon || "";
+
+        if (reelNum === 1) {
+          mainText = item.label;
+          subText = item.tag;
+        } else if (reelNum === 2) {
+          mainText = item.plural || item.word;
+          subText = item.plural ? "Countable" : "Uncountable";
+        } else if (reelNum === 3) {
+          mainText = item.value;
+          subText = `${item.subject} ${item.verb}`;
+        }
+
+        html += `
+          <div class="reel-item px-1.5 text-center select-none ${isCenter ? "scale-105 opacity-100" : "scale-90 opacity-45"}">
+            <div class="text-xl sm:text-2xl leading-none mb-1 drop-shadow">${icon}</div>
+            <div class="font-display font-bold text-sm sm:text-base md:text-lg ${isCenter ? "text-[#ffd166] drop-shadow-[0_0_8px_rgba(255,209,102,0.6)]" : "text-slate-300"} leading-tight">
+              ${mainText}
+            </div>
+            <div class="text-[10px] sm:text-xs font-extrabold ${isCenter ? "text-[#00f5d4]" : "text-slate-500"} leading-none mt-0.5">
+              ${subText}
+            </div>
+          </div>
+        `;
+      }
+      track.innerHTML = html;
+    }
+
+    function updateReelVisualStates() {
+      // Update top step pills
+      for (let step = 1; step <= 3; step++) {
+        const pill = document.getElementById(`stepPill${step}`);
+        if (state.reels[step].locked) {
+          pill.className = "px-2.5 py-1 rounded-xl bg-[#00ff87] text-slate-950 font-extrabold transition";
+        } else if (state.unlockedStep === step) {
+          pill.className = "px-2.5 py-1 rounded-xl bg-[#00f5d4] text-slate-950 font-extrabold transition";
+        } else {
+          pill.className = "px-2.5 py-1 rounded-xl bg-white/10 text-slate-400 transition";
+        }
+      }
+
+      // Update each reel container, header badge & padlock overlay
+      for (let r = 1; r <= 3; r++) {
+        const container = document.getElementById(`reel${r}Container`);
+        const badge = document.getElementById(`reel${r}Badge`);
+        const lockScreen = document.getElementById(`reel${r}LockScreen`);
+        const lockedBadge = document.getElementById(`reel${r}LockedBadge`);
+        const reopenBtn = document.getElementById(`reel1ReopenBtn`);
+
+        const isDone = state.reels[r].locked;
+        const isCurrent = state.unlockedStep === r && !isDone;
+
+        container.classList.remove("reel-unlocked-glow", "border-[#00f5d4]", "border-[#00ff87]", "border-slate-700");
+
+        if (isDone) {
+          container.classList.add("border-[#00ff87]");
+          badge.className = "text-center py-1.5 px-1.5 rounded-t-2xl bg-[#00ff87] text-slate-950 font-display font-bold text-[11px] sm:text-xs";
+          badge.textContent = `✅ Reel ${r} Set`;
+          if (lockScreen) lockScreen.classList.add("hidden");
+          if (lockedBadge) lockedBadge.classList.remove("hidden");
+          if (r === 1 && reopenBtn) reopenBtn.classList.remove("hidden");
+        } else if (isCurrent) {
+          container.classList.add("reel-unlocked-glow", "border-[#00f5d4]");
+          badge.className = "text-center py-1.5 px-1.5 rounded-t-2xl bg-gradient-to-r from-[#00f5d4] to-[#00bb9e] text-slate-950 font-display font-bold text-[11px] sm:text-xs";
+          badge.textContent = state.isSpinning ? "SPINNING..." : "SWIPE / TAP";
+          if (lockScreen) lockScreen.classList.add("hidden");
+          if (lockedBadge) lockedBadge.classList.add("hidden");
+          if (r === 1 && reopenBtn) reopenBtn.classList.add("hidden");
+        } else {
+          container.classList.add("border-slate-700");
+          badge.className = "text-center py-1.5 px-1.5 rounded-t-2xl bg-slate-800 text-slate-400 font-display font-bold text-[11px] sm:text-xs";
+          badge.textContent = "🔒 Locked";
+          if (lockScreen) lockScreen.classList.remove("hidden");
+          if (lockedBadge) lockedBadge.classList.add("hidden");
+          if (r === 1 && reopenBtn) reopenBtn.classList.add("hidden");
+        }
+      }
+
+      // Update Lever Badge & Primary Spin Button
+      const leverLabel = document.getElementById("leverStepLabel");
+      const spinBtn = document.getElementById("spinActiveReelBtn");
+      const spinBtnLabel = document.getElementById("spinActiveReelBtnLabel");
+
+      if (state.unlockedStep <= 3) {
+        leverLabel.textContent = `R${state.unlockedStep}`;
+        spinBtn.disabled = state.isSpinning;
+        spinBtn.classList.remove("opacity-45", "pointer-events-none");
+        spinBtnLabel.textContent = state.isSpinning
+          ? `SPINNING REEL ${state.unlockedStep}...`
+          : `SPIN REEL ${state.unlockedStep} (1s)`;
+      } else {
+        leverLabel.textContent = "DONE";
+        spinBtn.disabled = true;
+        spinBtn.classList.add("opacity-45", "pointer-events-none");
+        spinBtnLabel.textContent = "ALL 3 REELS LOCKED ✓";
+      }
+
+      // Instruction text below reels
+      const instr = document.getElementById("machineInstructionBar");
+      if (state.isSpinning) {
+        instr.textContent = `🎰 Reel ${state.unlockedStep} spinning for 1.0 second...`;
+      } else if (state.unlockedStep === 1) {
+        instr.textContent = '👆 Swipe/tap Reel 1 or pull the lever — runs 1s & lands on "How many" or "How much"!';
+      } else if (state.unlockedStep === 2) {
+        const qStarter = state.reels[1].items[state.reels[1].index].value;
+        instr.textContent = `👆 Great! Now spin Reel 2 (1s) to pick a random ${qStarter === "How many" ? "countable" : "uncountable"} food!`;
+      } else if (state.unlockedStep === 3) {
+        instr.textContent = "👆 Almost there! Spin Reel 3 (1s) to pick a random question ending!";
+      } else {
+        instr.textContent = "🎰 Jackpot line locked! Press Record below to speak your question!";
+      }
+    }
+
+    /**
+     * Automatically spins the active reel rapidly for 1.0 second (1000ms)
+     * with smooth cubic deceleration and stops on a random item.
+     */
+    function spinReelAutoOneSecond(reelNum) {
+      if (state.isSpinning || state.unlockedStep !== reelNum || state.reels[reelNum].locked) {
+        return;
+      }
+
+      sfx.unlock();
+      state.isSpinning = true;
+      updateReelVisualStates();
+
+      // Animate right-side casino lever pull
+      const leverBtn = document.getElementById("casinoLeverBtn");
+      leverBtn.classList.add("lever-pulled");
+      setTimeout(() => leverBtn.classList.remove("lever-pulled"), 340);
+
+      const reel = state.reels[reelNum];
+      const len = reel.items.length;
+      const startIndex = reel.index;
+      const targetIndex = Math.floor(Math.random() * len);
+
+      // Ensure at least ~14 visual item transitions during the 1.0s spin
+      const forwardDelta = (startIndex - targetIndex + len) % len;
+      const minCycles = Math.ceil(14 / len);
+      const totalSteps = minCycles * len + forwardDelta;
+
+      const durationMs = 1000;
+      const startTime = performance.now();
+      let lastTickStep = 0;
+
+      function animateSpinFrame(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / durationMs);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const currentFloatSteps = eased * totalSteps;
+        const stepCount = Math.floor(currentFloatSteps);
+        const fractionalPx = (currentFloatSteps - stepCount) * ITEM_HEIGHT;
+
+        if (stepCount > lastTickStep) {
+          sfx.playRatchetClick();
+          lastTickStep = stepCount;
+        }
+
+        reel.index = wrapIndex(startIndex - stepCount, len);
+        renderReel(reelNum, fractionalPx);
+
+        if (progress < 1) {
+          requestAnimationFrame(animateSpinFrame);
+        } else {
+          reel.index = targetIndex;
+          renderReel(reelNum, 0);
+          state.isSpinning = false;
+          lockReel(reelNum);
+        }
+      }
+
+      requestAnimationFrame(animateSpinFrame);
+    }
+
+    function reopenReel1ForEditing() {
+      if (state.isSpinning) return;
+      stopActiveRecording();
+      state.unlockedStep = 1;
+      state.reels[1].locked = false;
+      state.reels[2].locked = false;
+      state.reels[3].locked = false;
+      state.reels[2].index = 0;
+      state.reels[3].index = 0;
+
+      renderReel(1, 0);
+      renderReel(2, 0);
+      renderReel(3, 0);
+      updateReelVisualStates();
+
+      document.getElementById("questionSpeakingCard").classList.add("hidden");
+      document.getElementById("answerSpeakingCard").classList.add("hidden");
+      showToast("Reel 1 unlocked! Swipe/tap or pull lever to spin.", "🔓");
+    }
+
+    function lockReel(reelNum) {
+      if (state.unlockedStep !== reelNum || state.reels[reelNum].locked) return;
+
+      state.reels[reelNum].locked = true;
+      sfx.playNeonLock();
+
+      // When Reel 1 locks, dynamically populate Reel 2 with countable vs uncountable nouns
+      if (reelNum === 1) {
+        const chosenStarter = state.reels[1].items[state.reels[1].index].value;
+        state.reels[2].items = chosenStarter === "How many" ? COUNTABLE_FOODS : UNCOUNTABLE_FOODS;
+        state.reels[2].index = 0;
+        renderReel(2, 0);
+      }
+
+      if (reelNum < 3) {
+        state.unlockedStep = reelNum + 1;
+        updateReelVisualStates();
+      } else {
+        state.unlockedStep = 4;
+        updateReelVisualStates();
+        composeQuestionAndAnswer();
+      }
+    }
+
+    function initSlotMachineInteractions() {
+      for (let reelNum = 1; reelNum <= 3; reelNum++) {
+        const container = document.getElementById(`reel${reelNum}Container`);
+        let isDragging = false;
+        let startY = 0;
+        let currentOffset = 0;
+
+        const getClientY = (e) => {
+          if (e.touches && e.touches.length > 0) return e.touches[0].clientY;
+          if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientY;
+          return e.clientY;
+        };
+
+        const onStart = (e) => {
+          if (state.isSpinning) return;
+
+          if (reelNum === 1 && state.reels[1].locked && !state.isRecording) {
+            reopenReel1ForEditing();
+            return;
+          }
+
+          if (state.unlockedStep !== reelNum || state.reels[reelNum].locked) {
+            container.classList.remove("animate-shake");
+            void container.offsetWidth;
+            container.classList.add("animate-shake");
+            if (state.reels[reelNum].locked) {
+              showToast(`Reel ${reelNum} is already set!`, "🔒");
+            } else {
+              showToast(`Locked: Spin Reel ${state.unlockedStep} First!`, "🔒");
+            }
+            return;
+          }
+
+          if (e.cancelable) e.preventDefault();
+          sfx.unlock();
+          isDragging = true;
+          startY = getClientY(e);
+          currentOffset = 0;
+        };
+
+        const onMove = (e) => {
+          if (!isDragging || state.isSpinning) return;
+          if (e.cancelable) e.preventDefault();
+
+          const y = getClientY(e);
+          const dy = y - startY;
+          currentOffset += dy;
+          startY = y;
+
+          if (Math.abs(currentOffset) >= 18) {
+            isDragging = false;
+            renderReel(reelNum, 0);
+            spinReelAutoOneSecond(reelNum);
+            return;
+          }
+
+          renderReel(reelNum, currentOffset);
+        };
+
+        const onEnd = () => {
+          if (!isDragging) return;
+          isDragging = false;
+          renderReel(reelNum, 0);
+          spinReelAutoOneSecond(reelNum);
+        };
+
+        container.addEventListener("touchstart", onStart, { passive: false });
+        container.addEventListener("touchmove", onMove, { passive: false });
+        container.addEventListener("touchend", onEnd);
+        container.addEventListener("touchcancel", onEnd);
+
+        container.addEventListener("mousedown", onStart);
+        window.addEventListener("mousemove", onMove);
+        window.addEventListener("mouseup", onEnd);
+      }
+
+      document.getElementById("reel1ReopenBtn").addEventListener("click", (e) => {
+        e.stopPropagation();
+        reopenReel1ForEditing();
+      });
+
+      document.getElementById("casinoLeverBtn").addEventListener("click", () => {
+        if (state.isSpinning) return;
+        if (state.unlockedStep <= 3) {
+          spinReelAutoOneSecond(state.unlockedStep);
+        } else {
+          showToast("All 3 reels are locked! Speak below or press Reset Spin.", "🎰");
+        }
+      });
+
+      document.getElementById("spinActiveReelBtn").addEventListener("click", () => {
+        if (state.isSpinning) return;
+        if (state.unlockedStep <= 3) {
+          spinReelAutoOneSecond(state.unlockedStep);
+        }
+      });
+    }
+
+    function resetSlotMachine() {
+      stopActiveRecording();
+      state.isSpinning = false;
+      state.unlockedStep = 1;
+      state.reels[1].locked = false;
+      state.reels[2].locked = false;
+      state.reels[3].locked = false;
+      state.reels[2].items = state.reels[1].items[state.reels[1].index].value === "How many"
+        ? COUNTABLE_FOODS
+        : UNCOUNTABLE_FOODS;
+      state.reels[2].index = 0;
+
+      renderReel(1, 0);
+      renderReel(2, 0);
+      renderReel(3, 0);
+      updateReelVisualStates();
+
+      document.getElementById("questionSpeakingCard").classList.add("hidden");
+      document.getElementById("answerSpeakingCard").classList.add("hidden");
+    }
+
+    // =========================================================================
+    // 6. QUESTION & ANSWER COMPOSITION ENGINE
+    // =========================================================================
+    function composeQuestionAndAnswer() {
+      const part1 = state.reels[1].items[state.reels[1].index];
+      const part2 = state.reels[2].items[state.reels[2].index];
+      const part3 = state.reels[3].items[state.reels[3].index];
+
+      const isCountable = part1.value === "How many";
+      const foodWord = isCountable ? part2.plural : part2.word;
+
+      state.currentQuestion = `${part1.value} ${foodWord} ${part3.value}`;
+
+      document.getElementById("composedQuestionText").textContent = state.currentQuestion;
+      document.getElementById("questionGrammarTags").innerHTML = `
+        <span class="px-2.5 py-1 rounded-lg bg-[#ffd166]/20 border border-[#ffd166]/50 text-[#ffd166]">${part1.value}</span>
+        <span class="px-2.5 py-1 rounded-lg bg-[#00f5d4]/20 border border-[#00f5d4]/50 text-[#00f5d4]">${part2.icon} ${foodWord} (${isCountable ? "Countable" : "Uncountable"})</span>
+        <span class="px-2.5 py-1 rounded-lg bg-[#b5179e]/25 border border-[#b5179e]/60 text-[#f5d0fe]">${part3.value}</span>
+      `;
+
+      // Prepare corresponding Stage 2 answer pattern
+      const subject = part3.subject; // I, They, He, She
+      const verb = part3.verb;       // need, needs
+
+      if (isCountable) {
+        const qty = Math.floor(Math.random() * 10) + 1;
+        state.currentAnswer = `${subject} ${verb} ${qty} ${part2.plural}.`;
+        state.answerParts = {
+          isCountable: true,
+          blank1: subject,
+          verb: verb,
+          blank2: String(qty),
+          blank3: part2.plural,
+          icon: part2.icon
+        };
+      } else {
+        // Uncountable noun: Blank (1) = Subject, Blank (3) = "some", Blank (2) = Food noun
+        state.currentAnswer = `${subject} ${verb} some ${part2.word}.`;
+        state.answerParts = {
+          isCountable: false,
+          blank1: subject,
+          verb: verb,
+          blank2: part2.word,
+          blank3: "some",
+          icon: part2.icon
+        };
+      }
+
+      const qCard = document.getElementById("questionSpeakingCard");
+      qCard.classList.remove("hidden");
+      document.getElementById("answerSpeakingCard").classList.add("hidden");
+      qCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function revealAnswerSpeakingStep() {
+      const p = state.answerParts;
+      const ruleHint = document.getElementById("answerPatternRuleHint");
+      const badgesContainer = document.getElementById("answerBlankBadges");
+
+      if (p.isCountable) {
+        ruleHint.textContent = "Countable Pattern: (1) Subject + need/needs + (2) Number 1–10 + (3) Food";
+        badgesContainer.innerHTML = `
+          <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-[#181036] border-2 border-[#00ff87] shadow">
+            <span class="text-xs font-black px-1.5 py-0.5 rounded bg-[#00ff87] text-slate-950">(1)</span>
+            <span>${p.blank1}</span>
+          </span>
+          <span class="px-1.5 py-1 text-slate-300">${p.verb}</span>
+          <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-[#181036] border-2 border-[#ffd166] shadow">
+            <span class="text-xs font-black px-1.5 py-0.5 rounded bg-[#ffd166] text-slate-950">(2)</span>
+            <span class="text-[#ffd166]">${p.blank2}</span>
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-[#181036] border-2 border-[#00f5d4] shadow">
+            <span class="text-xs font-black px-1.5 py-0.5 rounded bg-[#00f5d4] text-slate-950">(3)</span>
+            <span>${p.icon} ${p.blank3}.</span>
+          </span>
+        `;
+      } else {
+        ruleHint.textContent = 'Uncountable Pattern: (1) Subject + need/needs + (3) "some" + (2) Food';
+        badgesContainer.innerHTML = `
+          <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-[#181036] border-2 border-[#00ff87] shadow">
+            <span class="text-xs font-black px-1.5 py-0.5 rounded bg-[#00ff87] text-slate-950">(1)</span>
+            <span>${p.blank1}</span>
+          </span>
+          <span class="px-1.5 py-1 text-slate-300">${p.verb}</span>
+          <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-[#ffd166]/15 border-2 border-[#ffd166] shadow">
+            <span class="text-xs font-black px-1.5 py-0.5 rounded bg-[#ffd166] text-slate-950">(3)</span>
+            <span class="text-[#ffd166]">some</span>
+            <span class="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#ffd166]/20 text-[#ffd166]">uncountable</span>
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-[#181036] border-2 border-[#00f5d4] shadow">
+            <span class="text-xs font-black px-1.5 py-0.5 rounded bg-[#00f5d4] text-slate-950">(2)</span>
+            <span>${p.icon} ${p.blank2}.</span>
+          </span>
+        `;
+      }
+
+      document.getElementById("composedAnswerText").textContent = `"${state.currentAnswer}"`;
+
+      const aCard = document.getElementById("answerSpeakingCard");
+      aCard.classList.remove("hidden");
+      aCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function speakModelSentence(text) {
+      if (!("speechSynthesis" in window)) {
+        showToast("Speech synthesis not supported on this browser.", "🔇");
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      utter.rate = 0.88;
+      window.speechSynthesis.speak(utter);
+    }
+
+    // =========================================================================
+    // 7. BULLETPROOF IPAD SAFARI & DESKTOP AI SPEECH RECORDING ENGINE
+    // =========================================================================
+    const NUM_TO_WORD = {
+      "1": "one", "2": "two", "3": "three", "4": "four", "5": "five",
+      "6": "six", "7": "seven", "8": "eight", "9": "nine", "10": "ten"
+    };
+
+    const STT_VARIANTS = {
+      "for": "four", "fore": "four",
+      "to": "two", "too": "two",
+      "ate": "eight",
+      "won": "one",
+      "tree": "three",
+      "sum": "some", "sun": "some",
+      "knead": "need", "kneads": "needs"
+    };
+
+    function normalizeWords(sentence) {
+      return sentence
+        .toLowerCase()
+        .replace(/[?.!,;:'"()]/g, " ")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((w) => {
+          if (NUM_TO_WORD[w]) return NUM_TO_WORD[w];
+          if (STT_VARIANTS[w]) return STT_VARIANTS[w];
+          return w;
+        });
+    }
+
+    function editDistance(a, b) {
+      const dp = Array.from({ length: b.length + 1 }, (_, i) => [i]);
+      for (let j = 0; j <= a.length; j++) dp[0][j] = j;
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          dp[i][j] = b[i - 1] === a[j - 1]
+            ? dp[i - 1][j - 1]
+            : Math.min(dp[i - 1][j - 1] + 1, dp[i][j - 1] + 1, dp[i - 1][j] + 1);
+        }
+      }
+      return dp[b.length][a.length];
+    }
+
+    function tokenMatchScore(targetWord, spokenWord) {
+      if (targetWord === spokenWord) return 1.0;
+      if (targetWord + "s" === spokenWord || spokenWord + "s" === targetWord) return 0.92;
+      if (targetWord.replace(/ies$/, "y") === spokenWord || spokenWord.replace(/ies$/, "y") === targetWord) return 0.92;
+      const maxLen = Math.max(targetWord.length, spokenWord.length);
+      if (maxLen === 0) return 1.0;
+      return Math.max(0, 1 - editDistance(targetWord, spokenWord) / maxLen);
+    }
+
+    function evaluateSingleTranscript(targetSentence, spokenTranscript) {
+      const rawTargetTokens = targetSentence
+        .replace(/[?.!,;:'"()]/g, " ")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+      const normTarget = normalizeWords(targetSentence);
+      const normSpoken = normalizeWords(spokenTranscript);
+
+      if (normSpoken.length === 0) {
+        return {
+          accuracy: 0,
+          transcript: spokenTranscript,
+          wordChips: rawTargetTokens.map((w) => ({ word: w, matched: false }))
+        };
+      }
+
+      let sumScore = 0;
+      const wordChips = normTarget.map((tWord, idx) => {
+        let best = 0;
+        normSpoken.forEach((sWord) => {
+          const sim = tokenMatchScore(tWord, sWord);
+          if (sim > best) best = sim;
+        });
+        sumScore += best;
+        return {
+          word: rawTargetTokens[idx] || tWord,
+          matched: best >= 0.72
+        };
+      });
+
+      const wordCoverage = sumScore / normTarget.length;
+      const targetStr = normTarget.join(" ");
+      const spokenStr = normSpoken.join(" ");
+      const maxChars = Math.max(targetStr.length, spokenStr.length);
+      const seqSim = maxChars > 0 ? 1 - editDistance(targetStr, spokenStr) / maxChars : 0;
+
+      const lengthPenalty = Math.min(1, normTarget.length / Math.max(normTarget.length, normSpoken.length));
+      const score = Math.round(Math.min(100, Math.max(0, (wordCoverage * 0.72 + seqSim * 0.28) * (0.88 + 0.12 * lengthPenalty) * 100)));
+
+      return {
+        accuracy: score,
+        transcript: spokenTranscript,
+        wordChips
+      };
+    }
+
+    function evaluateBestAlternative(targetSentence, alternativesList) {
+      if (!alternativesList || alternativesList.length === 0) {
+        return evaluateSingleTranscript(targetSentence, "");
+      }
+      let bestEval = null;
+      alternativesList.forEach((alt) => {
+        const res = evaluateSingleTranscript(targetSentence, alt);
+        if (!bestEval || res.accuracy > bestEval.accuracy) {
+          bestEval = res;
+        }
+      });
+      return bestEval;
+    }
+
+    // Active SpeechRecognition Session Controllers
+    let currentRecognition = null;
+    let currentFallbackStream = null;
+    let currentFinishFn = null;
+    let autoStopTimer = null;
+
+    function resetRecordingUI() {
+      state.isRecording = false;
+      state.activeStep = null;
+      currentFinishFn = null;
+      clearTimeout(autoStopTimer);
+
+      const qBtn = document.getElementById("recordQuestionBtn");
+      document.getElementById("recordQuestionIcon").textContent = "🎙️";
+      document.getElementById("recordQuestionLabel").textContent = "Record";
+      qBtn.classList.remove("animate-pulse");
+      document.getElementById("questionRecordingStatus").classList.add("hidden");
+
+      const aBtn = document.getElementById("recordAnswerBtn");
+      document.getElementById("recordAnswerIcon").textContent = "🎙️";
+      document.getElementById("recordAnswerLabel").textContent = "Record";
+      aBtn.classList.remove("animate-pulse");
+      document.getElementById("answerRecordingStatus").classList.add("hidden");
+    }
+
+    function stopActiveRecording() {
+      if (currentFinishFn) {
+        const fn = currentFinishFn;
+        currentFinishFn = null;
+        fn();
+        return;
+      }
+      if (currentRecognition) {
+        try { currentRecognition.abort(); } catch (_) {}
+        currentRecognition = null;
+      }
+      if (currentFallbackStream) {
+        currentFallbackStream.getTracks().forEach((t) => t.stop());
+        currentFallbackStream = null;
+      }
+      resetRecordingUI();
+    }
+
+    /**
+     * Bulletproof iPad Safari Speech Recognition:
+     * 1. Cancels any active speechSynthesis first so iOS audio hardware is free.
+     * 2. Aborts/destroys any prior recognition instance before creating a brand-new one.
+     * 3. Starts synchronously inside the user click/tap gesture.
+     */
+    function startRecordingForStep(stepType) {
+      if (state.isRecording) {
+        if (currentFinishFn) {
+          const fn = currentFinishFn;
+          currentFinishFn = null;
+          fn();
+        } else {
+          stopActiveRecording();
+        }
+        return;
+      }
+
+      // Free iOS Safari hardware audio session if TTS was speaking
+      if ("speechSynthesis" in window) {
+        try { window.speechSynthesis.cancel(); } catch (_) {}
+      }
+
+      // Destroy any lingering previous SpeechRecognition instance
+      if (currentRecognition) {
+        try { currentRecognition.abort(); } catch (_) {}
+        currentRecognition = null;
+      }
+
+      const targetSentence = stepType === "question" ? state.currentQuestion : state.currentAnswer;
+      const isQ = stepType === "question";
+      const btn = document.getElementById(isQ ? "recordQuestionBtn" : "recordAnswerBtn");
+      const iconEl = document.getElementById(isQ ? "recordQuestionIcon" : "recordAnswerIcon");
+      const labelEl = document.getElementById(isQ ? "recordQuestionLabel" : "recordAnswerLabel");
+      const statusBox = document.getElementById(isQ ? "questionRecordingStatus" : "answerRecordingStatus");
+      const statusText = document.getElementById(isQ ? "questionLiveStatusText" : "answerLiveStatusText");
+      const backupBtn = document.getElementById(isQ ? "backupQuestionPracticeBtn" : "backupAnswerPracticeBtn");
+
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (SpeechRec) {
+        try {
+          const recognition = new SpeechRec();
+          recognition.lang = "en-US";
+          recognition.continuous = false;
+          recognition.interimResults = true;
+          recognition.maxAlternatives = 5;
+
+          let finalized = false;
+          let collectedAlternatives = [];
+          let latestInterim = "";
+          let recognitionError = null;
+
+          const finalizeSpeechSession = () => {
+            if (finalized) return;
+            finalized = true;
+            clearTimeout(autoStopTimer);
+
+            try { recognition.stop(); } catch (_) {}
+            currentRecognition = null;
+            resetRecordingUI();
+
+            if (latestInterim && collectedAlternatives.length === 0) {
+              collectedAlternatives.push(latestInterim);
+            }
+
+            if (collectedAlternatives.length === 0 && recognitionError) {
+              backupBtn.classList.remove("hidden");
+              if (recognitionError === "not-allowed" || recognitionError === "service-not-allowed") {
+                showToast("Mic permission blocked by browser. Use 'Practice / Mic Check' or allow mic!", "🎙️");
+              } else {
+                showToast("Didn't catch voice — tap Record again or use 'Practice / Mic Check'!", "🎙️");
+              }
+              return;
+            }
+
+            const bestResult = evaluateBestAlternative(targetSentence, collectedAlternatives);
+            const displayHeard = bestResult.transcript || "(No speech detected — speak closer to the iPad mic)";
+            showAIAnalysisPopup(stepType, targetSentence, displayHeard, bestResult.accuracy, bestResult.wordChips);
+          };
+
+          recognition.onresult = (event) => {
+            let interimStr = "";
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+              const res = event.results[i];
+              if (res.isFinal) {
+                for (let altIdx = 0; altIdx < res.length; altIdx++) {
+                  const t = res[altIdx].transcript.trim();
+                  if (t) collectedAlternatives.push(t);
+                }
+              } else {
+                interimStr += res[0].transcript;
+              }
+            }
+            if (interimStr.trim()) {
+              latestInterim = interimStr.trim();
+              statusText.textContent = `Listening: "${latestInterim}"`;
+            } else if (collectedAlternatives.length > 0) {
+              statusText.textContent = `Heard: "${collectedAlternatives[0]}"`;
+            }
+          };
+
+          recognition.onerror = (ev) => {
+            recognitionError = ev.error || "speech-error";
+            if (recognitionError === "not-allowed" || recognitionError === "service-not-allowed") {
+              finalizeSpeechSession();
+            }
+          };
+
+          recognition.onend = () => {
+            finalizeSpeechSession();
+          };
+
+          // Start synchronously inside user click/tap
+          recognition.start();
+          sfx.playMicCue();
+
+          state.isRecording = true;
+          state.activeStep = stepType;
+          currentRecognition = recognition;
+          currentFinishFn = finalizeSpeechSession;
+
+          iconEl.textContent = "⏹️";
+          labelEl.textContent = "Stop & Check";
+          btn.classList.add("animate-pulse");
+          statusText.textContent = "Listening... Speak clearly now!";
+          statusBox.classList.remove("hidden");
+
+          // 6.0-second auto-stop watchdog timer
+          autoStopTimer = setTimeout(finalizeSpeechSession, 6000);
+          return;
+        } catch (_) {
+          // Fall through to Web Audio VAD fallback
+        }
+      }
+
+      startWebAudioFallback(stepType, targetSentence, btn, iconEl, labelEl, statusBox, statusText, backupBtn);
+    }
+
+    async function startWebAudioFallback(stepType, targetSentence, btn, iconEl, labelEl, statusBox, statusText, backupBtn) {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        backupBtn.classList.remove("hidden");
+        showToast("Speech API unavailable here. Tap 'Practice / Mic Check' to continue!", "🎧");
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        sfx.unlock();
+        sfx.playMicCue();
+
+        state.isRecording = true;
+        state.activeStep = stepType;
+        currentFallbackStream = stream;
+
+        iconEl.textContent = "⏹️";
+        labelEl.textContent = "Stop & Check";
+        btn.classList.add("animate-pulse");
+        statusText.textContent = "Listening via Mic... Speak your sentence aloud!";
+        statusBox.classList.remove("hidden");
+
+        const audioCtx = sfx.ctx || new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        const data = new Uint8Array(analyser.frequencyBinCount);
+
+        let activeFrames = 0;
+        let totalFrames = 0;
+        let finalized = false;
+
+        const sample = () => {
+          if (!state.isRecording || finalized) return;
+          analyser.getByteFrequencyData(data);
+          const avg = data.reduce((a, b) => a + b, 0) / data.length;
+          totalFrames++;
+          if (avg > 14) activeFrames++;
+          requestAnimationFrame(sample);
+        };
+        sample();
+
+        const finalizeFallback = () => {
+          if (finalized) return;
+          finalized = true;
+          clearTimeout(autoStopTimer);
+          stream.getTracks().forEach((t) => t.stop());
+          currentFallbackStream = null;
+          resetRecordingUI();
+
+          const ratio = totalFrames > 0 ? activeFrames / totalFrames : 0;
+          const accuracy = activeFrames > 18 ? Math.min(92, Math.round(62 + ratio * 45)) : 35;
+          const evalRes = evaluateSingleTranscript(targetSentence, activeFrames > 18 ? targetSentence : "");
+          const heardMsg = activeFrames > 18
+            ? `${targetSentence} (Voice energy verified)`
+            : "(Low microphone volume — speak louder or use Practice / Mic Check)";
+          showAIAnalysisPopup(stepType, targetSentence, heardMsg, accuracy, evalRes.wordChips);
+        };
+
+        currentFinishFn = finalizeFallback;
+        autoStopTimer = setTimeout(finalizeFallback, 4500);
+      } catch (_) {
+        backupBtn.classList.remove("hidden");
+        resetRecordingUI();
+        showToast("Microphone blocked in browser. Use 'Practice / Mic Check' to continue!", "🎧");
+      }
+    }
+
+    function runBackupPracticeCheck(stepType) {
+      const targetSentence = stepType === "question" ? state.currentQuestion : state.currentAnswer;
+      const evalRes = evaluateSingleTranscript(targetSentence, targetSentence);
+      showAIAnalysisPopup(
+        stepType,
+        targetSentence,
+        `${targetSentence} (Practice Check)`,
+        85,
+        evalRes.wordChips
+      );
+    }
+
+    // =========================================================================
+    // 8. AI ANALYSIS POP-UP MODAL (GREEN / YELLOW / ORANGE)
+    // =========================================================================
+    function showAIAnalysisPopup(stepType, targetSentence, heardTranscript, accuracy, wordChips) {
+      const modal = document.getElementById("analysisModal");
+      const box = document.getElementById("analysisBox");
+      const emoji = document.getElementById("analysisEmoji");
+      const headline = document.getElementById("analysisHeadline");
+      const percentEl = document.getElementById("analysisPercent");
+      const targetEl = document.getElementById("analysisTargetText");
+      const chipsEl = document.getElementById("analysisWordChips");
+      const heardRawEl = document.getElementById("analysisHeardRaw");
+      const actionsEl = document.getElementById("analysisActions");
+
+      percentEl.textContent = `${accuracy}%`;
+      targetEl.textContent = targetSentence;
+      heardRawEl.textContent = `Heard: "${heardTranscript}"`;
+
+      chipsEl.innerHTML = (wordChips || [])
+        .map((c) => {
+          const style = c.matched
+            ? "bg-emerald-500/25 border-emerald-400 text-emerald-200"
+            : "bg-rose-500/25 border-rose-400 text-rose-200";
+          return `<span class="px-2.5 py-1 rounded-lg border text-xs sm:text-sm font-extrabold ${style}">${escapeHTML(c.word)}</span>`;
+        })
+        .join("");
+
+      let pointsEarned = 0;
+      let ratingLabel = "Keep practicing";
+
+      // Exact Grading Thresholds:
+      // > 75%: Green pop-up box -> "Excellent +3"
+      // > 50% (51-75%): Yellow pop-up box -> "Good job +2"
+      // <= 50%: Orange pop-up box -> "Keep practicing"
+      if (accuracy > 75) {
+        pointsEarned = 3;
+        ratingLabel = "Excellent +3";
+        box.className = "w-full max-w-md rounded-3xl p-6 sm:p-7 shadow-[0_0_50px_rgba(16,185,129,0.65)] border-4 text-center animate-pop bg-emerald-500 border-emerald-200 text-white";
+        emoji.textContent = "🏆";
+        headline.textContent = "Excellent +3";
+        sfx.playJackpot();
+        launchConfetti();
+      } else if (accuracy > 50) {
+        pointsEarned = 2;
+        ratingLabel = "Good job +2";
+        box.className = "w-full max-w-md rounded-3xl p-6 sm:p-7 shadow-[0_0_50px_rgba(250,204,21,0.65)] border-4 text-center animate-pop bg-amber-400 border-amber-100 text-slate-950";
+        emoji.textContent = "⭐";
+        headline.textContent = "Good job +2";
+        sfx.playGoodJob();
+        launchConfetti();
+      } else {
+        pointsEarned = 0;
+        ratingLabel = "Keep practicing";
+        box.className = "w-full max-w-md rounded-3xl p-6 sm:p-7 shadow-[0_0_50px_rgba(249,115,22,0.65)] border-4 text-center animate-pop bg-orange-500 border-orange-200 text-white";
+        emoji.textContent = "💪";
+        headline.textContent = "Keep practicing";
+        sfx.playTryAgain();
+      }
+
+      if (pointsEarned > 0) {
+        state.studentScore += pointsEarned;
+        document.getElementById("headerStudentScore").textContent = state.studentScore;
+      }
+
+      if (stepType === "question") {
+        state.questionAccuracy = accuracy;
+        state.questionLabel = ratingLabel;
+        state.questionPoints = pointsEarned;
+
+        if (accuracy <= 50) {
+          actionsEl.innerHTML = `
+            <button id="popupTryAgainBtn" type="button" class="min-h-[52px] px-5 py-3 rounded-2xl bg-white text-orange-700 font-display font-bold text-base sm:text-lg shadow hover:bg-orange-50 active:scale-95 transition cursor-pointer">
+              🔄 Try Again
+            </button>
+            <button id="popupNextStageBtn" type="button" class="min-h-[52px] px-5 py-3 rounded-2xl bg-slate-950 text-white font-display font-bold text-base sm:text-lg shadow hover:bg-slate-900 active:scale-95 transition cursor-pointer">
+              Next: Answer ➔
+            </button>
+          `;
+        } else {
+          actionsEl.innerHTML = `
+            <button id="popupNextStageBtn" type="button" class="min-h-[54px] w-full py-3.5 px-6 rounded-2xl bg-slate-950 text-white font-display font-bold text-lg sm:text-xl shadow hover:bg-slate-900 active:scale-95 transition cursor-pointer">
+              Next: Speak the Answer ➔
+            </button>
+          `;
+        }
+
+        const tryBtn = document.getElementById("popupTryAgainBtn");
+        if (tryBtn) {
+          tryBtn.onclick = () => {
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+          };
+        }
+
+        document.getElementById("popupNextStageBtn").onclick = () => {
+          modal.classList.add("hidden");
+          modal.classList.remove("flex");
+          revealAnswerSpeakingStep();
+        };
+      } else {
+        // Stage 2 completed -> Save round to Firebase & show SPIN NEXT ROUND
+        state.answerAccuracy = accuracy;
+        state.answerLabel = ratingLabel;
+        state.answerPoints = pointsEarned;
+
+        if (accuracy <= 50) {
+          actionsEl.innerHTML = `
+            <button id="popupTryAgainBtn" type="button" class="min-h-[52px] px-5 py-3 rounded-2xl bg-white text-orange-700 font-display font-bold text-base sm:text-lg shadow hover:bg-orange-50 active:scale-95 transition cursor-pointer">
+              🔄 Try Again
+            </button>
+            <button id="popupNextSpinBtn" type="button" class="min-h-[52px] px-5 py-3 rounded-2xl bg-slate-950 text-[#ffd166] font-casino font-black text-sm sm:text-base shadow hover:bg-slate-900 active:scale-95 transition cursor-pointer">
+              SPIN NEXT ROUND 🎰
+            </button>
+          `;
+        } else {
+          actionsEl.innerHTML = `
+            <button id="popupNextSpinBtn" type="button" class="min-h-[56px] w-full py-3.5 px-6 rounded-2xl bg-slate-950 text-[#ffd166] font-casino font-black text-base sm:text-lg tracking-wide shadow hover:bg-slate-900 active:scale-95 transition cursor-pointer">
+              SPIN NEXT ROUND 🎰
+            </button>
+          `;
+        }
+
+        const tryBtn = document.getElementById("popupTryAgainBtn");
+        if (tryBtn) {
+          tryBtn.onclick = () => {
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+          };
+        }
+
+        document.getElementById("popupNextSpinBtn").onclick = () => {
+          modal.classList.add("hidden");
+          modal.classList.remove("flex");
+          saveRoundAndSync();
+          resetSlotMachine();
+        };
+      }
+
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    // =========================================================================
+    // 9. LIVE FIREBASE RANKING & CONVERSATION DASHBOARD
+    //    Endpoint: https://kate-98c3e-default-rtdb.firebaseio.com/casino_grammar
+    // =========================================================================
+    let firebaseEventSource = null;
+    let firebasePollInterval = null;
+    let broadcastChannel = null;
+
+    function getActiveFirebaseUrl() {
+      const saved = localStorage.getItem(STORAGE_KEY_FB_URL);
+      const raw = (saved && saved.trim() ? saved : FIREBASE_DB_URL).trim().replace(/\/+$/, "");
+      return raw || FIREBASE_DB_URL;
+    }
+
+    function getStudentFirebaseKey(name) {
+      return encodeURIComponent(String(name || "player").trim().toLowerCase().replace(/[.#$\[\]/]/g, "_"));
+    }
+
+    function loadLocalCacheState() {
+      try {
+        const storedStudents = JSON.parse(localStorage.getItem(STORAGE_KEY_STUDENTS) || "null");
+        const storedFeed = JSON.parse(localStorage.getItem(STORAGE_KEY_FEED) || "null");
+        if (storedStudents && typeof storedStudents === "object") {
+          state.studentsMap = storedStudents;
+        }
+        if (Array.isArray(storedFeed)) {
+          state.conversations = storedFeed;
+        }
+      } catch (_) {}
+    }
+
+    function persistLocalCacheState() {
+      try {
+        localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(state.studentsMap));
+        localStorage.setItem(STORAGE_KEY_FEED, JSON.stringify(state.conversations.slice(0, 50)));
+      } catch (_) {}
+      if (broadcastChannel) {
+        try {
+          broadcastChannel.postMessage({
+            type: "SYNC_CLASSROOM",
+            studentsMap: state.studentsMap,
+            conversations: state.conversations
+          });
+        } catch (_) {}
+      }
+    }
+
+    function setSyncBadgeState(mode, label) {
+      const dot = document.getElementById("syncStatusDot");
+      const text = document.getElementById("syncStatusText");
+      text.textContent = label;
+      if (mode === "live") {
+        dot.className = "w-2 h-2 rounded-full bg-[#00ff87] animate-ping";
+      } else if (mode === "syncing") {
+        dot.className = "w-2 h-2 rounded-full bg-[#ffd166] animate-pulse";
+      } else {
+        dot.className = "w-2 h-2 rounded-full bg-[#ff2a85]";
+      }
+    }
+
+    function connectRealtimeSync() {
+      if (firebaseEventSource) {
+        firebaseEventSource.close();
+        firebaseEventSource = null;
+      }
+      clearInterval(firebasePollInterval);
+
+      const fbUrl = getActiveFirebaseUrl();
+      state.firebaseUrl = fbUrl;
+
+      let shortHost = "kate-98c3e";
+      try {
+        shortHost = new URL(fbUrl).hostname.split(".")[0] || "kate-98c3e";
+      } catch (_) {}
+
+      setSyncBadgeState("syncing", `CONNECTING: ${shortHost}`);
+      loadLocalCacheState();
+      renderDashboard();
+
+      // Immediate initial GET fetch
+      pullFromFirebaseREST(fbUrl, shortHost);
+
+      // Real-time Server-Sent Events (EventSource) stream on /casino_grammar.json
+      if ("EventSource" in window) {
+        try {
+          const stream = new EventSource(`${fbUrl}/casino_grammar.json`);
+          const handleStreamEvent = () => {
+            pullFromFirebaseREST(fbUrl, shortHost);
+          };
+          stream.addEventListener("put", handleStreamEvent);
+          stream.addEventListener("patch", handleStreamEvent);
+          stream.onopen = () => {
+            setSyncBadgeState("live", `LIVE: ${shortHost}`);
+          };
+          stream.onerror = () => {
+            // Polling fallback remains active seamlessly
+          };
+          firebaseEventSource = stream;
+        } catch (_) {}
+      }
+
+      // 2.5-second polling fallback so all iPads stay synchronized in real time
+      firebasePollInterval = setInterval(() => pullFromFirebaseREST(fbUrl, shortHost), 2500);
+    }
+
+    async function pullFromFirebaseREST(fbUrl, shortHost = "kate-98c3e") {
+      try {
+        const res = await fetch(`${fbUrl}/casino_grammar.json`);
+        if (!res.ok) {
+          setSyncBadgeState("offline", "LOCAL CACHE");
+          return;
+        }
+        setSyncBadgeState("live", `LIVE: ${shortHost}`);
+        const root = await res.json();
+
+        if (!root || typeof root !== "object") {
+          state.studentsMap = {};
+          state.conversations = [];
+          persistLocalCacheState();
+          renderDashboard();
+          return;
+        }
+
+        if (root.students && typeof root.students === "object") {
+          state.studentsMap = root.students;
+          const myKey = state.studentName ? getStudentFirebaseKey(state.studentName) : "";
+          if (myKey && state.studentsMap[myKey]) {
+            const remote = state.studentsMap[myKey];
+            if ((remote.score || 0) > state.studentScore) {
+              state.studentScore = remote.score;
+              document.getElementById("headerStudentScore").textContent = state.studentScore;
+            }
+            if ((remote.rounds || 0) > state.roundsCompleted) {
+              state.roundsCompleted = remote.rounds;
+              document.getElementById("headerRoundsCount").textContent = state.roundsCompleted;
+            }
+          }
+        } else {
+          state.studentsMap = {};
+        }
+
+        if (root.conversations && typeof root.conversations === "object") {
+          const list = Object.entries(root.conversations).map(([id, item]) => ({ id, ...item }));
+          list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+          state.conversations = list.slice(0, 50);
+        } else {
+          state.conversations = [];
+        }
+
+        persistLocalCacheState();
+        renderDashboard();
+      } catch (_) {
+        setSyncBadgeState("offline", "LOCAL CACHE");
+      }
+    }
+
+    async function patchStudentToFirebase(studentKey, studentPayload) {
+      const fbUrl = getActiveFirebaseUrl();
+      try {
+        await fetch(`${fbUrl}/casino_grammar/students/${studentKey}.json`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(studentPayload)
+        });
+      } catch (_) {}
+    }
+
+    async function postConversationToFirebase(dialoguePayload) {
+      const fbUrl = getActiveFirebaseUrl();
+      try {
+        await fetch(`${fbUrl}/casino_grammar/conversations.json`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dialoguePayload)
+        });
+      } catch (_) {}
+    }
+
+    function saveRoundAndSync() {
+      state.roundsCompleted += 1;
+      document.getElementById("headerRoundsCount").textContent = state.roundsCompleted;
+
+      const avgAcc = Math.round((state.questionAccuracy + state.answerAccuracy) / 2);
+      state.lastAccuracy = avgAcc;
+
+      const studentKey = getStudentFirebaseKey(state.studentName);
+      const studentRecord = {
+        name: state.studentName,
+        seat: state.studentSeat,
+        chip: state.studentChip,
+        score: state.studentScore,
+        rounds: state.roundsCompleted,
+        lastAccuracy: avgAcc,
+        lastQ: state.currentQuestion,
+        lastA: state.currentAnswer,
+        updatedAt: Date.now()
+      };
+
+      const dialogueRecord = {
+        id: `round-${Date.now()}`,
+        student: state.studentName,
+        seat: state.studentSeat,
+        chip: state.studentChip,
+        question: state.currentQuestion,
+        qAccuracy: state.questionAccuracy,
+        qLabel: state.questionLabel,
+        answer: state.currentAnswer,
+        aAccuracy: state.answerAccuracy,
+        aLabel: state.answerLabel,
+        pointsEarned: state.questionPoints + state.answerPoints,
+        timestamp: Date.now()
+      };
+
+      state.studentsMap[studentKey] = studentRecord;
+      state.conversations.unshift(dialogueRecord);
+      state.conversations = state.conversations.slice(0, 50);
+
+      persistLocalCacheState();
+      renderDashboard();
+
+      // Sync both student record (PATCH) and conversation round (POST) to Firebase
+      patchStudentToFirebase(studentKey, studentRecord);
+      postConversationToFirebase(dialogueRecord);
+    }
+
+    function renderDashboard() {
+      // 1. Render Live Student Ranking Leaderboard
+      const leaderboardEl = document.getElementById("leaderboardList");
+      const sorted = Object.values(state.studentsMap)
+        .filter((s) => s && s.name)
+        .sort((a, b) => (b.score || 0) - (a.score || 0) || (b.lastAccuracy || 0) - (a.lastAccuracy || 0));
+
+      document.getElementById("playerCountBadge").textContent = `${sorted.length} player${sorted.length === 1 ? "" : "s"}`;
+
+      if (sorted.length === 0) {
+        leaderboardEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-5">No players on the board yet — enter your name and spin to claim #1!</p>`;
+      } else {
+        leaderboardEl.innerHTML = sorted
+          .map((student, idx) => {
+            const rank = idx + 1;
+            let rankBadge = `<span class="w-7 h-7 rounded-xl bg-white/10 text-slate-300 font-extrabold text-xs flex items-center justify-center">#${rank}</span>`;
+            if (rank === 1) rankBadge = `<span class="text-2xl leading-none drop-shadow-[0_0_8px_rgba(255,209,102,0.85)]">🥇</span>`;
+            if (rank === 2) rankBadge = `<span class="text-2xl leading-none">🥈</span>`;
+            if (rank === 3) rankBadge = `<span class="text-2xl leading-none">🥉</span>`;
+
+            const isMe = state.studentName && student.name.toLowerCase() === state.studentName.toLowerCase();
+            const cardStyle = isMe
+              ? "bg-[#1e1442] border-2 border-[#00f5d4] shadow-[0_0_15px_rgba(0,245,212,0.22)]"
+              : "bg-[#090616]/90 border border-white/10";
+
+            const accPill = student.lastAccuracy
+              ? `<span class="px-1.5 py-0.5 rounded bg-white/10 text-[#00f5d4] text-[10px] font-extrabold">${student.lastAccuracy}% avg</span>`
+              : "";
+
+            return `
+              <div class="p-3 rounded-2xl ${cardStyle} flex items-center justify-between gap-2 transition">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <div class="w-8 flex items-center justify-center shrink-0">${rankBadge}</div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="text-base leading-none">${student.chip || "🎰"}</span>
+                      <span class="font-extrabold text-white text-sm truncate">${escapeHTML(student.name)}</span>
+                      ${student.seat ? `<span class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300 text-[10px] font-bold">${escapeHTML(student.seat)}</span>` : ""}
+                      ${isMe ? '<span class="px-1.5 py-0.5 rounded bg-[#00f5d4] text-slate-950 text-[10px] font-black">YOU</span>' : ""}
+                      ${accPill}
+                    </div>
+                    <p class="text-[11px] text-slate-400 truncate mt-0.5">
+                      ${student.rounds || 0} round${(student.rounds || 0) === 1 ? "" : "s"} • ${student.lastQ ? `"${escapeHTML(student.lastQ)}"` : "Checked in & spinning"}
+                    </p>
+                  </div>
+                </div>
+                <div class="shrink-0 px-3 py-1 rounded-xl bg-gradient-to-r from-[#ffd166] to-[#f59e0b] text-slate-950 font-casino font-black text-xs sm:text-sm">
+                  🪙 ${student.score || 0}
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      // 2. Render Live Student Conversation Feed
+      const feedEl = document.getElementById("conversationFeedList");
+      document.getElementById("feedCountBadge").textContent = `${state.conversations.length} dialogue${state.conversations.length === 1 ? "" : "s"}`;
+
+      if (state.conversations.length === 0) {
+        feedEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-5">Completed Q&amp;A speaking rounds will stream live here!</p>`;
+        return;
+      }
+
+      feedEl.innerHTML = state.conversations
+        .map((item) => {
+          const ptsTag = typeof item.pointsEarned === "number"
+            ? `<span class="px-2 py-0.5 rounded-full bg-[#ffd166]/20 text-[#ffd166] font-extrabold text-[10px]">+${item.pointsEarned} pts</span>`
+            : "";
+
+          const qBadgeColor = (item.qAccuracy || 0) > 75
+            ? "text-emerald-300"
+            : (item.qAccuracy || 0) > 50
+              ? "text-amber-300"
+              : "text-orange-300";
+
+          const aBadgeColor = (item.aAccuracy || 0) > 75
+            ? "text-emerald-300"
+            : (item.aAccuracy || 0) > 50
+              ? "text-amber-300"
+              : "text-orange-300";
+
+          return `
+            <div class="p-3 rounded-2xl bg-[#090616]/90 border border-white/10 space-y-1.5 text-xs sm:text-sm">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-extrabold text-[#ff85b8] flex items-center gap-1.5">
+                  <span>${item.chip || "🎰"}</span>
+                  <span>${escapeHTML(item.student)}</span>
+                  ${item.seat ? `<span class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300 text-[10px]">${escapeHTML(item.seat)}</span>` : ""}
+                </span>
+                ${ptsTag}
+              </div>
+              <div class="text-slate-200 leading-snug">
+                <span class="font-extrabold text-[#00f5d4]">Q:</span> "${escapeHTML(item.question)}"
+                <span class="text-[11px] font-bold ${qBadgeColor}">(${item.qAccuracy}%${item.qLabel ? ` • ${escapeHTML(item.qLabel)}` : ""})</span>
+              </div>
+              <div class="text-slate-200 leading-snug">
+                <span class="font-extrabold text-[#00ff87]">A:</span> "${escapeHTML(item.answer)}"
+                <span class="text-[11px] font-bold ${aBadgeColor}">(${item.aAccuracy}%${item.aLabel ? ` • ${escapeHTML(item.aLabel)}` : ""})</span>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function escapeHTML(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    // =========================================================================
+    // 10. INITIALIZATION & UI EVENT WIRING
+    // =========================================================================
+    function initApp() {
+      if ("BroadcastChannel" in window) {
+        broadcastChannel = new BroadcastChannel("casino_grammar_slots_live_channel");
+        broadcastChannel.onmessage = (ev) => {
+          if (ev.data && ev.data.type === "SYNC_CLASSROOM") {
+            state.studentsMap = ev.data.studentsMap || state.studentsMap;
+            state.conversations = ev.data.conversations || state.conversations;
+            renderDashboard();
+          }
+        };
+      }
+
+      renderReel(1, 0);
+      renderReel(2, 0);
+      renderReel(3, 0);
+      updateReelVisualStates();
+      initSlotMachineInteractions();
+      connectRealtimeSync();
+
+      // Lucky Avatar Chip Selector in Pre-Game Modal
+      document.querySelectorAll(".chip-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".chip-btn").forEach((b) => {
+            b.className = "chip-btn min-h-[48px] rounded-2xl bg-[#130b29] border-2 border-slate-700 hover:border-[#ffd166] text-2xl flex items-center justify-center cursor-pointer";
+          });
+          btn.className = "chip-btn min-h-[48px] rounded-2xl bg-[#24164a] border-2 border-[#00f5d4] text-2xl flex items-center justify-center shadow-[0_0_12px_rgba(0,245,212,0.4)] cursor-pointer";
+          state.studentChip = btn.dataset.chip;
+          sfx.playRatchetClick();
+        });
+      });
+
+      // Pre-Game Check-In Form
+      const startForm = document.getElementById("startForm");
+      const nameInput = document.getElementById("studentNameInput");
+      const seatInput = document.getElementById("studentSeatInput");
+      const nameErrorHint = document.getElementById("nameErrorHint");
+
+      startForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const rawName = nameInput.value.trim();
+        const rawSeat = seatInput.value.trim();
+        if (!rawName) {
+          nameErrorHint.classList.remove("hidden");
+          const card = document.getElementById("startCard");
+          card.classList.remove("animate-shake");
+          void card.offsetWidth;
+          card.classList.add("animate-shake");
+          nameInput.focus();
+          return;
+        }
+
+        nameErrorHint.classList.add("hidden");
+        sfx.unlock();
+        sfx.playNeonLock();
+
+        state.studentName = rawName;
+        state.studentSeat = rawSeat;
+        const studentKey = getStudentFirebaseKey(rawName);
+
+        if (state.studentsMap[studentKey]) {
+          state.studentScore = state.studentsMap[studentKey].score || 0;
+          state.roundsCompleted = state.studentsMap[studentKey].rounds || 0;
+          state.studentsMap[studentKey].name = rawName;
+          state.studentsMap[studentKey].chip = state.studentChip;
+          if (rawSeat) state.studentsMap[studentKey].seat = rawSeat;
+        } else {
+          state.studentScore = 0;
+          state.roundsCompleted = 0;
+          state.studentsMap[studentKey] = {
+            name: rawName,
+            seat: rawSeat,
+            chip: state.studentChip,
+            score: 0,
+            rounds: 0,
+            lastAccuracy: 0,
+            lastQ: "",
+            lastA: "",
+            updatedAt: Date.now()
+          };
+        }
+
+        document.getElementById("headerStudentName").textContent = rawName;
+        const headerSeatEl = document.getElementById("headerStudentSeat");
+        if (rawSeat) {
+          headerSeatEl.textContent = rawSeat;
+          headerSeatEl.classList.remove("hidden");
+        } else {
+          headerSeatEl.classList.add("hidden");
+        }
+        document.getElementById("headerChipIcon").textContent = state.studentChip;
+        document.getElementById("headerRoundsCount").textContent = state.roundsCompleted;
+        document.getElementById("headerStudentScore").textContent = state.studentScore;
+
+        document.getElementById("startModal").classList.add("hidden");
+        persistLocalCacheState();
+        renderDashboard();
+
+        // Immediately register/sync student to Firebase via PATCH
+        patchStudentToFirebase(studentKey, state.studentsMap[studentKey]);
+      });
+
+      // Switch Student Button
+      document.getElementById("switchStudentBtn").addEventListener("click", () => {
+        stopActiveRecording();
+        nameInput.value = "";
+        seatInput.value = "";
+        nameErrorHint.classList.add("hidden");
+        document.getElementById("startModal").classList.remove("hidden");
+        setTimeout(() => nameInput.focus(), 100);
+      });
+
+      // Mute / Unmute Toggle
+      document.getElementById("muteToggleBtn").addEventListener("click", () => {
+        sfx.muted = !sfx.muted;
+        document.getElementById("muteIcon").textContent = sfx.muted ? "🔇" : "🔊";
+        showToast(sfx.muted ? "Casino sound muted" : "Casino sound enabled!", sfx.muted ? "🔇" : "🔊");
+      });
+
+      // Reset Spin Button
+      document.getElementById("resetMachineBtn").addEventListener("click", () => {
+        sfx.playRatchetClick();
+        resetSlotMachine();
+        showToast("Machine reset! Spin Reel 1 to start.", "🎰");
+      });
+
+      // Model Pronunciation Audio Buttons
+      document.getElementById("listenQuestionBtn").addEventListener("click", () => {
+        speakModelSentence(state.currentQuestion);
+      });
+      document.getElementById("listenAnswerBtn").addEventListener("click", () => {
+        speakModelSentence(state.currentAnswer);
+      });
+
+      // Stage 1 & Stage 2 Record Buttons
+      document.getElementById("recordQuestionBtn").addEventListener("click", () => {
+        startRecordingForStep("question");
+      });
+      document.getElementById("recordAnswerBtn").addEventListener("click", () => {
+        startRecordingForStep("answer");
+      });
+
+      // Backup Practice / Mic Check Buttons
+      document.getElementById("backupQuestionPracticeBtn").addEventListener("click", () => {
+        runBackupPracticeCheck("question");
+      });
+      document.getElementById("backupAnswerPracticeBtn").addEventListener("click", () => {
+        runBackupPracticeCheck("answer");
+      });
+
+      // Teacher Firebase Setup & Diagnostics Modal Controls
+      const fbModal = document.getElementById("firebaseModal");
+      const fbInput = document.getElementById("firebaseUrlInput");
+      const fbTestResult = document.getElementById("firebaseTestResult");
+      const armClearBtn = document.getElementById("armClearBoardBtn");
+      const confirmClearBtn = document.getElementById("confirmClearBoardBtn");
+
+      document.getElementById("openFirebaseModalBtn").addEventListener("click", () => {
+        fbInput.value = getActiveFirebaseUrl();
+        fbTestResult.classList.add("hidden");
+        confirmClearBtn.classList.add("hidden");
+        fbModal.classList.remove("hidden");
+        fbModal.classList.add("flex");
+      });
+
+      document.getElementById("closeFirebaseModalBtn").addEventListener("click", () => {
+        fbModal.classList.add("hidden");
+        fbModal.classList.remove("flex");
+      });
+
+      document.getElementById("testFirebaseBtn").addEventListener("click", async () => {
+        const testUrl = (fbInput.value.trim() || getActiveFirebaseUrl()).replace(/\/+$/, "");
+        fbTestResult.classList.remove("hidden");
+        fbTestResult.className = "px-3.5 py-2.5 rounded-xl bg-[#06040e] border border-[#ffd166]/50 text-xs font-bold text-[#ffd166]";
+        fbTestResult.textContent = "⏳ Testing read & write connection to Firebase...";
+
+        const t0 = performance.now();
+        try {
+          const pingRes = await fetch(`${testUrl}/casino_grammar/_ping.json`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ok: true, ts: Date.now() })
+          });
+          const ms = Math.round(performance.now() - t0);
+          if (pingRes.ok) {
+            fbTestResult.className = "px-3.5 py-2.5 rounded-xl bg-emerald-950/70 border border-emerald-400 text-xs font-bold text-emerald-300";
+            fbTestResult.textContent = `✅ Connected! Live read/write verified in ${ms}ms.`;
+          } else {
+            fbTestResult.className = "px-3.5 py-2.5 rounded-xl bg-rose-950/70 border border-rose-400 text-xs font-bold text-rose-300";
+            fbTestResult.textContent = `⚠️ HTTP ${pingRes.status}: Check Firebase Realtime Database Rules (read/write).`;
+          }
+        } catch (_) {
+          fbTestResult.className = "px-3.5 py-2.5 rounded-xl bg-rose-950/70 border border-rose-400 text-xs font-bold text-rose-300";
+          fbTestResult.textContent = "⚠️ Network error reaching Firebase URL. Check Wi-Fi or URL.";
+        }
+      });
+
+      document.getElementById("resetDefaultFirebaseBtn").addEventListener("click", () => {
+        localStorage.removeItem(STORAGE_KEY_FB_URL);
+        fbInput.value = FIREBASE_DB_URL;
+        showToast("Restored default Firebase URL!", "🔥");
+      });
+
+      document.getElementById("saveFirebaseBtn").addEventListener("click", () => {
+        const clean = fbInput.value.trim().replace(/\/+$/, "");
+        if (clean) {
+          localStorage.setItem(STORAGE_KEY_FB_URL, clean);
+        } else {
+          localStorage.removeItem(STORAGE_KEY_FB_URL);
+        }
+        fbModal.classList.add("hidden");
+        fbModal.classList.remove("flex");
+        connectRealtimeSync();
+        showToast("Firebase Live Sync updated!", "🔥");
+      });
+
+      // Two-step inline clear board confirmation (no confirm()/alert())
+      armClearBtn.addEventListener("click", () => {
+        confirmClearBtn.classList.remove("hidden");
+        showToast("Tap 'Confirm Clear All' to wipe leaderboard & feed.", "⚠️");
+      });
+
+      confirmClearBtn.addEventListener("click", async () => {
+        const fbUrl = getActiveFirebaseUrl();
+        confirmClearBtn.classList.add("hidden");
+        try {
+          await fetch(`${fbUrl}/casino_grammar.json`, { method: "DELETE" });
+        } catch (_) {}
+
+        state.studentsMap = {};
+        state.conversations = [];
+        state.studentScore = 0;
+        state.roundsCompleted = 0;
+        document.getElementById("headerStudentScore").textContent = "0";
+        document.getElementById("headerRoundsCount").textContent = "0";
+
+        if (state.studentName) {
+          const myKey = getStudentFirebaseKey(state.studentName);
+          state.studentsMap[myKey] = {
+            name: state.studentName,
+            seat: state.studentSeat,
+            chip: state.studentChip,
+            score: 0,
+            rounds: 0,
+            lastAccuracy: 0,
+            lastQ: "",
+            lastA: "",
+            updatedAt: Date.now()
+          };
+          patchStudentToFirebase(myKey, state.studentsMap[myKey]);
+        }
+
+        persistLocalCacheState();
+        renderDashboard();
+        fbModal.classList.add("hidden");
+        fbModal.classList.remove("flex");
+        showToast("Classroom leaderboard & conversations cleared!", "🧹");
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", initApp);
+  </script>
+</body>
+</html>
