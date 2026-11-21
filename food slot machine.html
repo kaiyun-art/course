@@ -1,0 +1,3552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Supermarket Price Slots • Grade 6 ESL Speaking Game</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Cheerful Supermarket & Kid-Friendly Display Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --font-display: 'Fredoka', cursive, sans-serif;
+      --font-body: 'Nunito', sans-serif;
+    }
+
+    * {
+      touch-action: manipulation;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: #fffbeb;
+      background-image:
+        radial-gradient(circle at 12% 14%, rgba(251, 191, 36, 0.28) 0%, transparent 40%),
+        radial-gradient(circle at 88% 16%, rgba(52, 211, 153, 0.26) 0%, transparent 42%),
+        radial-gradient(circle at 50% 92%, rgba(56, 189, 248, 0.22) 0%, transparent 48%),
+        linear-gradient(170deg, #fffbeb 0%, #f0fdf4 52%, #ecfeff 100%);
+      color: #1e293b;
+      min-height: 100vh;
+      padding-bottom: env(safe-area-inset-bottom);
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .font-display {
+      font-family: var(--font-display);
+    }
+
+    /* Subtle Grocery Tile Pattern */
+    .supermarket-tile-bg {
+      background-image:
+        radial-gradient(rgba(16, 185, 129, 0.08) 1.5px, transparent 1.5px),
+        radial-gradient(rgba(245, 158, 11, 0.08) 1.5px, transparent 1.5px);
+      background-size: 36px 36px;
+      background-position: 0 0, 18px 18px;
+    }
+
+    /* Striped Red & White Market Awning */
+    .market-awning {
+      background: repeating-linear-gradient(
+        90deg,
+        #ef4444 0px,
+        #ef4444 26px,
+        #ffffff 26px,
+        #ffffff 52px
+      );
+      box-shadow: 0 6px 14px rgba(239, 68, 68, 0.22);
+    }
+
+    /* Bright Supermarket Checkout Cabinet */
+    .supermarket-cabinet {
+      background: linear-gradient(180deg, #ffffff 0%, #fefce8 65%, #fef3c7 100%);
+      border: 4px solid #f59e0b;
+      box-shadow:
+        0 14px 34px rgba(245, 158, 11, 0.22),
+        0 4px 12px rgba(15, 23, 42, 0.08),
+        inset 0 2px 10px rgba(255, 255, 255, 0.9);
+    }
+
+    /* Desktop Keyboard Keycap Badge */
+    .kbd-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      background: rgba(15, 23, 42, 0.14);
+      border: 1px solid rgba(15, 23, 42, 0.24);
+      color: inherit;
+    }
+
+    /* Prevent accidental iPad scrolling when dragging reels */
+    .slot-reel-touch {
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: grab;
+    }
+    .slot-reel-touch:active {
+      cursor: grabbing;
+    }
+
+    /* Crisp White Cylindrical Supermarket Reel Window */
+    .reel-cylinder {
+      height: 234px; /* 3 visible slots * 78px */
+      background: linear-gradient(
+        180deg,
+        #e2e8f0 0%,
+        #ffffff 18%,
+        #ffffff 82%,
+        #e2e8f0 100%
+      );
+      box-shadow:
+        inset 0 18px 18px -12px rgba(15, 23, 42, 0.22),
+        inset 0 -18px 18px -12px rgba(15, 23, 42, 0.22);
+    }
+
+    .reel-item {
+      height: 78px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s ease, opacity 0.1s ease;
+    }
+
+    /* Active Unlocked Reel Pulse */
+    @keyframes activeReelPulse {
+      0%, 100% {
+        box-shadow: 0 0 0 3px #10b981, 0 8px 20px rgba(16, 185, 129, 0.35);
+      }
+      50% {
+        box-shadow: 0 0 0 4px #f59e0b, 0 10px 24px rgba(245, 158, 11, 0.42);
+      }
+    }
+
+    .reel-unlocked-glow {
+      animation: activeReelPulse 1.6s infinite ease-in-out;
+    }
+
+    /* Interactive Sky-Blue & Sunny-Yellow Checkout Pull Lever */
+    .supermarket-lever-track {
+      background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 50%, #e0f2fe 100%);
+      border: 3px solid #0284c7;
+      box-shadow: inset 0 2px 8px rgba(2, 132, 199, 0.2), 0 6px 14px rgba(2, 132, 199, 0.18);
+    }
+
+    .supermarket-lever-shaft {
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-origin: bottom center;
+    }
+
+    .supermarket-lever-ball {
+      background: radial-gradient(circle at 32% 30%, #fde047 0%, #f59e0b 55%, #d97706 100%);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.55), inset 0 -3px 6px rgba(146, 64, 14, 0.35);
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .lever-pulled .supermarket-lever-shaft {
+      transform: scaleY(0.32);
+    }
+
+    .lever-pulled .supermarket-lever-ball {
+      transform: translateY(84px) scale(1.08);
+    }
+
+    @keyframes gentleShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    .animate-shake {
+      animation: gentleShake 0.38s ease-in-out;
+    }
+
+    @keyframes popSpring {
+      0% { transform: scale(0.75); opacity: 0; }
+      70% { transform: scale(1.04); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pop {
+      animation: popSpring 0.34s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    .float-decor {
+      animation: floatSlow 4.5s ease-in-out infinite;
+    }
+
+    /* Live Recording Soundwave */
+    @keyframes wavePulse {
+      0%, 100% { transform: scaleY(0.28); }
+      50% { transform: scaleY(1); }
+    }
+    .wave-bar {
+      animation: wavePulse 0.65s infinite ease-in-out;
+      transform-origin: center;
+    }
+
+    /* Light Custom Scrollbars */
+    .market-scroll::-webkit-scrollbar { width: 6px; }
+    .market-scroll::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 9999px;
+    }
+    .market-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="supermarket-tile-bg antialiased selection:bg-amber-300 selection:text-slate-900">
+
+  <!-- Decorative Floating Supermarket Produce (Non-interactive) -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0 opacity-35" aria-hidden="true">
+    <span class="float-decor absolute top-24 left-6 text-4xl">🍎</span>
+    <span class="float-decor absolute top-36 right-8 text-4xl" style="animation-delay: -1.2s;">🍌</span>
+    <span class="float-decor absolute bottom-20 left-10 text-4xl" style="animation-delay: -2.4s;">🍉</span>
+    <span class="float-decor absolute bottom-28 right-10 text-4xl" style="animation-delay: -3.1s;">🥐</span>
+  </div>
+
+  <!-- Confetti Overlay -->
+  <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+  <!-- Inline Toast Banner -->
+  <div id="toastBanner" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 hidden">
+    <div class="px-5 py-3 rounded-2xl bg-slate-900/95 border-2 border-amber-400 text-white font-extrabold shadow-xl flex items-center gap-2.5 text-sm sm:text-base">
+      <span id="toastIcon">🛒</span>
+      <span id="toastMessage">Ready to shop!</span>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- PRE-GAME SUPERMARKET CHECK-IN MODAL (STUDENT NAME & CLASS/SEAT)         -->
+  <!-- ======================================================================= -->
+  <div id="startModal" class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="startCard" class="w-full max-w-lg rounded-3xl bg-white border-4 border-amber-400 shadow-2xl animate-pop text-center relative overflow-hidden">
+      <!-- Striped Red & White Supermarket Awning Header -->
+      <div class="market-awning h-6 w-full"></div>
+
+      <div class="p-6 sm:p-8">
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg mb-3 text-4xl">
+          🛒
+        </div>
+
+        <h1 class="font-display text-2xl sm:text-3xl font-bold text-slate-900">
+          Supermarket Price Slots
+        </h1>
+        <p class="font-display text-base sm:text-lg font-semibold text-emerald-600 mt-0.5">
+          How much is the ___? / How much are the ___?
+        </p>
+        <p class="text-slate-600 text-xs sm:text-sm mt-2 max-w-md mx-auto font-semibold">
+          Spin Part 2 (<span class="text-emerald-700 font-extrabold">is the / are the</span>) and Part 3 (<span class="text-amber-700 font-extrabold">20 Grade 6 foods</span>), ask the price aloud, and answer to top the live ranking!
+        </p>
+
+        <form id="startForm" class="mt-5 space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
+            <div class="sm:col-span-2">
+              <label for="studentNameInput" class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1.5">
+                Student Name (Required):
+              </label>
+              <input
+                id="studentNameInput"
+                type="text"
+                maxlength="24"
+                autocomplete="off"
+                autocapitalize="words"
+                placeholder="Type your name (e.g., Leo)..."
+                class="w-full min-h-[52px] px-4 py-3 text-base sm:text-lg font-bold rounded-2xl border-2 border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition bg-slate-50 text-slate-900 placeholder:text-slate-400"
+              />
+            </div>
+            <div>
+              <label for="studentSeatInput" class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1.5">
+                Class / Seat:
+              </label>
+              <input
+                id="studentSeatInput"
+                type="text"
+                maxlength="14"
+                autocomplete="off"
+                placeholder="Optional (6A)"
+                class="w-full min-h-[52px] px-3.5 py-3 text-base sm:text-lg font-bold rounded-2xl border-2 border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition bg-slate-50 text-slate-900 placeholder:text-slate-400"
+              />
+            </div>
+          </div>
+          <p id="nameErrorHint" class="text-left text-rose-600 font-extrabold text-xs sm:text-sm -mt-2 hidden">
+            Please type your name before starting!
+          </p>
+
+          <!-- Shopping Buddy Avatar Selector -->
+          <div class="text-left">
+            <span class="block text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2">
+              Choose Your Shopping Buddy:
+            </span>
+            <div id="chipSelector" class="grid grid-cols-6 gap-2">
+              <button type="button" data-chip="🛒" class="chip-btn min-h-[48px] rounded-2xl bg-emerald-100 border-2 border-emerald-500 text-2xl flex items-center justify-center shadow-sm cursor-pointer">🛒</button>
+              <button type="button" data-chip="🍎" class="chip-btn min-h-[48px] rounded-2xl bg-slate-100 border-2 border-slate-200 hover:border-amber-400 text-2xl flex items-center justify-center cursor-pointer">🍎</button>
+              <button type="button" data-chip="🍔" class="chip-btn min-h-[48px] rounded-2xl bg-slate-100 border-2 border-slate-200 hover:border-amber-400 text-2xl flex items-center justify-center cursor-pointer">🍔</button>
+              <button type="button" data-chip="🍓" class="chip-btn min-h-[48px] rounded-2xl bg-slate-100 border-2 border-slate-200 hover:border-amber-400 text-2xl flex items-center justify-center cursor-pointer">🍓</button>
+              <button type="button" data-chip="🥐" class="chip-btn min-h-[48px] rounded-2xl bg-slate-100 border-2 border-slate-200 hover:border-amber-400 text-2xl flex items-center justify-center cursor-pointer">🥐</button>
+              <button type="button" data-chip="🏷️" class="chip-btn min-h-[48px] rounded-2xl bg-slate-100 border-2 border-slate-200 hover:border-amber-400 text-2xl flex items-center justify-center cursor-pointer">🏷️</button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full min-h-[56px] py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 hover:brightness-105 active:scale-[0.98] text-white font-display text-lg sm:text-xl font-bold shadow-lg transition flex items-center justify-center gap-2.5 cursor-pointer"
+          >
+            <span>START SHOPPING &amp; SPEAKING</span>
+            <span>🛒</span>
+            <span class="pc-only-hint hidden md:inline-flex kbd-badge">ENTER</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- TEACHER FIREBASE REALTIME DATABASE SETTINGS & DIAGNOSTICS MODAL         -->
+  <!-- ======================================================================= -->
+  <div id="firebaseModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="w-full max-w-lg rounded-3xl p-6 bg-white border-4 border-sky-400 shadow-2xl animate-pop">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-display text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+          <span>⚙️</span>
+          <span>Teacher Firebase Live Controls</span>
+        </h3>
+        <button id="closeFirebaseModalBtn" type="button" class="w-11 h-11 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer">✕</button>
+      </div>
+      <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+        Connected live to Firebase Realtime Database (<code class="text-emerald-700 font-bold">/supermarket_grammar</code>). All student iPads and PCs sync automatically in real time.
+      </p>
+
+      <div class="mt-4 space-y-3">
+        <div>
+          <label for="firebaseUrlInput" class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1">
+            Active Firebase Realtime Database URL:
+          </label>
+          <input
+            id="firebaseUrlInput"
+            type="url"
+            placeholder="https://kate-98c3e-default-rtdb.firebaseio.com"
+            class="w-full min-h-[48px] px-4 py-2.5 rounded-xl bg-slate-50 border-2 border-slate-300 focus:border-sky-500 text-slate-900 text-xs sm:text-sm font-mono outline-none"
+          />
+        </div>
+
+        <div id="firebaseTestResult" class="hidden px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700">
+          Testing connection...
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+          <div class="flex flex-wrap gap-2">
+            <button id="testFirebaseBtn" type="button" class="min-h-[48px] px-4 py-2.5 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-800 font-extrabold text-xs sm:text-sm cursor-pointer">
+              🔌 Test Connection
+            </button>
+            <button id="exportCsvBtn" type="button" class="min-h-[48px] px-4 py-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-extrabold text-xs sm:text-sm cursor-pointer">
+              📥 Export CSV
+            </button>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button id="resetDefaultFirebaseBtn" type="button" class="min-h-[48px] px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs cursor-pointer">
+              Default URL
+            </button>
+            <button id="saveFirebaseBtn" type="button" class="min-h-[48px] px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs sm:text-sm shadow cursor-pointer">
+              Save &amp; Sync
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
+          <span class="text-xs text-slate-500 font-bold">Starting a new class period?</span>
+          <div class="flex items-center gap-2">
+            <button id="armClearBoardBtn" type="button" class="min-h-[48px] px-4 py-2.5 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 font-extrabold text-xs cursor-pointer">
+              🗑️ Reset Classroom Board
+            </button>
+            <button id="confirmClearBoardBtn" type="button" class="hidden min-h-[48px] px-4 py-2.5 rounded-xl bg-rose-600 text-white font-extrabold text-xs shadow cursor-pointer">
+              ⚠️ Confirm Clear All
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- AI SPEECH ANALYSIS POP-UP MODAL (GREEN / YELLOW / ORANGE)               -->
+  <!-- ======================================================================= -->
+  <div id="analysisModal" class="fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div id="analysisBox" class="w-full max-w-md rounded-3xl p-6 sm:p-7 shadow-2xl border-4 text-center animate-pop bg-emerald-500 border-emerald-200 text-white">
+      <div id="analysisEmoji" class="text-6xl mb-2 drop-shadow">🏆</div>
+
+      <!-- Exact Rating Headline: "Excellent +3", "Good job +2", or "Keep practicing" -->
+      <h2 id="analysisHeadline" class="font-display text-3xl sm:text-4xl font-bold tracking-tight drop-shadow-sm">
+        Excellent +3
+      </h2>
+
+      <!-- Accuracy Percentage Pill -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/20 font-extrabold text-sm sm:text-base mt-2.5">
+        <span>AI Speech Accuracy:</span>
+        <span id="analysisPercent">92%</span>
+      </div>
+
+      <!-- Word-by-Word Highlight Chips & Target Comparison -->
+      <div class="mt-4 bg-white text-slate-900 rounded-2xl p-4 text-left shadow-inner space-y-3">
+        <div>
+          <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Target Sentence:</span>
+          <p id="analysisTargetText" class="font-bold text-slate-900 text-base sm:text-lg mt-0.5">
+            How much is the pineapple?
+          </p>
+        </div>
+        <div class="border-t border-slate-100 pt-2.5">
+          <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Word Match Breakdown:</span>
+          <div id="analysisWordChips" class="flex flex-wrap gap-1.5 mt-1.5"></div>
+          <p id="analysisHeardRaw" class="text-xs text-slate-500 italic mt-2">
+            Heard: "How much is the pineapple"
+          </p>
+          <p id="analysisCoachTip" class="text-xs font-extrabold text-emerald-700 mt-1.5">
+            💡 Great pronunciation and rhythm!
+          </p>
+          <!-- Audio Playback Button for Student's Recorded Voice -->
+          <div id="analysisAudioPlaybackRow" class="hidden mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+            <span class="text-[11px] font-extrabold text-sky-700">🎧 Voice Recording Saved</span>
+            <button
+              id="playRecordedVoiceBtn"
+              type="button"
+              class="min-h-[40px] px-3.5 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-800 font-extrabold text-xs flex items-center gap-1.5 cursor-pointer"
+            >
+              <span id="playRecordedVoiceIcon">▶️</span>
+              <span id="playRecordedVoiceLabel">Play My Voice</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pop-up Action Buttons -->
+      <div id="analysisActions" class="mt-5 flex flex-col sm:flex-row gap-3 justify-center"></div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- TOP SUPERMARKET HEADER & STUDENT HUD                                    -->
+  <!-- ======================================================================= -->
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b-2 border-amber-300 shadow-sm">
+    <div class="max-w-[1440px] mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white flex items-center justify-center text-2xl shadow">
+          🛒
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-display text-base sm:text-xl font-bold text-slate-900">
+              Supermarket Price Slots
+            </h1>
+            <span id="deviceModePill" class="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 text-[11px] font-extrabold">
+              ⌨️ PC: [Space] Spin/Rec • [Enter] Next
+            </span>
+          </div>
+          <p class="text-[11px] font-bold text-slate-500 hidden sm:block">
+            Grade 6 Interactive ESL Speaking • How much is/are the ___?
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div class="min-h-[48px] flex items-center gap-2 bg-amber-50 border-2 border-amber-300 px-3 py-1.5 rounded-2xl shadow-sm">
+          <span id="headerChipIcon" class="text-lg">🛒</span>
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span id="headerStudentName" class="font-extrabold text-slate-900 text-xs sm:text-sm max-w-[95px] sm:max-w-[140px] truncate">
+              Shopper
+            </span>
+            <span id="headerStudentSeat" class="hidden px-1.5 py-0.5 rounded-md bg-amber-200 text-amber-900 text-[10px] font-extrabold">
+              6A
+            </span>
+          </div>
+          <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-xl bg-sky-100 border border-sky-300 text-sky-800 font-extrabold text-xs">
+            🛍️ <span id="headerRoundsCount" class="ml-1">0</span>
+          </span>
+          <span class="px-2.5 py-0.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 text-slate-950 font-display font-bold text-xs sm:text-sm shadow-sm">
+            ⭐ <span id="headerStudentScore">0</span>
+          </span>
+        </div>
+
+        <button
+          id="muteToggleBtn"
+          type="button"
+          title="Mute / Unmute Sound Effects"
+          class="w-12 h-12 rounded-2xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 flex items-center justify-center active:scale-95 transition cursor-pointer"
+        >
+          <span id="muteIcon" class="text-lg">🔊</span>
+        </button>
+
+        <button
+          id="openFirebaseModalBtn"
+          type="button"
+          title="Teacher Firebase Controls"
+          class="w-12 h-12 rounded-2xl bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-800 flex items-center justify-center active:scale-95 transition cursor-pointer"
+        >
+          <span class="text-lg">⚙️</span>
+        </button>
+
+        <button
+          id="switchStudentBtn"
+          type="button"
+          class="min-h-[48px] px-3.5 rounded-2xl bg-rose-100 hover:bg-rose-200 border border-rose-300 text-rose-700 font-extrabold text-xs sm:text-sm active:scale-95 transition cursor-pointer"
+        >
+          👤 Switch
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================= -->
+  <!-- MAIN IPAD & PC SUPERMARKET FLOOR                                        -->
+  <!-- ======================================================================= -->
+  <main class="relative z-10 max-w-[1440px] mx-auto px-3 sm:px-6 py-4 sm:py-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+
+      <!-- =================================================================== -->
+      <!-- LEFT COLUMN (7 COLS): 3-PART SUPERMARKET SLOT MACHINE + STAGES      -->
+      <!-- =================================================================== -->
+      <section class="lg:col-span-7 space-y-5">
+
+        <!-- BRIGHT SUPERMARKET PRICE CHECKOUT SLOT MACHINE -->
+        <div class="supermarket-cabinet rounded-3xl overflow-hidden relative">
+          <!-- Striped Supermarket Awning Canopy -->
+          <div class="market-awning h-5 w-full"></div>
+
+          <div class="p-3.5 sm:p-5">
+            <!-- Step Progress Pills & Reset Button -->
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <div class="flex items-center gap-1.5 text-xs font-extrabold flex-wrap">
+                <span id="stepPill1" class="px-2.5 py-1 rounded-xl bg-amber-400 text-slate-950">1. How much (Fixed)</span>
+                <span class="text-slate-400">➔</span>
+                <span id="stepPill2" class="px-2.5 py-1 rounded-xl bg-emerald-500 text-white transition">2. is the / are the</span>
+                <span class="text-slate-400">➔</span>
+                <span id="stepPill3" class="px-2.5 py-1 rounded-xl bg-slate-200 text-slate-500 transition">3. Food (20)</span>
+              </div>
+
+              <button
+                id="resetMachineBtn"
+                type="button"
+                class="min-h-[46px] px-4 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 active:scale-95 text-amber-900 text-xs font-extrabold tracking-wide transition cursor-pointer"
+              >
+                🔄 Reset Spin
+              </button>
+            </div>
+
+            <!-- 3-Part Reel Window + Right-Side Supermarket Checkout Lever -->
+            <div class="flex items-stretch gap-2.5 sm:gap-3.5">
+              <div class="flex-1 bg-gradient-to-b from-emerald-500 to-teal-600 p-2.5 sm:p-4 rounded-3xl border-2 border-emerald-700 shadow-inner">
+                <div class="grid grid-cols-3 gap-2 sm:gap-3">
+
+                  <!-- ==================== PART 1: FIXED "How much" ==================== -->
+                  <div class="flex flex-col">
+                    <div class="text-center py-1.5 px-1.5 rounded-t-2xl bg-amber-400 text-slate-950 font-display font-bold text-[11px] sm:text-xs">
+                      1. FIXED
+                    </div>
+                    <div
+                      id="reel1Container"
+                      class="reel-cylinder relative rounded-b-2xl overflow-hidden border-2 border-amber-400 flex flex-col items-center justify-center"
+                    >
+                      <div class="absolute inset-x-1 top-1/2 -translate-y-1/2 h-[78px] rounded-xl border-2 border-amber-400 bg-amber-300/20 pointer-events-none z-10"></div>
+                      <div class="relative z-20 flex flex-col items-center justify-center text-center px-1.5">
+                        <span class="text-2xl sm:text-3xl leading-none mb-1">🏷️</span>
+                        <span class="font-display font-bold text-sm sm:text-lg text-slate-900 leading-tight">
+                          How much
+                        </span>
+                      </div>
+                      <div class="absolute top-1.5 right-1.5 z-20 px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black shadow-sm">
+                        FIXED
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ==================== PART 2: "is the" / "are the" ==================== -->
+                  <div class="flex flex-col">
+                    <div id="reel2Badge" class="text-center py-1.5 px-1.5 rounded-t-2xl bg-emerald-300 text-slate-950 font-display font-bold text-[11px] sm:text-xs">
+                      2. SPIN / DRAG
+                    </div>
+                    <div
+                      id="reel2Container"
+                      data-reel="2"
+                      class="reel-cylinder slot-reel-touch reel-unlocked-glow relative rounded-b-2xl overflow-hidden border-2 border-emerald-300"
+                    >
+                      <div class="absolute inset-x-1 top-1/2 -translate-y-1/2 h-[78px] rounded-xl border-2 border-amber-400 bg-amber-300/20 pointer-events-none z-10"></div>
+                      <div id="reel2Track" class="relative z-0 will-change-transform"></div>
+                      <div id="reel2LockedBadge" class="hidden absolute top-1.5 right-1.5 z-20 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[10px] font-black shadow">
+                        ✓ SET
+                      </div>
+                      <button
+                        id="reel2ReopenBtn"
+                        type="button"
+                        class="hidden absolute bottom-1.5 inset-x-1.5 z-20 py-1 rounded-lg bg-slate-900/85 text-amber-300 text-[10px] font-extrabold hover:bg-slate-900 cursor-pointer"
+                      >
+                        ↻ Change
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- ==================== PART 3: 20 GRADE 6 FOODS ==================== -->
+                  <div class="flex flex-col">
+                    <div id="reel3Badge" class="text-center py-1.5 px-1.5 rounded-t-2xl bg-emerald-800 text-emerald-200 font-display font-bold text-[11px] sm:text-xs">
+                      🔒 Locked
+                    </div>
+                    <div
+                      id="reel3Container"
+                      data-reel="3"
+                      class="reel-cylinder slot-reel-touch relative rounded-b-2xl overflow-hidden border-2 border-emerald-700"
+                    >
+                      <div class="absolute inset-x-1 top-1/2 -translate-y-1/2 h-[78px] rounded-xl border-2 border-amber-400 bg-amber-300/20 pointer-events-none z-10"></div>
+                      <div id="reel3Track" class="relative z-0 will-change-transform"></div>
+                      <div id="reel3LockedBadge" class="hidden absolute top-1.5 right-1.5 z-20 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[10px] font-black shadow">
+                        ✓ SET
+                      </div>
+                      <div id="reel3LockScreen" class="absolute inset-0 z-20 bg-slate-900/55 backdrop-blur-[2px] flex flex-col items-center justify-center p-2 text-center">
+                        <span class="text-2xl mb-1">🔒</span>
+                        <span class="text-[11px] font-extrabold text-white leading-tight">Spin Part 2 First</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Interactive Supermarket Checkout Pull Lever -->
+              <button
+                id="casinoLeverBtn"
+                type="button"
+                title="Pull Lever to Spin Active Part (1s)"
+                class="supermarket-lever-track w-12 sm:w-14 rounded-3xl p-1.5 flex flex-col items-center justify-between relative shrink-0 cursor-pointer active:scale-95 transition"
+              >
+                <span id="leverStepLabel" class="font-display text-xs font-bold text-sky-900 mt-1">
+                  P2
+                </span>
+                <div class="relative w-full flex-1 flex flex-col items-center justify-end pb-4">
+                  <div class="supermarket-lever-shaft w-2.5 h-28 rounded-full bg-gradient-to-b from-slate-300 via-slate-400 to-slate-600 shadow"></div>
+                  <div class="supermarket-lever-ball absolute top-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-white"></div>
+                </div>
+                <span class="text-[9px] font-extrabold uppercase tracking-wider text-sky-900 mb-1">
+                  PULL
+                </span>
+              </button>
+            </div>
+
+            <!-- Action Instruction Bar & Big Spin Button -->
+            <div class="mt-3.5 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+              <div id="machineInstructionBar" class="text-center sm:text-left text-emerald-800 font-extrabold text-xs sm:text-sm">
+                👆 Drag/click Part 2, pull lever, or press [Space] — spins 1s &amp; stops randomly!
+              </div>
+
+              <button
+                id="spinActiveReelBtn"
+                type="button"
+                class="w-full sm:w-auto min-h-[52px] px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-emerald-400 hover:brightness-105 active:scale-95 text-slate-950 font-display text-sm sm:text-base font-bold shadow-md transition flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+              >
+                <span>🛒</span>
+                <span id="spinActiveReelBtnLabel">SPIN PART 2 (1s)</span>
+                <span class="pc-only-hint hidden md:inline-flex kbd-badge">SPACE</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- STAGE 1 SPEAKING CONSOLE: COMPOSED QUESTION + RECORD BUTTON       -->
+        <!-- ================================================================= -->
+        <div id="questionSpeakingCard" class="hidden rounded-3xl p-5 sm:p-6 bg-white border-4 border-sky-400 shadow-xl animate-pop">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <span class="px-3 py-1 rounded-full bg-sky-100 border border-sky-300 text-sky-800 font-extrabold text-xs uppercase tracking-wider">
+              🎤 Stage 1 of 2 • Ask the Price Question
+            </span>
+            <button
+              id="listenQuestionBtn"
+              type="button"
+              class="min-h-[46px] px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>🔊</span>
+              <span>Hear Hint</span>
+            </button>
+          </div>
+
+          <div class="bg-sky-50 border-2 border-sky-200 rounded-2xl p-4 sm:p-5 text-center">
+            <p class="text-[11px] font-extrabold uppercase tracking-widest text-sky-700 mb-1">
+              Composed Question:
+            </p>
+            <p id="composedQuestionText" class="font-display text-2xl sm:text-3xl font-bold text-slate-900">
+              How much is the pineapple?
+            </p>
+            <div id="questionGrammarTags" class="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs font-extrabold"></div>
+          </div>
+
+          <!-- Primary Record & Type Fallback Controls -->
+          <div class="mt-4 flex flex-col items-center gap-2.5">
+            <div class="flex flex-wrap items-center justify-center gap-3 w-full">
+              <button
+                id="recordQuestionBtn"
+                type="button"
+                class="min-h-[56px] min-w-[220px] py-3.5 px-8 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 hover:brightness-105 active:scale-95 text-white font-display text-lg sm:text-xl font-bold shadow-lg transition flex items-center justify-center gap-3 cursor-pointer"
+              >
+                <span id="recordQuestionIcon" class="text-2xl">🎙️</span>
+                <span id="recordQuestionLabel">Record</span>
+                <span class="pc-only-hint hidden md:inline-flex kbd-badge">SPACE</span>
+              </button>
+
+              <button
+                id="toggleQuestionFallbackBtn"
+                type="button"
+                title="Type your spoken sentence if your device lacks a microphone"
+                class="min-h-[56px] px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-extrabold text-xs sm:text-sm transition cursor-pointer"
+              >
+                ⌨️ Type / Mic Fallback
+              </button>
+            </div>
+
+            <!-- Inline Typed Speech Fallback Box (Stage 1) -->
+            <div id="questionFallbackPanel" class="hidden w-full max-w-lg mt-1 p-3.5 rounded-2xl bg-amber-50 border-2 border-amber-300 space-y-2.5">
+              <p class="text-xs font-extrabold text-amber-900">
+                Microphone unavailable? Type the question you practiced below for AI evaluation:
+              </p>
+              <div class="flex gap-2">
+                <input
+                  id="questionFallbackInput"
+                  type="text"
+                  placeholder="Type the composed question..."
+                  class="flex-1 min-h-[48px] px-3.5 py-2 rounded-xl bg-white border-2 border-slate-300 focus:border-sky-500 text-slate-900 text-sm font-bold outline-none"
+                />
+                <button
+                  id="submitQuestionFallbackBtn"
+                  type="button"
+                  class="min-h-[48px] px-4 py-2 rounded-xl bg-sky-500 text-white font-extrabold text-xs sm:text-sm cursor-pointer"
+                >
+                  Check ✓
+                </button>
+              </div>
+            </div>
+
+            <!-- Live Recording Soundwave & Signal Meter -->
+            <div id="questionRecordingStatus" class="hidden mt-2 w-full max-w-md p-3.5 rounded-2xl bg-rose-50 border-2 border-rose-300 flex flex-col items-center gap-2">
+              <div class="flex items-center justify-between w-full text-[11px] font-extrabold px-1">
+                <span class="text-rose-600 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-rose-600 animate-ping"></span>
+                  <span>REC LIVE</span>
+                </span>
+                <span id="questionSignalLabel" class="text-emerald-700">Mic Signal: Ready</span>
+              </div>
+              <div class="flex items-center gap-1.5 h-8">
+                <span class="w-1.5 h-6 bg-rose-500 rounded-full wave-bar" style="animation-delay: 0s"></span>
+                <span class="w-1.5 h-8 bg-amber-500 rounded-full wave-bar" style="animation-delay: 0.12s"></span>
+                <span class="w-1.5 h-5 bg-emerald-500 rounded-full wave-bar" style="animation-delay: 0.24s"></span>
+                <span class="w-1.5 h-8 bg-sky-500 rounded-full wave-bar" style="animation-delay: 0.36s"></span>
+                <span class="w-1.5 h-6 bg-purple-500 rounded-full wave-bar" style="animation-delay: 0.48s"></span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-slate-200 overflow-hidden">
+                <div id="questionMicLevelBar" class="h-full w-1/6 bg-gradient-to-r from-emerald-400 via-teal-400 to-amber-400 transition-all duration-75"></div>
+              </div>
+              <p id="questionLiveStatusText" class="text-sm font-extrabold text-slate-800 text-center">
+                🎙️ Speak your question clearly into the mic...
+              </p>
+              <button
+                id="doneQuestionRecordingBtn"
+                type="button"
+                class="min-h-[44px] px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs uppercase tracking-wider shadow cursor-pointer"
+              >
+                ✅ Done Speaking &amp; Score
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- STAGE 2 SPEAKING CONSOLE: 3-BLANK PRICE ANSWER + RECORD BUTTON    -->
+        <!-- ================================================================= -->
+        <div id="answerSpeakingCard" class="hidden rounded-3xl p-5 sm:p-6 bg-white border-4 border-emerald-400 shadow-xl animate-pop">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <span class="px-3 py-1 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 font-extrabold text-xs uppercase tracking-wider">
+              🗣️ Stage 2 of 2 • Speak the Price Answer
+            </span>
+            <button
+              id="listenAnswerBtn"
+              type="button"
+              class="min-h-[46px] px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>🔊</span>
+              <span>Hear Hint</span>
+            </button>
+          </div>
+
+          <div class="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 sm:p-5 text-center">
+            <p id="answerPatternRuleHint" class="text-[11px] font-extrabold uppercase tracking-widest text-emerald-700 mb-2">
+              Answer Pattern: (1) Subject + is/are + (2) Price Number + (3) dollars
+            </p>
+            <div id="answerBlankBadges" class="flex flex-wrap items-center justify-center gap-2 font-display text-lg sm:text-2xl font-bold text-slate-900 my-2"></div>
+            <p id="composedAnswerText" class="font-display text-xl sm:text-2xl font-bold text-amber-700 mt-2">
+              "It is 8 dollars."
+            </p>
+          </div>
+
+          <!-- Primary Record & Type Fallback Controls -->
+          <div class="mt-4 flex flex-col items-center gap-2.5">
+            <div class="flex flex-wrap items-center justify-center gap-3 w-full">
+              <button
+                id="recordAnswerBtn"
+                type="button"
+                class="min-h-[56px] min-w-[220px] py-3.5 px-8 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:brightness-105 active:scale-95 text-white font-display text-lg sm:text-xl font-bold shadow-lg transition flex items-center justify-center gap-3 cursor-pointer"
+              >
+                <span id="recordAnswerIcon" class="text-2xl">🎙️</span>
+                <span id="recordAnswerLabel">Record</span>
+                <span class="pc-only-hint hidden md:inline-flex kbd-badge">SPACE</span>
+              </button>
+
+              <button
+                id="toggleAnswerFallbackBtn"
+                type="button"
+                title="Type your spoken answer if your device lacks a microphone"
+                class="min-h-[56px] px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-extrabold text-xs sm:text-sm transition cursor-pointer"
+              >
+                ⌨️ Type / Mic Fallback
+              </button>
+            </div>
+
+            <!-- Inline Typed Speech Fallback Box (Stage 2) -->
+            <div id="answerFallbackPanel" class="hidden w-full max-w-lg mt-1 p-3.5 rounded-2xl bg-amber-50 border-2 border-amber-300 space-y-2.5">
+              <p class="text-xs font-extrabold text-amber-900">
+                Microphone unavailable? Type the answering sentence below for AI evaluation:
+              </p>
+              <div class="flex gap-2">
+                <input
+                  id="answerFallbackInput"
+                  type="text"
+                  placeholder="Type the answering sentence..."
+                  class="flex-1 min-h-[48px] px-3.5 py-2 rounded-xl bg-white border-2 border-slate-300 focus:border-emerald-500 text-slate-900 text-sm font-bold outline-none"
+                />
+                <button
+                  id="submitAnswerFallbackBtn"
+                  type="button"
+                  class="min-h-[48px] px-4 py-2 rounded-xl bg-emerald-500 text-white font-extrabold text-xs sm:text-sm cursor-pointer"
+                >
+                  Check ✓
+                </button>
+              </div>
+            </div>
+
+            <!-- Live Recording Soundwave & Signal Meter -->
+            <div id="answerRecordingStatus" class="hidden mt-2 w-full max-w-md p-3.5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 flex flex-col items-center gap-2">
+              <div class="flex items-center justify-between w-full text-[11px] font-extrabold px-1">
+                <span class="text-emerald-700 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
+                  <span>REC LIVE</span>
+                </span>
+                <span id="answerSignalLabel" class="text-amber-700">Mic Signal: Ready</span>
+              </div>
+              <div class="flex items-center gap-1.5 h-8">
+                <span class="w-1.5 h-6 bg-emerald-500 rounded-full wave-bar" style="animation-delay: 0s"></span>
+                <span class="w-1.5 h-8 bg-teal-500 rounded-full wave-bar" style="animation-delay: 0.12s"></span>
+                <span class="w-1.5 h-5 bg-amber-500 rounded-full wave-bar" style="animation-delay: 0.24s"></span>
+                <span class="w-1.5 h-8 bg-sky-500 rounded-full wave-bar" style="animation-delay: 0.36s"></span>
+                <span class="w-1.5 h-6 bg-rose-500 rounded-full wave-bar" style="animation-delay: 0.48s"></span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-slate-200 overflow-hidden">
+                <div id="answerMicLevelBar" class="h-full w-1/6 bg-gradient-to-r from-emerald-400 via-sky-400 to-amber-400 transition-all duration-75"></div>
+              </div>
+              <p id="answerLiveStatusText" class="text-sm font-extrabold text-slate-800 text-center">
+                🎙️ Speak your answer clearly into the mic...
+              </p>
+              <button
+                id="doneAnswerRecordingBtn"
+                type="button"
+                class="min-h-[44px] px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs uppercase tracking-wider shadow cursor-pointer"
+              >
+                ✅ Done Speaking &amp; Score
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- RIGHT COLUMN (5 COLS): LIVE FIREBASE RANKING & CONVERSATION FEED    -->
+      <!-- =================================================================== -->
+      <aside class="lg:col-span-5">
+        <div class="rounded-3xl p-5 bg-white border-4 border-emerald-400 shadow-xl">
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b-2 border-slate-100">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">🏆</span>
+              <h2 class="font-display text-base sm:text-lg font-bold text-slate-900">
+                Live Classroom Ranking
+              </h2>
+            </div>
+
+            <span id="syncStatusBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 text-[11px] font-extrabold">
+              <span id="syncStatusDot" class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+              <span id="syncStatusText">LIVE: kate-98c3e</span>
+            </span>
+          </div>
+
+          <div class="mt-3 grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200 text-xs font-extrabold">
+            <button id="dashTabBoth" type="button" class="min-h-[40px] rounded-xl bg-emerald-500 text-white shadow-sm transition cursor-pointer">
+              📊 All Live
+            </button>
+            <button id="dashTabRanking" type="button" class="min-h-[40px] rounded-xl text-slate-600 hover:text-slate-900 transition cursor-pointer">
+              🏆 Ranking
+            </button>
+            <button id="dashTabFeed" type="button" class="min-h-[40px] rounded-xl text-slate-600 hover:text-slate-900 transition cursor-pointer">
+              💬 Dialogues
+            </button>
+          </div>
+
+          <div id="leaderboardSection" class="mt-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+              <div class="flex items-center gap-2">
+                <h3 class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">
+                  Top Shoppers Leaderboard
+                </h3>
+                <span id="playerCountBadge" class="text-[11px] font-extrabold text-amber-700">0 players</span>
+              </div>
+
+              <!-- Direct Leaderboard Actions: Download Ranking CSV & Safe Two-Step Clear All -->
+              <div class="flex items-center gap-1.5">
+                <button
+                  id="downloadRankingBtn"
+                  type="button"
+                  title="Download Classroom Ranking List (CSV)"
+                  class="min-h-[42px] px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 active:scale-95 border border-amber-300 text-amber-900 font-extrabold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <span>📥</span>
+                  <span>Download</span>
+                </button>
+
+                <button
+                  id="boardClearAllBtn"
+                  type="button"
+                  title="Clear All Rankings & Conversations"
+                  class="min-h-[42px] px-3 py-1.5 rounded-xl bg-rose-100 hover:bg-rose-200 active:scale-95 border border-rose-300 text-rose-700 font-extrabold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <span>🗑️</span>
+                  <span>Clear All</span>
+                </button>
+
+                <button
+                  id="boardConfirmClearBtn"
+                  type="button"
+                  class="hidden min-h-[42px] px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-extrabold text-xs shadow flex items-center gap-1 transition cursor-pointer"
+                >
+                  <span>⚠️ Confirm Clear</span>
+                </button>
+
+                <button
+                  id="boardCancelClearBtn"
+                  type="button"
+                  title="Cancel Clear"
+                  class="hidden min-h-[42px] px-2.5 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-extrabold text-xs transition cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            <div id="leaderboardList" class="space-y-2.5 max-h-[290px] overflow-y-auto market-scroll pr-1"></div>
+          </div>
+
+          <div id="conversationSection" class="mt-5 pt-4 border-t-2 border-slate-100">
+            <div class="flex items-center justify-between mb-2.5">
+              <h3 class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">
+                💬 Live Student Conversations
+              </h3>
+              <span id="feedCountBadge" class="text-xs font-extrabold text-sky-700">0 dialogues</span>
+            </div>
+            <div id="conversationFeedList" class="space-y-2.5 max-h-[300px] overflow-y-auto market-scroll pr-1"></div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- ======================================================================= -->
+  <!-- JAVASCRIPT: FIREBASE RTDB, SUPERMARKET SLOTS & AI VOICE EVALUATOR       -->
+  <!-- ======================================================================= -->
+  <script>
+    // =========================================================================
+    // 1. FIREBASE CONFIGURATION, DEVICE DETECTION & GLOBAL GAME STATE
+    // =========================================================================
+    const FIREBASE_DB_URL = "https://kate-98c3e-default-rtdb.firebaseio.com";
+    const STORAGE_KEY_FB_URL = "supermarket_grammar_fb_url_v1";
+    const STORAGE_KEY_STUDENTS = "supermarket_grammar_students_v1";
+    const STORAGE_KEY_FEED = "supermarket_grammar_feed_v1";
+
+    const IS_TOUCH_DEVICE =
+      ("ontouchstart" in window) ||
+      (navigator.maxTouchPoints > 0) ||
+      (navigator.msMaxTouchPoints > 0);
+
+    const state = {
+      studentName: "",
+      studentSeat: "",
+      studentChip: "🛒",
+      studentScore: 0,
+      roundsCompleted: 0,
+      unlockedStep: 2, // Part 1 is fixed ("How much"); student starts by spinning Part 2 -> Part 3
+      isSpinning: false,
+      reel2Index: 0,
+      reel3Index: 0,
+      reel1Value: { text: "How much", emoji: "🏷️" },
+      reel2Value: null,
+      reel3Value: null,
+      currentQuestion: "",
+      currentAnswer: "",
+      isRecording: false,
+      activeStep: null,
+      lastRecordingAudioUrl: null,
+      questionAccuracy: 0,
+      questionLabel: "",
+      questionPoints: 0,
+      answerAccuracy: 0,
+      answerLabel: "",
+      answerPoints: 0,
+      lastAccuracy: 0,
+      firebaseUrl: FIREBASE_DB_URL,
+      studentsMap: {},
+      conversations: []
+    };
+
+    // =========================================================================
+    // 2. SUPERMARKET SLOT REEL VOCABULARY & SINGULAR/PLURAL DATA (GRADE 6)
+    // =========================================================================
+    const REEL_DATA = {
+      reel1Fixed: { text: "How much", emoji: "🏷️" },
+      reel2: [
+        { text: "is the", subLabel: "Singular (1)", emoji: "1️⃣", numberType: "singular" },
+        { text: "are the", subLabel: "Plural (2+)", emoji: "🔢", numberType: "plural" }
+      ],
+      singularFoods: [
+        { text: "apple", emoji: "🍎" },
+        { text: "banana", emoji: "🍌" },
+        { text: "orange", emoji: "🍊" },
+        { text: "strawberry", emoji: "🍓" },
+        { text: "pineapple", emoji: "🍍" },
+        { text: "watermelon", emoji: "🍉" },
+        { text: "peach", emoji: "🍑" },
+        { text: "mango", emoji: "🥭" },
+        { text: "tomato", emoji: "🍅" },
+        { text: "potato", emoji: "🥔" },
+        { text: "carrot", emoji: "🥕" },
+        { text: "mushroom", emoji: "🍄" },
+        { text: "hamburger", emoji: "🍔" },
+        { text: "hot dog", emoji: "🌭" },
+        { text: "sandwich", emoji: "🥪" },
+        { text: "taco", emoji: "🌮" },
+        { text: "croissant", emoji: "🥐" },
+        { text: "donut", emoji: "🍩" },
+        { text: "cupcake", emoji: "🧁" },
+        { text: "cookie", emoji: "🍪" }
+      ],
+      pluralFoods: [
+        { text: "apples", emoji: "🍎" },
+        { text: "bananas", emoji: "🍌" },
+        { text: "oranges", emoji: "🍊" },
+        { text: "strawberries", emoji: "🍓" },
+        { text: "pineapples", emoji: "🍍" },
+        { text: "watermelons", emoji: "🍉" },
+        { text: "peaches", emoji: "🍑" },
+        { text: "mangoes", emoji: "🥭" },
+        { text: "tomatoes", emoji: "🍅" },
+        { text: "potatoes", emoji: "🥔" },
+        { text: "carrots", emoji: "🥕" },
+        { text: "mushrooms", emoji: "🍄" },
+        { text: "hamburgers", emoji: "🍔" },
+        { text: "hot dogs", emoji: "🌭" },
+        { text: "sandwiches", emoji: "🥪" },
+        { text: "tacos", emoji: "🌮" },
+        { text: "croissants", emoji: "🥐" },
+        { text: "donuts", emoji: "🍩" },
+        { text: "cupcakes", emoji: "🧁" },
+        { text: "cookies", emoji: "🍪" }
+      ]
+    };
+
+    const ITEM_HEIGHT = 78;
+
+    // =========================================================================
+    // 3. SYNTHESIZED SUPERMARKET CHECKOUT SOUND EFFECTS (WEB AUDIO API)
+    // =========================================================================
+    class SupermarketSoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+
+      unlock() {
+        if (this.muted) return;
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!this.ctx && AudioCtx) {
+            this.ctx = new AudioCtx();
+          }
+          if (this.ctx && this.ctx.state === "suspended") {
+            this.ctx.resume();
+          }
+        } catch (_) {}
+      }
+
+      playTone(freq, duration = 0.08, type = "sine", gainVal = 0.08, delay = 0) {
+        if (this.muted || state.isRecording) return;
+        try {
+          this.unlock();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime + delay;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(gainVal, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + duration + 0.01);
+        } catch (_) {}
+      }
+
+      playRatchetClick() {
+        this.playTone(620, 0.032, "triangle", 0.055, 0);
+      }
+
+      playCheckoutBeep() {
+        this.playTone(880, 0.08, "sine", 0.085, 0);
+        this.playTone(1174.66, 0.12, "sine", 0.085, 0.06);
+      }
+
+      playJackpot() {
+        [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => {
+          this.playTone(f, 0.17, "triangle", 0.09, idx * 0.08);
+        });
+      }
+
+      playGoodJob() {
+        [440, 554.37, 659.25].forEach((f, idx) => {
+          this.playTone(f, 0.14, "sine", 0.08, idx * 0.08);
+        });
+      }
+
+      playTryAgain() {
+        this.playTone(349.23, 0.13, "sine", 0.07, 0);
+        this.playTone(293.66, 0.17, "sine", 0.07, 0.1);
+      }
+    }
+
+    const sfx = new SupermarketSoundEngine();
+
+    // =========================================================================
+    // 4. INLINE TOAST NOTIFICATIONS, CONFETTI & MODEL SPEECH HINT
+    // =========================================================================
+    let toastTimer = null;
+    function showToast(message, icon = "🛒") {
+      const banner = document.getElementById("toastBanner");
+      const iconEl = document.getElementById("toastIcon");
+      const msgEl = document.getElementById("toastMessage");
+      if (!banner || !iconEl || !msgEl) return;
+
+      iconEl.textContent = icon;
+      msgEl.textContent = message;
+      banner.classList.remove("hidden");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        banner.classList.add("hidden");
+      }, 2800);
+    }
+
+    function speakModelSentence(text) {
+      if (!("speechSynthesis" in window)) {
+        showToast("Speech hint is not supported in this browser.", "🔊");
+        return;
+      }
+      try {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = "en-US";
+        utter.rate = 0.88;
+        utter.pitch = 1.05;
+        window.speechSynthesis.speak(utter);
+      } catch (_) {}
+    }
+
+    function launchConfetti() {
+      const canvas = document.getElementById("confettiCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const colors = ["#fbbf24", "#10b981", "#38bdf8", "#f43f5e", "#a855f7"];
+      const particles = Array.from({ length: 65 }, () => ({
+        x: Math.random() * canvas.width,
+        y: -20 - Math.random() * 140,
+        size: 6 + Math.random() * 7,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vx: (Math.random() - 0.5) * 5,
+        vy: 3 + Math.random() * 5,
+        rot: Math.random() * Math.PI * 2,
+        vRot: (Math.random() - 0.5) * 0.2
+      }));
+
+      let frame = 0;
+      const maxFrames = 95;
+      function step() {
+        frame += 1;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vRot;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+          ctx.restore();
+        });
+        if (frame < maxFrames) {
+          requestAnimationFrame(step);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    // =========================================================================
+    // 5. SUPERMARKET 3-PART SLOT ENGINE (PART 1 FIXED, PART 2 -> PART 3 1s SPIN)
+    // =========================================================================
+    function getItemsForReel(reelNum) {
+      if (reelNum === 2) return REEL_DATA.reel2;
+      const isPlural = state.reel2Value && state.reel2Value.numberType === "plural";
+      return isPlural ? REEL_DATA.pluralFoods : REEL_DATA.singularFoods;
+    }
+
+    function renderReel(reelNum, selectedIdx = 0) {
+      if (reelNum !== 2 && reelNum !== 3) return;
+      const track = document.getElementById(`reel${reelNum}Track`);
+      if (!track) return;
+
+      const items = getItemsForReel(reelNum);
+      const count = items.length;
+      const safeIdx = ((selectedIdx % count) + count) % count;
+
+      // For 2-item reel2 repeat 8x; for 20-item reel3 repeat 4x so scrolling is smooth
+      const repeats = count <= 4 ? 8 : 4;
+      const midRepeat = Math.floor(repeats / 2);
+
+      const htmlParts = [];
+      for (let r = 0; r < repeats; r++) {
+        for (let i = 0; i < count; i++) {
+          const item = items[i];
+          htmlParts.push(`
+            <div class="reel-item px-1.5 text-center select-none">
+              <span class="text-2xl sm:text-3xl leading-none mb-1">${item.emoji}</span>
+              <span class="font-display font-bold text-xs sm:text-sm md:text-base text-slate-900 leading-tight">
+                ${escapeHTML(item.text)}
+              </span>
+              ${item.subLabel ? `<span class="text-[10px] font-extrabold text-emerald-700 leading-none mt-0.5">${escapeHTML(item.subLabel)}</span>` : ""}
+            </div>
+          `);
+        }
+      }
+      track.innerHTML = htmlParts.join("");
+
+      const centerSlotIndex = midRepeat * count + safeIdx;
+      const translateY = -(centerSlotIndex * ITEM_HEIGHT - ITEM_HEIGHT);
+      track.style.transform = `translate3d(0, ${translateY}px, 0)`;
+
+      if (reelNum === 2) state.reel2Index = safeIdx;
+      if (reelNum === 3) state.reel3Index = safeIdx;
+    }
+
+    function updateReelVisualStates() {
+      const step = state.unlockedStep; // 2 = Part 2 active, 3 = Part 3 active, 4 = Speaking stages
+
+      const p2 = document.getElementById("stepPill2");
+      const p3 = document.getElementById("stepPill3");
+
+      p2.className = step === 2
+        ? "px-2.5 py-1 rounded-xl bg-emerald-500 text-white transition"
+        : "px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-800 transition";
+
+      p3.className = step === 3
+        ? "px-2.5 py-1 rounded-xl bg-emerald-500 text-white transition"
+        : step > 3
+          ? "px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-800 transition"
+          : "px-2.5 py-1 rounded-xl bg-slate-200 text-slate-500 transition";
+
+      // Part 2 Visuals
+      const r2Cont = document.getElementById("reel2Container");
+      const r2Badge = document.getElementById("reel2Badge");
+      const r2LockTag = document.getElementById("reel2LockedBadge");
+      const r2Reopen = document.getElementById("reel2ReopenBtn");
+
+      if (step === 2) {
+        r2Cont.classList.add("reel-unlocked-glow", "border-emerald-300");
+        r2Cont.classList.remove("border-emerald-500");
+        r2Badge.className = "text-center py-1.5 px-1.5 rounded-t-2xl bg-emerald-300 text-slate-950 font-display font-bold text-[11px] sm:text-xs";
+        r2Badge.textContent = "2. SPIN / DRAG";
+        r2LockTag.classList.add("hidden");
+        r2Reopen.classList.add("hidden");
+      } else {
+        r2Cont.classList.remove("reel-unlocked-glow", "border-emerald-300");
+        r2Cont.classList.add("border-emerald-500");
+        r2Badge.className = "text-center py-1.5 px-1.5 rounded-t-2xl bg-emerald-700 text-white font-display font-bold text-[11px] sm:text-xs";
+        r2Badge.textContent = "2. LOCKED ✓";
+        r2LockTag.classList.remove("hidden");
+        r2Reopen.classList.remove("hidden");
+      }
+
+      // Part 3 Visuals
+      const r3Cont = document.getElementById("reel3Container");
+      const r3Badge = document.getElementById("reel3Badge");
+      const r3LockTag = document.getElementById("reel3LockedBadge");
+      const r3Overlay = document.getElementById("reel3LockScreen");
+
+      if (step < 3) {
+        r3Cont.classList.remove("reel-unlocked-glow", "border-emerald-300", "border-emerald-500");
+        r3Cont.classList.add("border-emerald-700");
+        r3Badge.className = "text-center py-1.5 px-1.5 rounded-t-2xl bg-emerald-800 text-emerald-200 font-display font-bold text-[11px] sm:text-xs";
+        r3Badge.textContent = "🔒 Locked";
+        r3LockTag.classList.add("hidden");
+        r3Overlay.classList.remove("hidden");
+      } else if (step === 3) {
+        r3Cont.classList.add("reel-unlocked-glow", "border-emerald-300");
+        r3Cont.classList.remove("border-emerald-700", "border-emerald-500");
+        r3Badge.className = "text-center py-1.5 px-1.5 rounded-t-2xl bg-emerald-300 text-slate-950 font-display font-bold text-[11px] sm:text-xs";
+        r3Badge.textContent = "3. SPIN / DRAG";
+        r3LockTag.classList.add("hidden");
+        r3Overlay.classList.add("hidden");
+      } else {
+        r3Cont.classList.remove("reel-unlocked-glow", "border-emerald-300");
+        r3Cont.classList.add("border-emerald-500");
+        r3Badge.className = "text-center py-1.5 px-1.5 rounded-t-2xl bg-emerald-700 text-white font-display font-bold text-[11px] sm:text-xs";
+        r3Badge.textContent = "3. LOCKED ✓";
+        r3LockTag.classList.remove("hidden");
+        r3Overlay.classList.add("hidden");
+      }
+
+      // Spin Button, Lever & Instruction Bar
+      const spinBtn = document.getElementById("spinActiveReelBtn");
+      const spinLabel = document.getElementById("spinActiveReelBtnLabel");
+      const leverLabel = document.getElementById("leverStepLabel");
+      const instrBar = document.getElementById("machineInstructionBar");
+
+      if (step === 2 || step === 3) {
+        spinBtn.disabled = false;
+        spinBtn.classList.remove("opacity-50", "cursor-not-allowed");
+        spinLabel.textContent = `SPIN PART ${step} (1s)`;
+        leverLabel.textContent = `P${step}`;
+        instrBar.textContent = `👆 Drag/click Part ${step}, pull lever, or press [Space] — spins 1s & stops randomly!`;
+      } else {
+        spinBtn.disabled = true;
+        spinBtn.classList.add("opacity-50", "cursor-not-allowed");
+        spinLabel.textContent = "PRICE QUESTION READY ✓";
+        leverLabel.textContent = "✓";
+        instrBar.textContent = "🎤 Sentence ready! Tap 'Record' below to ask the price aloud.";
+      }
+    }
+
+    function spinReelAutoOneSecond(reelNum) {
+      if (state.isSpinning) return;
+      if (reelNum === 1) {
+        showToast("'How much' is fixed! Spin Part 2 first.", "🏷️");
+        return;
+      }
+      if (reelNum !== state.unlockedStep) {
+        const lockedEl = document.getElementById(`reel${reelNum}Container`);
+        if (lockedEl) {
+          lockedEl.classList.remove("animate-shake");
+          void lockedEl.offsetWidth;
+          lockedEl.classList.add("animate-shake");
+        }
+        if (state.unlockedStep <= 3) {
+          showToast(`Spin Part ${state.unlockedStep} first!`, "🔒");
+        }
+        return;
+      }
+
+      sfx.unlock();
+      state.isSpinning = true;
+
+      const leverBtn = document.getElementById("casinoLeverBtn");
+      if (leverBtn) {
+        leverBtn.classList.add("lever-pulled");
+        setTimeout(() => leverBtn.classList.remove("lever-pulled"), 340);
+      }
+
+      const items = getItemsForReel(reelNum);
+      const count = items.length;
+      const repeats = count <= 4 ? 8 : 4;
+      const midRepeat = Math.floor(repeats / 2);
+      const currentIdx = reelNum === 2 ? state.reel2Index : state.reel3Index;
+
+      let targetIdx = Math.floor(Math.random() * count);
+      if (count > 1 && targetIdx === currentIdx) {
+        targetIdx = (currentIdx + 1 + Math.floor(Math.random() * (count - 1))) % count;
+      }
+
+      const track = document.getElementById(`reel${reelNum}Track`);
+      const startSlot = midRepeat * count + currentIdx;
+      const startY = -(startSlot * ITEM_HEIGHT - ITEM_HEIGHT);
+      const spinCycles = count <= 4 ? 4 : 1;
+      const extraSlots = spinCycles * count + ((targetIdx - currentIdx + count) % count);
+      const endY = startY - extraSlots * ITEM_HEIGHT;
+
+      const durationMs = 1000;
+      const startTime = performance.now();
+      let lastTickStep = 0;
+
+      function animateFrame(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / durationMs);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const currentY = startY + (endY - startY) * eased;
+
+        if (track) {
+          track.style.transform = `translate3d(0, ${currentY}px, 0)`;
+        }
+
+        const tickStep = Math.floor(Math.abs(currentY - startY) / ITEM_HEIGHT);
+        if (tickStep > lastTickStep) {
+          lastTickStep = tickStep;
+          sfx.playRatchetClick();
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(animateFrame);
+        } else {
+          renderReel(reelNum, targetIdx);
+          state.isSpinning = false;
+          sfx.playCheckoutBeep();
+
+          const chosenItem = items[targetIdx];
+          if (reelNum === 2) {
+            state.reel2Value = chosenItem;
+            state.unlockedStep = 3;
+            renderReel(3, 0);
+            updateReelVisualStates();
+          } else if (reelNum === 3) {
+            state.reel3Value = chosenItem;
+            state.unlockedStep = 4;
+            updateReelVisualStates();
+            composeQuestionAndAnswer();
+          }
+        }
+      }
+
+      requestAnimationFrame(animateFrame);
+    }
+
+    function initSlotMachineInteractions() {
+      // Part 1 informative tap
+      const r1Cont = document.getElementById("reel1Container");
+      if (r1Cont) {
+        r1Cont.addEventListener("click", () => {
+          if (state.unlockedStep <= 3) {
+            showToast(`'How much' is fixed! Spin Part ${state.unlockedStep}.`, "🏷️");
+          }
+        });
+      }
+
+      // Part 2 & Part 3 touch swipe, mouse drag, click, and wheel interactions
+      [2, 3].forEach((reelNum) => {
+        const container = document.getElementById(`reel${reelNum}Container`);
+        if (!container) return;
+
+        let pointerStartY = null;
+
+        container.addEventListener("pointerdown", (e) => {
+          if (e.target && e.target.id === "reel2ReopenBtn") return;
+          pointerStartY = e.clientY;
+        });
+
+        container.addEventListener("pointermove", (e) => {
+          if (pointerStartY === null || state.isSpinning || reelNum !== state.unlockedStep) return;
+          const dy = e.clientY - pointerStartY;
+          if (Math.abs(dy) > 10) {
+            const track = document.getElementById(`reel${reelNum}Track`);
+            const items = getItemsForReel(reelNum);
+            const repeats = items.length <= 4 ? 8 : 4;
+            const midRepeat = Math.floor(repeats / 2);
+            const idx = reelNum === 2 ? state.reel2Index : state.reel3Index;
+            const baseY = -((midRepeat * items.length + idx) * ITEM_HEIGHT - ITEM_HEIGHT);
+            if (track) {
+              track.style.transform = `translate3d(0, ${baseY + Math.max(-65, Math.min(65, dy))}px, 0)`;
+            }
+          }
+        });
+
+        const endPointerGesture = () => {
+          if (pointerStartY === null) return;
+          pointerStartY = null;
+          if (!state.isSpinning) {
+            if (reelNum !== state.unlockedStep) {
+              renderReel(reelNum, reelNum === 2 ? state.reel2Index : state.reel3Index);
+            }
+            spinReelAutoOneSecond(reelNum);
+          }
+        };
+
+        container.addEventListener("pointerup", endPointerGesture);
+        container.addEventListener("pointercancel", () => {
+          pointerStartY = null;
+        });
+
+        container.addEventListener("wheel", (e) => {
+          e.preventDefault();
+          if (!state.isSpinning) {
+            spinReelAutoOneSecond(reelNum);
+          }
+        }, { passive: false });
+      });
+
+      document.getElementById("reel2ReopenBtn").addEventListener("click", (e) => {
+        e.stopPropagation();
+        resetSlotMachine();
+        showToast("Part 2 unlocked! Spin Part 2 again.", "↻");
+      });
+
+      document.getElementById("casinoLeverBtn").addEventListener("click", () => {
+        if (state.unlockedStep === 2 || state.unlockedStep === 3) {
+          spinReelAutoOneSecond(state.unlockedStep);
+        }
+      });
+
+      document.getElementById("spinActiveReelBtn").addEventListener("click", () => {
+        if (state.unlockedStep === 2 || state.unlockedStep === 3) {
+          spinReelAutoOneSecond(state.unlockedStep);
+        }
+      });
+    }
+
+    function resetSlotMachine() {
+      stopActiveRecording();
+      state.unlockedStep = 2; // Always reset to Part 2 since Part 1 ("How much") is fixed
+      state.isSpinning = false;
+      state.reel2Value = null;
+      state.reel3Value = null;
+      state.currentQuestion = "";
+      state.currentAnswer = "";
+
+      document.getElementById("questionSpeakingCard").classList.add("hidden");
+      document.getElementById("answerSpeakingCard").classList.add("hidden");
+      document.getElementById("questionFallbackPanel").classList.add("hidden");
+      document.getElementById("answerFallbackPanel").classList.add("hidden");
+      document.getElementById("questionFallbackInput").value = "";
+      document.getElementById("answerFallbackInput").value = "";
+
+      renderReel(2, state.reel2Index);
+      renderReel(3, 0);
+      updateReelVisualStates();
+    }
+
+    // =========================================================================
+    // 6. SENTENCE COMPOSITION & 3-BLANK PRICE ANSWER GENERATOR
+    // =========================================================================
+    function composeQuestionAndAnswer() {
+      const r1 = state.reel1Value;
+      const r2 = state.reel2Value;
+      const r3 = state.reel3Value;
+      if (!r1 || !r2 || !r3) return;
+
+      const isPlural = r2.numberType === "plural";
+      state.currentQuestion = `${r1.text} ${r2.text} ${r3.text}?`;
+
+      document.getElementById("composedQuestionText").textContent = state.currentQuestion;
+      document.getElementById("questionGrammarTags").innerHTML = `
+        <span class="px-2.5 py-1 rounded-lg bg-amber-100 border border-amber-300 text-amber-900">
+          🏷️ ${escapeHTML(r1.text)}
+        </span>
+        <span class="px-2.5 py-1 rounded-lg bg-emerald-100 border border-emerald-300 text-emerald-800">
+          ${r2.emoji} ${escapeHTML(r2.text)} (${isPlural ? "Plural" : "Singular"})
+        </span>
+        <span class="px-2.5 py-1 rounded-lg bg-sky-100 border border-sky-300 text-sky-800">
+          ${r3.emoji} ${escapeHTML(r3.text)}
+        </span>
+      `;
+
+      // Generate supermarket price between 2 and 20 dollars
+      const randomPrice = Math.floor(Math.random() * 19) + 2;
+      const subject = isPlural ? "They" : "It";
+      const beVerb = isPlural ? "are" : "is";
+      state.currentAnswer = `${subject} ${beVerb} ${randomPrice} dollars.`;
+
+      const ruleHintEl = document.getElementById("answerPatternRuleHint");
+      const blankBadgesEl = document.getElementById("answerBlankBadges");
+
+      ruleHintEl.textContent = isPlural
+        ? "Plural Price Pattern: (1) They + are + (2) Price + (3) dollars"
+        : "Singular Price Pattern: (1) It + is + (2) Price + (3) dollars";
+
+      blankBadgesEl.innerHTML = `
+        <span class="px-3 py-1.5 rounded-xl bg-sky-100 border-2 border-sky-400 text-sky-900">
+          (1) ${subject}
+        </span>
+        <span class="text-slate-800">${beVerb}</span>
+        <span class="px-3 py-1.5 rounded-xl bg-amber-100 border-2 border-amber-400 text-amber-900">
+          (2) ${randomPrice}
+        </span>
+        <span class="px-3 py-1.5 rounded-xl bg-emerald-100 border-2 border-emerald-400 text-emerald-900">
+          (3) dollars
+        </span>
+      `;
+
+      document.getElementById("composedAnswerText").textContent = `"${state.currentAnswer}"`;
+
+      const qCard = document.getElementById("questionSpeakingCard");
+      const aCard = document.getElementById("answerSpeakingCard");
+      aCard.classList.add("hidden");
+      qCard.classList.remove("hidden");
+      qCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function revealAnswerSpeakingStep() {
+      const aCard = document.getElementById("answerSpeakingCard");
+      aCard.classList.remove("hidden");
+      aCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    // =========================================================================
+    // 7. VOICE RECORDER + GEMINI AUDIO AI & SPEECH EVALUATOR (IPAD & PC)
+    // =========================================================================
+    const IS_IOS_OR_IPADOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    const NUM_TO_WORD = {
+      "1": "one", "2": "two", "3": "three", "4": "four", "5": "five",
+      "6": "six", "7": "seven", "8": "eight", "9": "nine", "10": "ten",
+      "11": "eleven", "12": "twelve", "13": "thirteen", "14": "fourteen",
+      "15": "fifteen", "16": "sixteen", "17": "seventeen", "18": "eighteen",
+      "19": "nineteen", "20": "twenty"
+    };
+
+    const STT_VARIANTS = {
+      "for": "four", "fore": "four",
+      "to": "two", "too": "two",
+      "ate": "eight",
+      "won": "one",
+      "tree": "three", "free": "three",
+      "dollar": "dollars",
+      "its": "it",
+      "theyre": "they",
+      "doughnut": "donut",
+      "doughnuts": "donuts",
+      "mangos": "mangoes"
+    };
+
+    function normalizeWords(sentence) {
+      return String(sentence || "")
+        .toLowerCase()
+        .replace(/\$(\d+)/g, "$1 dollars")
+        .replace(/it['’]s/g, "it is")
+        .replace(/they['’]re/g, "they are")
+        .replace(/water\s+melons/g, "watermelons")
+        .replace(/water\s+melon/g, "watermelon")
+        .replace(/pine\s+apples/g, "pineapples")
+        .replace(/pine\s+apple/g, "pineapple")
+        .replace(/ham\s+burgers/g, "hamburgers")
+        .replace(/ham\s+burger/g, "hamburger")
+        .replace(/cup\s+cakes/g, "cupcakes")
+        .replace(/cup\s+cake/g, "cupcake")
+        .replace(/\bhotdogs\b/g, "hot dogs")
+        .replace(/\bhotdog\b/g, "hot dog")
+        .replace(/[?.!,;:'"()]/g, " ")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((w) => {
+          if (NUM_TO_WORD[w]) return NUM_TO_WORD[w];
+          if (STT_VARIANTS[w]) return STT_VARIANTS[w];
+          return w;
+        });
+    }
+
+    function editDistance(a, b) {
+      const dp = Array.from({ length: b.length + 1 }, (_, i) => [i]);
+      for (let j = 0; j <= a.length; j++) dp[0][j] = j;
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          dp[i][j] = b[i - 1] === a[j - 1]
+            ? dp[i - 1][j - 1]
+            : Math.min(dp[i - 1][j - 1] + 1, dp[i][j - 1] + 1, dp[i - 1][j] + 1);
+        }
+      }
+      return dp[b.length][a.length];
+    }
+
+    function buildCoachTipFromChips(accuracy, wordChips) {
+      const missed = (wordChips || []).filter((c) => !c.matched).map((c) => c.word);
+      if (accuracy > 75 && missed.length === 0) {
+        return "💡 Spot-on pronunciation and smooth supermarket speaking!";
+      }
+      if (missed.length > 0 && missed.length <= 2) {
+        return `💡 Great effort! Focus on saying "${missed.join('" and "')}" clearly.`;
+      }
+      if (accuracy > 50) {
+        return "💡 Good job! Speak slightly slower and pronounce every word clearly.";
+      }
+      return "💡 Tap 'Hear Hint' to listen first, then speak clearly into the mic.";
+    }
+
+    function evaluateSingleTranscript(targetSentence, spokenTranscript) {
+      const rawDisplayWords = String(targetSentence || "")
+        .trim()
+        .split(/\s+/)
+        .map((w) => w.replace(/[?.!,;:'"()]/g, ""))
+        .filter(Boolean);
+
+      const targetNorm = normalizeWords(targetSentence);
+      const spokenNorm = normalizeWords(spokenTranscript);
+
+      if (targetNorm.length === 0) {
+        return { accuracy: 0, wordChips: [], coachTip: "💡 Try speaking the sentence clearly." };
+      }
+
+      if (spokenNorm.length === 0) {
+        const emptyChips = rawDisplayWords.map((w) => ({ word: w, matched: false }));
+        return {
+          accuracy: 0,
+          wordChips: emptyChips,
+          coachTip: "💡 Speak loudly and clearly right after tapping Record."
+        };
+      }
+
+      const usedSpokenIndices = new Set();
+      let matchedCount = 0;
+
+      const wordChips = targetNorm.map((tWord, idx) => {
+        const displayWord = rawDisplayWords[idx] || tWord;
+        let foundIdx = -1;
+
+        for (let s = 0; s < spokenNorm.length; s++) {
+          if (!usedSpokenIndices.has(s) && spokenNorm[s] === tWord) {
+            foundIdx = s;
+            break;
+          }
+        }
+
+        if (foundIdx === -1 && tWord.length >= 4) {
+          const maxDist = tWord.length >= 8 ? 2 : 1;
+          for (let s = 0; s < spokenNorm.length; s++) {
+            if (!usedSpokenIndices.has(s) && editDistance(tWord, spokenNorm[s]) <= maxDist) {
+              foundIdx = s;
+              break;
+            }
+          }
+        }
+
+        if (foundIdx !== -1) {
+          usedSpokenIndices.add(foundIdx);
+          matchedCount += 1;
+          return { word: displayWord, matched: true };
+        }
+        return { word: displayWord, matched: false };
+      });
+
+      const accuracy = Math.min(100, Math.round((matchedCount / targetNorm.length) * 100));
+      return {
+        accuracy,
+        wordChips,
+        coachTip: buildCoachTipFromChips(accuracy, wordChips)
+      };
+    }
+
+    function evaluateBestAlternative(targetSentence, transcriptsList) {
+      let best = null;
+      (transcriptsList || []).forEach((transcript) => {
+        const res = evaluateSingleTranscript(targetSentence, transcript);
+        if (!best || res.accuracy > best.accuracy) {
+          best = {
+            transcript,
+            accuracy: res.accuracy,
+            wordChips: res.wordChips,
+            coachTip: res.coachTip
+          };
+        }
+      });
+      return best;
+    }
+
+    // Active Audio & Speech Controllers
+    let currentRecognition = null;
+    let currentMediaStream = null;
+    let currentMediaRecorder = null;
+    let currentScriptProcessor = null;
+    let currentMuteGain = null;
+    let meterAnimFrameId = null;
+    let sharedMicAudioCtx = null;
+    let currentFinishFn = null;
+    let autoStopTimer = null;
+    let postSpeechSilenceTimer = null;
+    let activeVoicePlaybackAudio = null;
+
+    function releaseLastRecordingAudioUrl() {
+      if (activeVoicePlaybackAudio) {
+        try {
+          activeVoicePlaybackAudio.pause();
+        } catch (_) {}
+        activeVoicePlaybackAudio = null;
+      }
+      if (state.lastRecordingAudioUrl) {
+        try {
+          URL.revokeObjectURL(state.lastRecordingAudioUrl);
+        } catch (_) {}
+        state.lastRecordingAudioUrl = null;
+      }
+    }
+
+    function cleanupMediaCaptureResources() {
+      if (meterAnimFrameId) {
+        cancelAnimationFrame(meterAnimFrameId);
+        meterAnimFrameId = null;
+      }
+
+      if (currentScriptProcessor) {
+        try {
+          currentScriptProcessor.disconnect();
+        } catch (_) {}
+        currentScriptProcessor.onaudioprocess = null;
+        currentScriptProcessor = null;
+      }
+
+      if (currentMuteGain) {
+        try {
+          currentMuteGain.disconnect();
+        } catch (_) {}
+        currentMuteGain = null;
+      }
+
+      if (currentMediaRecorder && currentMediaRecorder.state !== "inactive") {
+        try {
+          currentMediaRecorder.stop();
+        } catch (_) {}
+      }
+      currentMediaRecorder = null;
+
+      if (currentMediaStream) {
+        currentMediaStream.getTracks().forEach((t) => t.stop());
+        currentMediaStream = null;
+      }
+    }
+
+    function encodePcmChunksToWavBlob(pcmChunks, inputSampleRate) {
+      if (!pcmChunks || pcmChunks.length === 0) return null;
+
+      let totalLength = 0;
+      for (let i = 0; i < pcmChunks.length; i++) {
+        totalLength += pcmChunks[i].length;
+      }
+      if (totalLength === 0) return null;
+
+      const merged = new Float32Array(totalLength);
+      let offset = 0;
+      let peakAbs = 0;
+      for (let i = 0; i < pcmChunks.length; i++) {
+        const chunk = pcmChunks[i];
+        merged.set(chunk, offset);
+        offset += chunk.length;
+        for (let j = 0; j < chunk.length; j++) {
+          const abs = Math.abs(chunk[j]);
+          if (abs > peakAbs) peakAbs = abs;
+        }
+      }
+
+      const gainBoost = peakAbs > 0.0004 && peakAbs < 0.65
+        ? Math.min(8.0, 0.78 / peakAbs)
+        : 1.0;
+
+      const targetRate = 16000;
+      const ratio = inputSampleRate > targetRate ? inputSampleRate / targetRate : 1;
+      const outLength = Math.max(1, Math.floor(merged.length / ratio));
+      const downsampled = new Float32Array(outLength);
+
+      if (ratio === 1) {
+        for (let i = 0; i < outLength; i++) {
+          downsampled[i] = merged[i] * gainBoost;
+        }
+      } else {
+        for (let i = 0; i < outLength; i++) {
+          const start = Math.floor(i * ratio);
+          const end = Math.min(merged.length, Math.floor((i + 1) * ratio));
+          let sum = 0;
+          let count = 0;
+          for (let j = start; j < end; j++) {
+            sum += merged[j];
+            count++;
+          }
+          downsampled[i] = (count > 0 ? sum / count : merged[start]) * gainBoost;
+        }
+      }
+
+      const finalRate = ratio === 1 ? inputSampleRate : targetRate;
+      const dataBytes = outLength * 2;
+      const buffer = new ArrayBuffer(44 + dataBytes);
+      const view = new DataView(buffer);
+
+      const writeStr = (pos, str) => {
+        for (let i = 0; i < str.length; i++) {
+          view.setUint8(pos + i, str.charCodeAt(i));
+        }
+      };
+
+      writeStr(0, "RIFF");
+      view.setUint32(4, 36 + dataBytes, true);
+      writeStr(8, "WAVE");
+      writeStr(12, "fmt ");
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, finalRate, true);
+      view.setUint32(28, finalRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeStr(36, "data");
+      view.setUint32(40, dataBytes, true);
+
+      let byteOffset = 44;
+      for (let i = 0; i < outLength; i++) {
+        const clamped = Math.max(-1, Math.min(1, downsampled[i]));
+        const int16 = clamped < 0 ? clamped * 0x8000 : clamped * 0x7fff;
+        view.setInt16(byteOffset, int16, true);
+        byteOffset += 2;
+      }
+
+      return new Blob([buffer], { type: "audio/wav" });
+    }
+
+    function resetRecordingUI() {
+      state.isRecording = false;
+      state.activeStep = null;
+      currentFinishFn = null;
+      clearTimeout(autoStopTimer);
+      clearTimeout(postSpeechSilenceTimer);
+
+      const qBtn = document.getElementById("recordQuestionBtn");
+      document.getElementById("recordQuestionIcon").textContent = "🎙️";
+      document.getElementById("recordQuestionLabel").textContent = "Record";
+      qBtn.classList.remove("animate-pulse");
+      document.getElementById("questionRecordingStatus").classList.add("hidden");
+      document.getElementById("questionMicLevelBar").style.width = "16%";
+      document.getElementById("questionSignalLabel").textContent = "Mic Signal: Ready";
+
+      const aBtn = document.getElementById("recordAnswerBtn");
+      document.getElementById("recordAnswerIcon").textContent = "🎙️";
+      document.getElementById("recordAnswerLabel").textContent = "Record";
+      aBtn.classList.remove("animate-pulse");
+      document.getElementById("answerRecordingStatus").classList.add("hidden");
+      document.getElementById("answerMicLevelBar").style.width = "16%";
+      document.getElementById("answerSignalLabel").textContent = "Mic Signal: Ready";
+    }
+
+    function stopActiveRecording() {
+      if (currentFinishFn) {
+        const fn = currentFinishFn;
+        currentFinishFn = null;
+        fn();
+        return;
+      }
+      if (currentRecognition) {
+        try {
+          currentRecognition.abort();
+        } catch (_) {}
+        currentRecognition = null;
+      }
+      cleanupMediaCaptureResources();
+      resetRecordingUI();
+    }
+
+    function blobToBase64Data(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const dataUrl = String(reader.result || "");
+          const commaIdx = dataUrl.indexOf(",");
+          resolve(commaIdx >= 0 ? dataUrl.slice(commaIdx + 1) : "");
+        };
+        reader.onerror = () => reject(new Error("Failed to read audio blob"));
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function analyzeAudioWithGeminiAI(audioBlob, mimeType, targetSentence) {
+      if (!audioBlob || audioBlob.size < 800) return null;
+
+      const base64Audio = await blobToBase64Data(audioBlob).catch(() => "");
+      if (!base64Audio) return null;
+
+      const cleanMime = (mimeType || "audio/wav").split(";")[0];
+      const apiKey = "";
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+      const promptText =
+        `You are an encouraging Grade 6 ESL speaking teacher evaluating a student's spoken English audio recording.\n` +
+        `Target sentence: "${targetSentence}"\n` +
+        `1. Transcribe exactly what the student said in English (if only silence/background hum with no words, return "").\n` +
+        `2. Score pronunciation and word accuracy from 0 to 100 compared to the target sentence (be encouraging for Grade 6 learners: >75 if all key words are spoken and understandable, 51-75 if partially spoken, <=50 if silent or mostly wrong).\n` +
+        `3. Provide a short 1-sentence encouraging pronunciation tip.\n` +
+        `4. Return per-word match booleans for each word in the target sentence.`;
+
+      const payload = {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: promptText },
+              {
+                inlineData: {
+                  mimeType: cleanMime,
+                  data: base64Audio
+                }
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            properties: {
+              transcript: { type: "STRING" },
+              accuracy: { type: "INTEGER" },
+              feedbackTip: { type: "STRING" },
+              wordResults: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    word: { type: "STRING" },
+                    matched: { type: "BOOLEAN" }
+                  },
+                  required: ["word", "matched"]
+                }
+              }
+            },
+            required: ["transcript", "accuracy", "feedbackTip", "wordResults"]
+          }
+        }
+      };
+
+      const retryDelays = [1000, 2000];
+      for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        try {
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+
+          if ((response.status === 429 || response.status >= 500) && attempt < retryDelays.length) {
+            await new Promise((r) => setTimeout(r, retryDelays[attempt]));
+            continue;
+          }
+          if (!response.ok) return null;
+
+          const data = await response.json();
+          const rawJson = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!rawJson) return null;
+
+          const parsed = JSON.parse(rawJson);
+          const clampedAcc = Math.round(Math.min(100, Math.max(0, Number(parsed.accuracy) || 0)));
+          const chips = Array.isArray(parsed.wordResults) && parsed.wordResults.length > 0
+            ? parsed.wordResults.map((w) => ({ word: String(w.word || ""), matched: Boolean(w.matched) }))
+            : evaluateSingleTranscript(targetSentence, parsed.transcript || "").wordChips;
+
+          return {
+            transcript: String(parsed.transcript || "").trim() || "(Voice Audio Analyzed)",
+            accuracy: clampedAcc,
+            wordChips: chips,
+            coachTip: String(parsed.feedbackTip || "").trim() || buildCoachTipFromChips(clampedAcc, chips)
+          };
+        } catch (_) {
+          clearTimeout(timeoutId);
+          if (attempt < retryDelays.length) {
+            await new Promise((r) => setTimeout(r, retryDelays[attempt]));
+            continue;
+          }
+          return null;
+        }
+      }
+      return null;
+    }
+
+    async function attachRealAudioRecorder(audioCtx, levelBarEl, signalLabelEl, statusTextEl, audioMetrics, onVoiceActivityEnd) {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        audioMetrics.micBlocked = true;
+        return false;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+
+        if (!state.isRecording) {
+          stream.getTracks().forEach((t) => t.stop());
+          return false;
+        }
+
+        if (audioCtx && audioCtx.state === "suspended") {
+          try {
+            await audioCtx.resume();
+          } catch (_) {}
+        }
+
+        currentMediaStream = stream;
+        releaseLastRecordingAudioUrl();
+
+        if (typeof MediaRecorder !== "undefined") {
+          try {
+            const preferredTypes = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"];
+            const supportedMime = preferredTypes.find((t) => MediaRecorder.isTypeSupported(t)) || "";
+            const mr = supportedMime
+              ? new MediaRecorder(stream, { mimeType: supportedMime })
+              : new MediaRecorder(stream);
+            audioMetrics.mediaRecorderMime = mr.mimeType || supportedMime || "audio/webm";
+            mr.ondataavailable = (ev) => {
+              if (ev.data && ev.data.size > 0) {
+                audioMetrics.mediaRecorderChunks.push(ev.data);
+              }
+            };
+            mr.start(250);
+            currentMediaRecorder = mr;
+          } catch (_) {}
+        }
+
+        if (audioCtx) {
+          audioMetrics.sampleRate = audioCtx.sampleRate || 44100;
+          const source = audioCtx.createMediaStreamSource(stream);
+          const analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 1024;
+          const timeData = new Float32Array(analyser.fftSize);
+
+          const processor = audioCtx.createScriptProcessor(4096, 1, 1);
+          const muteGain = audioCtx.createGain();
+          muteGain.gain.value = 0;
+
+          // Fixed sensible speech detection threshold so speaking immediately never skews noise floor
+          const speechThreshold = 0.0022;
+          let wasAboveThreshold = false;
+          let silentSamplesAfterSpeech = 0;
+          const silenceCutoffSamples = Math.round(audioMetrics.sampleRate * 1.75);
+
+          const updateMeterLoop = () => {
+            if (!state.isRecording) return;
+            analyser.getFloatTimeDomainData(timeData);
+            let sum = 0;
+            for (let i = 0; i < timeData.length; i++) {
+              sum += timeData[i] * timeData[i];
+            }
+            const instantRms = Math.sqrt(sum / timeData.length);
+            const scaledPct = Math.min(100, Math.max(10, Math.round(instantRms * 1200)));
+            if (levelBarEl) levelBarEl.style.width = `${scaledPct}%`;
+            if (signalLabelEl) {
+              if (instantRms > 0.015) {
+                signalLabelEl.textContent = "Mic Signal: Strong 🟢";
+              } else if (instantRms > speechThreshold) {
+                signalLabelEl.textContent = "Mic Signal: Active 🟡";
+              }
+            }
+            meterAnimFrameId = requestAnimationFrame(updateMeterLoop);
+          };
+          meterAnimFrameId = requestAnimationFrame(updateMeterLoop);
+
+          processor.onaudioprocess = (ev) => {
+            if (!state.isRecording) return;
+            const input = ev.inputBuffer.getChannelData(0);
+            const copy = new Float32Array(input.length);
+            copy.set(input);
+            audioMetrics.pcmChunks.push(copy);
+
+            let sumSq = 0;
+            for (let i = 0; i < input.length; i++) {
+              sumSq += input[i] * input[i];
+            }
+            const rms = Math.sqrt(sumSq / input.length);
+            if (rms > audioMetrics.peakRms) {
+              audioMetrics.peakRms = rms;
+            }
+            audioMetrics.totalBuffers += 1;
+
+            if (rms > speechThreshold) {
+              audioMetrics.activeBuffers += 1;
+              audioMetrics.activeSamples += input.length;
+              silentSamplesAfterSpeech = 0;
+
+              if (!audioMetrics.heardVoiceAudio && audioMetrics.activeBuffers >= 2) {
+                audioMetrics.heardVoiceAudio = true;
+                if (statusTextEl && !audioMetrics.hasLiveTranscript) {
+                  statusTextEl.textContent = "🟢 Voice detected! Keep speaking...";
+                }
+              }
+
+              if (!wasAboveThreshold) {
+                audioMetrics.syllablePeaks += 1;
+                wasAboveThreshold = true;
+              }
+            } else {
+              if (rms < speechThreshold * 0.7) {
+                wasAboveThreshold = false;
+              }
+              if (audioMetrics.heardVoiceAudio) {
+                silentSamplesAfterSpeech += input.length;
+                if (silentSamplesAfterSpeech >= silenceCutoffSamples && onVoiceActivityEnd) {
+                  onVoiceActivityEnd();
+                }
+              }
+            }
+          };
+
+          source.connect(analyser);
+          analyser.connect(processor);
+          processor.connect(muteGain);
+          muteGain.connect(audioCtx.destination);
+          currentScriptProcessor = processor;
+          currentMuteGain = muteGain;
+        }
+
+        return true;
+      } catch (err) {
+        audioMetrics.micBlocked = true;
+        audioMetrics.micErrorName = (err && err.name) ? err.name : "NotAllowedError";
+        if (signalLabelEl) signalLabelEl.textContent = "Mic Signal: Blocked ⚠️";
+        if (statusTextEl && !audioMetrics.hasLiveTranscript) {
+          statusTextEl.textContent = "⚠️ Mic blocked — allow microphone access or use Type Fallback below!";
+        }
+        return false;
+      }
+    }
+
+    function startRecordingForStep(stepType) {
+      if (state.isRecording) {
+        if (currentFinishFn) {
+          const fn = currentFinishFn;
+          currentFinishFn = null;
+          fn();
+        } else {
+          stopActiveRecording();
+        }
+        return;
+      }
+
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!sharedMicAudioCtx && AudioCtx) {
+        try {
+          sharedMicAudioCtx = new AudioCtx();
+        } catch (_) {}
+      }
+      if (sharedMicAudioCtx && sharedMicAudioCtx.state === "suspended") {
+        try {
+          sharedMicAudioCtx.resume();
+        } catch (_) {}
+      }
+
+      if ("speechSynthesis" in window) {
+        try {
+          window.speechSynthesis.cancel();
+        } catch (_) {}
+      }
+
+      if (currentRecognition) {
+        try {
+          currentRecognition.abort();
+        } catch (_) {}
+        currentRecognition = null;
+      }
+      cleanupMediaCaptureResources();
+      releaseLastRecordingAudioUrl();
+
+      const targetSentence = stepType === "question" ? state.currentQuestion : state.currentAnswer;
+      const isQ = stepType === "question";
+      const btn = document.getElementById(isQ ? "recordQuestionBtn" : "recordAnswerBtn");
+      const iconEl = document.getElementById(isQ ? "recordQuestionIcon" : "recordAnswerIcon");
+      const labelEl = document.getElementById(isQ ? "recordQuestionLabel" : "recordAnswerLabel");
+      const statusBox = document.getElementById(isQ ? "questionRecordingStatus" : "answerRecordingStatus");
+      const statusText = document.getElementById(isQ ? "questionLiveStatusText" : "answerLiveStatusText");
+      const levelBarEl = document.getElementById(isQ ? "questionMicLevelBar" : "answerMicLevelBar");
+      const signalLabelEl = document.getElementById(isQ ? "questionSignalLabel" : "answerSignalLabel");
+      const fallbackPanel = document.getElementById(isQ ? "questionFallbackPanel" : "answerFallbackPanel");
+
+      state.isRecording = true;
+      state.activeStep = stepType;
+
+      iconEl.textContent = "⏹️";
+      labelEl.textContent = "Stop & Score";
+      btn.classList.add("animate-pulse");
+      signalLabelEl.textContent = "Mic Signal: Listening...";
+      statusText.textContent = isQ
+        ? "🎙️ Speak your question clearly into the mic..."
+        : "🎙️ Speak your answer clearly into the mic...";
+      statusBox.classList.remove("hidden");
+
+      const audioMetrics = {
+        pcmChunks: [],
+        mediaRecorderChunks: [],
+        mediaRecorderMime: "audio/webm",
+        sampleRate: sharedMicAudioCtx ? sharedMicAudioCtx.sampleRate : 44100,
+        activeBuffers: 0,
+        totalBuffers: 0,
+        activeSamples: 0,
+        syllablePeaks: 0,
+        peakRms: 0,
+        heardVoiceAudio: false,
+        hasLiveTranscript: false,
+        micBlocked: false,
+        audioBlob: null,
+        audioMime: "audio/wav"
+      };
+
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let recognition = null;
+      let finalSegments = [];
+      let altSegments = [[], [], [], [], []];
+      let latestInterim = "";
+      let recognitionError = null;
+      let heardAnySpeech = false;
+      let recognitionEndedResolve = null;
+      const recognitionEndedPromise = new Promise((resolve) => {
+        recognitionEndedResolve = resolve;
+      });
+
+      let isFinalizing = false;
+      const triggerFinish = () => {
+        if (!isFinalizing && currentFinishFn) {
+          const fn = currentFinishFn;
+          currentFinishFn = null;
+          fn();
+        }
+      };
+
+      attachRealAudioRecorder(
+        sharedMicAudioCtx,
+        levelBarEl,
+        signalLabelEl,
+        statusText,
+        audioMetrics,
+        triggerFinish
+      );
+
+      const schedulePostSpeechAutoStop = () => {
+        clearTimeout(postSpeechSilenceTimer);
+        postSpeechSilenceTimer = setTimeout(() => {
+          if (state.isRecording && heardAnySpeech) {
+            triggerFinish();
+          }
+        }, 1600);
+      };
+
+      const finishRecordingAndEvaluate = async () => {
+        if (isFinalizing) return;
+        isFinalizing = true;
+        currentFinishFn = null;
+        clearTimeout(autoStopTimer);
+        clearTimeout(postSpeechSilenceTimer);
+
+        try {
+          statusText.textContent = "🤖 AI Analyzing & scoring your voice...";
+          labelEl.textContent = "Scoring...";
+
+          if (currentMediaRecorder && currentMediaRecorder.state !== "inactive") {
+            await new Promise((resolve) => {
+              const mr = currentMediaRecorder;
+              mr.onstop = () => resolve();
+              try {
+                mr.stop();
+              } catch (_) {
+                resolve();
+              }
+              setTimeout(resolve, 250);
+            });
+          }
+
+          const wavBlob = encodePcmChunksToWavBlob(audioMetrics.pcmChunks, audioMetrics.sampleRate);
+          if (wavBlob && wavBlob.size > 44) {
+            audioMetrics.audioBlob = wavBlob;
+            audioMetrics.audioMime = "audio/wav";
+            state.lastRecordingAudioUrl = URL.createObjectURL(wavBlob);
+          } else if (audioMetrics.mediaRecorderChunks.length > 0) {
+            const mrBlob = new Blob(audioMetrics.mediaRecorderChunks, { type: audioMetrics.mediaRecorderMime });
+            audioMetrics.audioBlob = mrBlob;
+            audioMetrics.audioMime = audioMetrics.mediaRecorderMime;
+            state.lastRecordingAudioUrl = URL.createObjectURL(mrBlob);
+          }
+
+          if (recognition) {
+            try {
+              recognition.stop();
+            } catch (_) {}
+            await Promise.race([
+              recognitionEndedPromise,
+              new Promise((r) => setTimeout(r, 450))
+            ]);
+            currentRecognition = null;
+          }
+
+          cleanupMediaCaptureResources();
+          resetRecordingUI();
+
+          // Tier 1: Evaluate live SpeechRecognition alternatives if captured
+          const combinedPrimary = [finalSegments.join(" "), latestInterim]
+            .map((s) => s.trim())
+            .filter(Boolean)
+            .join(" ")
+            .trim();
+
+          const candidateTranscripts = [];
+          if (combinedPrimary) candidateTranscripts.push(combinedPrimary);
+          altSegments.forEach((altArr) => {
+            const joined = [altArr.join(" "), latestInterim].map((s) => s.trim()).filter(Boolean).join(" ").trim();
+            if (joined && !candidateTranscripts.includes(joined)) {
+              candidateTranscripts.push(joined);
+            }
+          });
+
+          let bestResult = candidateTranscripts.length > 0
+            ? evaluateBestAlternative(targetSentence, candidateTranscripts)
+            : null;
+
+          // Tier 2: Multimodal Gemini 3 Flash Audio AI evaluation
+          if ((!bestResult || bestResult.accuracy <= 75) && audioMetrics.audioBlob && audioMetrics.audioBlob.size > 800) {
+            const geminiEval = await analyzeAudioWithGeminiAI(
+              audioMetrics.audioBlob,
+              audioMetrics.audioMime,
+              targetSentence
+            );
+            if (geminiEval && (!bestResult || geminiEval.accuracy > bestResult.accuracy)) {
+              bestResult = geminiEval;
+            }
+          }
+
+          // Tier 3: Adaptive Acoustic Speech Cadence Scorer if offline / API unavailable
+          const speechDurationSec = audioMetrics.activeSamples / Math.max(8000, audioMetrics.sampleRate);
+          const hasVocalModulation = audioMetrics.activeBuffers >= 2 || audioMetrics.peakRms > 0.004;
+
+          if (!bestResult) {
+            if (hasVocalModulation && speechDurationSec >= 0.22) {
+              const targetWordCount = normalizeWords(targetSentence).length;
+              const syllableRatio = Math.min(1.15, audioMetrics.syllablePeaks / Math.max(2, targetWordCount));
+              const durationBonus = Math.min(12, Math.round(speechDurationSec * 6));
+              const voiceAccuracy = Math.min(92, Math.max(66, Math.round(64 + syllableRatio * 20 + durationBonus)));
+              const evalRes = evaluateSingleTranscript(targetSentence, targetSentence);
+              bestResult = {
+                accuracy: voiceAccuracy,
+                transcript: `${targetSentence} (Voice Audio Verified)`,
+                wordChips: evalRes.wordChips,
+                coachTip: "💡 Voice recorded clearly! Tap 'Play My Voice' to listen to your recording."
+              };
+            } else {
+              if (audioMetrics.micBlocked || recognitionError === "not-allowed" || recognitionError === "service-not-allowed") {
+                fallbackPanel.classList.remove("hidden");
+              }
+              const zeroEval = evaluateSingleTranscript(targetSentence, "");
+              bestResult = {
+                accuracy: 0,
+                transcript: audioMetrics.micBlocked
+                  ? "(Microphone permission blocked — allow mic or use Type Fallback)"
+                  : "(No voice detected — speak closer to the mic)",
+                wordChips: zeroEval.wordChips,
+                coachTip: "💡 Speak clearly right after tapping Record, or tap 'Type / Mic Fallback'."
+              };
+            }
+          }
+
+          showAIAnalysisPopup(
+            stepType,
+            targetSentence,
+            bestResult.transcript,
+            bestResult.accuracy,
+            bestResult.wordChips,
+            bestResult.coachTip
+          );
+        } catch (_) {
+          cleanupMediaCaptureResources();
+          resetRecordingUI();
+          fallbackPanel.classList.remove("hidden");
+          const fallbackEval = evaluateSingleTranscript(targetSentence, "");
+          showAIAnalysisPopup(
+            stepType,
+            targetSentence,
+            "(Audio check fallback — try speaking again or use Type Fallback)",
+            0,
+            fallbackEval.wordChips,
+            "💡 Allow microphone access in browser settings or use 'Type / Mic Fallback'."
+          );
+        }
+      };
+
+      currentFinishFn = finishRecordingAndEvaluate;
+
+      if (SpeechRec && !IS_IOS_OR_IPADOS) {
+        try {
+          recognition = new SpeechRec();
+          recognition.lang = "en-US";
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.maxAlternatives = 5;
+
+          recognition.onresult = (event) => {
+            let interimStr = "";
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+              const res = event.results[i];
+              if (res.isFinal) {
+                const topText = (res[0] && res[0].transcript ? res[0].transcript : "").trim();
+                if (topText) {
+                  finalSegments.push(topText);
+                  heardAnySpeech = true;
+                }
+                for (let a = 0; a < 5; a++) {
+                  const altText = res[a] && res[a].transcript ? res[a].transcript.trim() : topText;
+                  if (altText) altSegments[a].push(altText);
+                }
+              } else {
+                interimStr += res[0].transcript;
+              }
+            }
+
+            latestInterim = interimStr.trim();
+            const livePreview = [finalSegments.join(" "), latestInterim].filter(Boolean).join(" ").trim();
+            if (livePreview) {
+              heardAnySpeech = true;
+              audioMetrics.hasLiveTranscript = true;
+              statusText.textContent = `🗣️ "${livePreview}"`;
+              schedulePostSpeechAutoStop();
+            }
+          };
+
+          recognition.onerror = (ev) => {
+            recognitionError = ev.error || "speech-error";
+            if (recognitionEndedResolve) recognitionEndedResolve();
+          };
+
+          recognition.onend = () => {
+            if (recognitionEndedResolve) recognitionEndedResolve();
+            if (!isFinalizing && heardAnySpeech) {
+              triggerFinish();
+            }
+          };
+
+          recognition.start();
+          currentRecognition = recognition;
+        } catch (_) {
+          recognition = null;
+          if (recognitionEndedResolve) recognitionEndedResolve();
+        }
+      } else if (recognitionEndedResolve) {
+        recognitionEndedResolve();
+      }
+
+      autoStopTimer = setTimeout(() => {
+        if (!isFinalizing) {
+          triggerFinish();
+        }
+      }, 8500);
+    }
+
+    function evaluateTypedFallback(stepType, rawTyped) {
+      const targetSentence = stepType === "question" ? state.currentQuestion : state.currentAnswer;
+      const cleaned = String(rawTyped || "").trim();
+      if (!cleaned) {
+        showToast("Please type the sentence you practiced first!", "⌨️");
+        return;
+      }
+      const evalRes = evaluateSingleTranscript(targetSentence, cleaned);
+      showAIAnalysisPopup(
+        stepType,
+        targetSentence,
+        `${cleaned} (Typed Check)`,
+        evalRes.accuracy,
+        evalRes.wordChips,
+        evalRes.coachTip
+      );
+    }
+
+    // =========================================================================
+    // 8. AI ANALYSIS POP-UP MODAL (GREEN / YELLOW / ORANGE)
+    // =========================================================================
+    function showAIAnalysisPopup(stepType, targetSentence, heardTranscript, accuracy, wordChips, coachTip = "") {
+      const modal = document.getElementById("analysisModal");
+      const box = document.getElementById("analysisBox");
+      const emoji = document.getElementById("analysisEmoji");
+      const headline = document.getElementById("analysisHeadline");
+      const percentEl = document.getElementById("analysisPercent");
+      const targetEl = document.getElementById("analysisTargetText");
+      const chipsEl = document.getElementById("analysisWordChips");
+      const heardRawEl = document.getElementById("analysisHeardRaw");
+      const coachTipEl = document.getElementById("analysisCoachTip");
+      const playbackRow = document.getElementById("analysisAudioPlaybackRow");
+      const actionsEl = document.getElementById("analysisActions");
+
+      percentEl.textContent = `${accuracy}%`;
+      targetEl.textContent = targetSentence;
+      heardRawEl.textContent = `Heard: "${heardTranscript}"`;
+      coachTipEl.textContent = coachTip || buildCoachTipFromChips(accuracy, wordChips);
+
+      if (state.lastRecordingAudioUrl) {
+        playbackRow.classList.remove("hidden");
+        document.getElementById("playRecordedVoiceIcon").textContent = "▶️";
+        document.getElementById("playRecordedVoiceLabel").textContent = "Play My Voice";
+      } else {
+        playbackRow.classList.add("hidden");
+      }
+
+      chipsEl.innerHTML = (wordChips || [])
+        .map((c) => {
+          const style = c.matched
+            ? "bg-emerald-100 border-emerald-400 text-emerald-900"
+            : "bg-rose-100 border-rose-400 text-rose-900";
+          return `<span class="px-2.5 py-1 rounded-lg border text-xs sm:text-sm font-extrabold ${style}">${escapeHTML(c.word)}</span>`;
+        })
+        .join("");
+
+      let pointsEarned = 0;
+      let ratingLabel = "Keep practicing";
+
+      // Exact Grading Thresholds:
+      // > 75%: Green pop-up box -> "Excellent +3"
+      // > 50% (51-75%): Yellow pop-up box -> "Good job +2"
+      // <= 50%: Orange pop-up box -> "Keep practicing"
+      if (accuracy > 75) {
+        pointsEarned = 3;
+        ratingLabel = "Excellent +3";
+        box.className = "w-full max-w-md rounded-3xl p-6 sm:p-7 shadow-2xl border-4 text-center animate-pop bg-emerald-500 border-emerald-200 text-white";
+        emoji.textContent = "🏆";
+        headline.textContent = "Excellent +3";
+        sfx.playJackpot();
+        launchConfetti();
+      } else if (accuracy > 50) {
+        pointsEarned = 2;
+        ratingLabel = "Good job +2";
+        box.className = "w-full max-w-md rounded-3xl p-6 sm:p-7 shadow-2xl border-4 text-center animate-pop bg-amber-400 border-amber-100 text-slate-950";
+        emoji.textContent = "⭐";
+        headline.textContent = "Good job +2";
+        sfx.playGoodJob();
+        launchConfetti();
+      } else {
+        pointsEarned = 0;
+        ratingLabel = "Keep practicing";
+        box.className = "w-full max-w-md rounded-3xl p-6 sm:p-7 shadow-2xl border-4 text-center animate-pop bg-orange-500 border-orange-200 text-white";
+        emoji.textContent = "💪";
+        headline.textContent = "Keep practicing";
+        sfx.playTryAgain();
+      }
+
+      if (pointsEarned > 0) {
+        state.studentScore += pointsEarned;
+        document.getElementById("headerStudentScore").textContent = state.studentScore;
+      }
+
+      if (stepType === "question") {
+        state.questionAccuracy = accuracy;
+        state.questionLabel = ratingLabel;
+        state.questionPoints = pointsEarned;
+
+        if (accuracy <= 50) {
+          actionsEl.innerHTML = `
+            <button id="popupTryAgainBtn" type="button" class="min-h-[52px] px-5 py-3 rounded-2xl bg-white text-orange-700 font-display font-bold text-base sm:text-lg shadow hover:bg-orange-50 active:scale-95 transition cursor-pointer">
+              🔄 Try Again
+            </button>
+            <button id="popupNextStageBtn" type="button" class="min-h-[52px] px-5 py-3 rounded-2xl bg-slate-900 text-white font-display font-bold text-base sm:text-lg shadow hover:bg-slate-800 active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>Next: Answer ➔</span>
+              <span class="pc-only-hint hidden md:inline-flex kbd-badge">ENTER</span>
+            </button>
+          `;
+        } else {
+          actionsEl.innerHTML = `
+            <button id="popupNextStageBtn" type="button" class="min-h-[54px] w-full py-3.5 px-6 rounded-2xl bg-slate-900 text-white font-display font-bold text-lg sm:text-xl shadow hover:bg-slate-800 active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>Next: Speak the Answer ➔</span>
+              <span class="pc-only-hint hidden md:inline-flex kbd-badge">ENTER</span>
+            </button>
+          `;
+        }
+
+        const tryBtn = document.getElementById("popupTryAgainBtn");
+        if (tryBtn) {
+          tryBtn.onclick = () => {
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+          };
+        }
+
+        document.getElementById("popupNextStageBtn").onclick = () => {
+          modal.classList.add("hidden");
+          modal.classList.remove("flex");
+          revealAnswerSpeakingStep();
+        };
+      } else {
+        state.answerAccuracy = accuracy;
+        state.answerLabel = ratingLabel;
+        state.answerPoints = pointsEarned;
+
+        if (accuracy <= 50) {
+          actionsEl.innerHTML = `
+            <button id="popupTryAgainBtn" type="button" class="min-h-[52px] px-5 py-3 rounded-2xl bg-white text-orange-700 font-display font-bold text-base sm:text-lg shadow hover:bg-orange-50 active:scale-95 transition cursor-pointer">
+              🔄 Try Again
+            </button>
+            <button id="popupNextSpinBtn" type="button" class="min-h-[52px] px-5 py-3 rounded-2xl bg-slate-900 text-amber-300 font-display font-bold text-sm sm:text-base shadow hover:bg-slate-800 active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>PLAY NEXT ROUND 🛒</span>
+              <span class="pc-only-hint hidden md:inline-flex kbd-badge">ENTER</span>
+            </button>
+          `;
+        } else {
+          actionsEl.innerHTML = `
+            <button id="popupNextSpinBtn" type="button" class="min-h-[56px] w-full py-3.5 px-6 rounded-2xl bg-slate-900 text-amber-300 font-display font-bold text-base sm:text-lg shadow hover:bg-slate-800 active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>PLAY NEXT ROUND 🛒</span>
+              <span class="pc-only-hint hidden md:inline-flex kbd-badge">ENTER</span>
+            </button>
+          `;
+        }
+
+        const tryBtn = document.getElementById("popupTryAgainBtn");
+        if (tryBtn) {
+          tryBtn.onclick = () => {
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+          };
+        }
+
+        document.getElementById("popupNextSpinBtn").onclick = () => {
+          modal.classList.add("hidden");
+          modal.classList.remove("flex");
+          saveRoundAndSync();
+          resetSlotMachine();
+        };
+      }
+
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    // =========================================================================
+    // 9. LIVE FIREBASE RANKING & CONVERSATION DASHBOARD
+    //    Endpoint: https://kate-98c3e-default-rtdb.firebaseio.com/supermarket_grammar
+    // =========================================================================
+    let firebaseEventSource = null;
+    let firebasePollInterval = null;
+    let broadcastChannel = null;
+
+    function getActiveFirebaseUrl() {
+      const saved = localStorage.getItem(STORAGE_KEY_FB_URL);
+      const raw = (saved && saved.trim() ? saved : FIREBASE_DB_URL).trim().replace(/\/+$/, "");
+      return raw || FIREBASE_DB_URL;
+    }
+
+    function getStudentFirebaseKey(name) {
+      return encodeURIComponent(String(name || "shopper").trim().toLowerCase().replace(/[.#$\[\]/]/g, "_"));
+    }
+
+    function loadLocalCacheState() {
+      try {
+        const storedStudents = JSON.parse(localStorage.getItem(STORAGE_KEY_STUDENTS) || "null");
+        const storedFeed = JSON.parse(localStorage.getItem(STORAGE_KEY_FEED) || "null");
+        if (storedStudents && typeof storedStudents === "object") {
+          state.studentsMap = storedStudents;
+        }
+        if (Array.isArray(storedFeed)) {
+          state.conversations = storedFeed;
+        }
+      } catch (_) {}
+    }
+
+    function persistLocalCacheState() {
+      try {
+        localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(state.studentsMap));
+        localStorage.setItem(STORAGE_KEY_FEED, JSON.stringify(state.conversations.slice(0, 50)));
+      } catch (_) {}
+      if (broadcastChannel) {
+        try {
+          broadcastChannel.postMessage({
+            type: "SYNC_SUPERMARKET",
+            studentsMap: state.studentsMap,
+            conversations: state.conversations
+          });
+        } catch (_) {}
+      }
+    }
+
+    function setSyncBadgeState(mode, label) {
+      const dot = document.getElementById("syncStatusDot");
+      const text = document.getElementById("syncStatusText");
+      text.textContent = label;
+      if (mode === "live") {
+        dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-ping";
+      } else if (mode === "syncing") {
+        dot.className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
+      } else {
+        dot.className = "w-2 h-2 rounded-full bg-rose-500";
+      }
+    }
+
+    function connectRealtimeSync() {
+      if (firebaseEventSource) {
+        firebaseEventSource.close();
+        firebaseEventSource = null;
+      }
+      clearInterval(firebasePollInterval);
+
+      const fbUrl = getActiveFirebaseUrl();
+      state.firebaseUrl = fbUrl;
+
+      let shortHost = "kate-98c3e";
+      try {
+        shortHost = new URL(fbUrl).hostname.split(".")[0] || "kate-98c3e";
+      } catch (_) {}
+
+      setSyncBadgeState("syncing", `CONNECTING: ${shortHost}`);
+      loadLocalCacheState();
+      renderDashboard();
+
+      pullFromFirebaseREST(fbUrl, shortHost);
+
+      if ("EventSource" in window) {
+        try {
+          const stream = new EventSource(`${fbUrl}/supermarket_grammar.json`);
+          const handleStreamEvent = () => {
+            pullFromFirebaseREST(fbUrl, shortHost);
+          };
+          stream.addEventListener("put", handleStreamEvent);
+          stream.addEventListener("patch", handleStreamEvent);
+          stream.onopen = () => {
+            setSyncBadgeState("live", `LIVE: ${shortHost}`);
+          };
+          stream.onerror = () => {};
+          firebaseEventSource = stream;
+        } catch (_) {}
+      }
+
+      firebasePollInterval = setInterval(() => pullFromFirebaseREST(fbUrl, shortHost), 2500);
+    }
+
+    async function pullFromFirebaseREST(fbUrl, shortHost = "kate-98c3e") {
+      try {
+        const res = await fetch(`${fbUrl}/supermarket_grammar.json`);
+        if (!res.ok) {
+          setSyncBadgeState("offline", "LOCAL CACHE");
+          return;
+        }
+        setSyncBadgeState("live", `LIVE: ${shortHost}`);
+        const root = await res.json();
+
+        if (!root || typeof root !== "object") {
+          state.studentsMap = {};
+          state.conversations = [];
+          persistLocalCacheState();
+          renderDashboard();
+          return;
+        }
+
+        if (root.students && typeof root.students === "object") {
+          state.studentsMap = root.students;
+          const myKey = state.studentName ? getStudentFirebaseKey(state.studentName) : "";
+          if (myKey && state.studentsMap[myKey]) {
+            const remote = state.studentsMap[myKey];
+            if ((remote.score || 0) > state.studentScore) {
+              state.studentScore = remote.score;
+              document.getElementById("headerStudentScore").textContent = state.studentScore;
+            }
+            if ((remote.rounds || 0) > state.roundsCompleted) {
+              state.roundsCompleted = remote.rounds;
+              document.getElementById("headerRoundsCount").textContent = state.roundsCompleted;
+            }
+          }
+        } else {
+          state.studentsMap = {};
+        }
+
+        if (root.conversations && typeof root.conversations === "object") {
+          const list = Object.entries(root.conversations).map(([id, item]) => ({ id, ...item }));
+          list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+          state.conversations = list.slice(0, 50);
+        } else {
+          state.conversations = [];
+        }
+
+        persistLocalCacheState();
+        renderDashboard();
+      } catch (_) {
+        setSyncBadgeState("offline", "LOCAL CACHE");
+      }
+    }
+
+    async function patchStudentToFirebase(studentKey, studentPayload) {
+      const fbUrl = getActiveFirebaseUrl();
+      try {
+        await fetch(`${fbUrl}/supermarket_grammar/students/${studentKey}.json`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(studentPayload)
+        });
+      } catch (_) {}
+    }
+
+    async function postConversationToFirebase(dialoguePayload) {
+      const fbUrl = getActiveFirebaseUrl();
+      try {
+        await fetch(`${fbUrl}/supermarket_grammar/conversations.json`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dialoguePayload)
+        });
+      } catch (_) {}
+    }
+
+    function saveRoundAndSync() {
+      state.roundsCompleted += 1;
+      document.getElementById("headerRoundsCount").textContent = state.roundsCompleted;
+
+      const avgAcc = Math.round((state.questionAccuracy + state.answerAccuracy) / 2);
+      state.lastAccuracy = avgAcc;
+
+      const studentKey = getStudentFirebaseKey(state.studentName);
+      const studentRecord = {
+        name: state.studentName,
+        seat: state.studentSeat,
+        chip: state.studentChip,
+        score: state.studentScore,
+        rounds: state.roundsCompleted,
+        lastAccuracy: avgAcc,
+        lastQ: state.currentQuestion,
+        lastA: state.currentAnswer,
+        updatedAt: Date.now()
+      };
+
+      const dialogueRecord = {
+        id: `round-${Date.now()}`,
+        student: state.studentName,
+        seat: state.studentSeat,
+        chip: state.studentChip,
+        question: state.currentQuestion,
+        qAccuracy: state.questionAccuracy,
+        qLabel: state.questionLabel,
+        answer: state.currentAnswer,
+        aAccuracy: state.answerAccuracy,
+        aLabel: state.answerLabel,
+        pointsEarned: state.questionPoints + state.answerPoints,
+        timestamp: Date.now()
+      };
+
+      state.studentsMap[studentKey] = studentRecord;
+      state.conversations.unshift(dialogueRecord);
+      state.conversations = state.conversations.slice(0, 50);
+
+      persistLocalCacheState();
+      renderDashboard();
+
+      patchStudentToFirebase(studentKey, studentRecord);
+      postConversationToFirebase(dialogueRecord);
+    }
+
+    function renderDashboard() {
+      const leaderboardEl = document.getElementById("leaderboardList");
+      const sorted = Object.values(state.studentsMap)
+        .filter((s) => s && s.name)
+        .sort((a, b) => (b.score || 0) - (a.score || 0) || (b.lastAccuracy || 0) - (a.lastAccuracy || 0));
+
+      document.getElementById("playerCountBadge").textContent = `${sorted.length} player${sorted.length === 1 ? "" : "s"}`;
+
+      if (sorted.length === 0) {
+        leaderboardEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-5">No shoppers on the board yet — enter your name and spin to claim #1!</p>`;
+      } else {
+        leaderboardEl.innerHTML = sorted
+          .map((student, idx) => {
+            const rank = idx + 1;
+            let rankBadge = `<span class="w-7 h-7 rounded-xl bg-slate-200 text-slate-700 font-extrabold text-xs flex items-center justify-center">#${rank}</span>`;
+            if (rank === 1) rankBadge = `<span class="text-2xl leading-none">🥇</span>`;
+            if (rank === 2) rankBadge = `<span class="text-2xl leading-none">🥈</span>`;
+            if (rank === 3) rankBadge = `<span class="text-2xl leading-none">🥉</span>`;
+
+            const isMe = state.studentName && student.name.toLowerCase() === state.studentName.toLowerCase();
+            const cardStyle = isMe
+              ? "bg-emerald-50 border-2 border-emerald-400 shadow-sm"
+              : "bg-slate-50 border border-slate-200";
+
+            const accPill = student.lastAccuracy
+              ? `<span class="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 text-[10px] font-extrabold">${student.lastAccuracy}% avg</span>`
+              : "";
+
+            return `
+              <div class="p-3 rounded-2xl ${cardStyle} flex items-center justify-between gap-2 transition">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <div class="w-8 flex items-center justify-center shrink-0">${rankBadge}</div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="text-base leading-none">${student.chip || "🛒"}</span>
+                      <span class="font-extrabold text-slate-900 text-sm truncate">${escapeHTML(student.name)}</span>
+                      ${student.seat ? `<span class="px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 text-[10px] font-bold">${escapeHTML(student.seat)}</span>` : ""}
+                      ${isMe ? '<span class="px-1.5 py-0.5 rounded bg-emerald-500 text-white text-[10px] font-black">YOU</span>' : ""}
+                      ${accPill}
+                    </div>
+                    <p class="text-[11px] text-slate-500 truncate mt-0.5 font-semibold">
+                      ${student.rounds || 0} round${(student.rounds || 0) === 1 ? "" : "s"} • ${student.lastQ ? `"${escapeHTML(student.lastQ)}"` : "Checked in & shopping"}
+                    </p>
+                  </div>
+                </div>
+                <div class="shrink-0 px-3 py-1 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 text-slate-950 font-display font-bold text-xs sm:text-sm">
+                  ⭐ ${student.score || 0}
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      const feedEl = document.getElementById("conversationFeedList");
+      document.getElementById("feedCountBadge").textContent = `${state.conversations.length} dialogue${state.conversations.length === 1 ? "" : "s"}`;
+
+      if (state.conversations.length === 0) {
+        feedEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-5">Completed Q&amp;A speaking rounds will stream live here!</p>`;
+        return;
+      }
+
+      feedEl.innerHTML = state.conversations
+        .map((item) => {
+          const ptsTag = typeof item.pointsEarned === "number"
+            ? `<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-extrabold text-[10px]">+${item.pointsEarned} pts</span>`
+            : "";
+
+          const qBadgeColor = (item.qAccuracy || 0) > 75
+            ? "text-emerald-700"
+            : (item.qAccuracy || 0) > 50
+              ? "text-amber-700"
+              : "text-orange-700";
+
+          const aBadgeColor = (item.aAccuracy || 0) > 75
+            ? "text-emerald-700"
+            : (item.aAccuracy || 0) > 50
+              ? "text-amber-700"
+              : "text-orange-700";
+
+          return `
+            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs sm:text-sm">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-extrabold text-slate-900 flex items-center gap-1.5">
+                  <span>${item.chip || "🛒"}</span>
+                  <span>${escapeHTML(item.student)}</span>
+                  ${item.seat ? `<span class="px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 text-[10px]">${escapeHTML(item.seat)}</span>` : ""}
+                </span>
+                ${ptsTag}
+              </div>
+              <div class="text-slate-700 leading-snug">
+                <span class="font-extrabold text-sky-700">Q:</span> "${escapeHTML(item.question)}"
+                <span class="text-[11px] font-bold ${qBadgeColor}">(${item.qAccuracy}%${item.qLabel ? ` • ${escapeHTML(item.qLabel)}` : ""})</span>
+              </div>
+              <div class="text-slate-700 leading-snug">
+                <span class="font-extrabold text-emerald-700">A:</span> "${escapeHTML(item.answer)}"
+                <span class="text-[11px] font-bold ${aBadgeColor}">(${item.aAccuracy}%${item.aLabel ? ` • ${escapeHTML(item.aLabel)}` : ""})</span>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function escapeHTML(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function exportClassroomCSV() {
+      const rows = [
+        ["Rank", "Student Name", "Class/Seat", "Total Points", "Rounds Completed", "Avg Accuracy (%)", "Last Question", "Last Answer"]
+      ];
+      const sorted = Object.values(state.studentsMap)
+        .filter((s) => s && s.name)
+        .sort((a, b) => (b.score || 0) - (a.score || 0) || (b.lastAccuracy || 0) - (a.lastAccuracy || 0));
+
+      sorted.forEach((s, idx) => {
+        rows.push([
+          idx + 1,
+          `"${String(s.name || "").replace(/"/g, '""')}"`,
+          `"${String(s.seat || "").replace(/"/g, '""')}"`,
+          s.score || 0,
+          s.rounds || 0,
+          s.lastAccuracy || 0,
+          `"${String(s.lastQ || "").replace(/"/g, '""')}"`,
+          `"${String(s.lastA || "").replace(/"/g, '""')}"`
+        ]);
+      });
+
+      const csvContent = rows.map((r) => r.join(",")).join("\n");
+      const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const dateTag = new Date().toISOString().slice(0, 10);
+      link.href = url;
+      link.download = `supermarket_price_ranking_${dateTag}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast("Ranking list downloaded (CSV)!", "📥");
+    }
+
+    async function clearAllLeaderboardData() {
+      const fbUrl = getActiveFirebaseUrl();
+      try {
+        await fetch(`${fbUrl}/supermarket_grammar.json`, { method: "DELETE" });
+      } catch (_) {}
+
+      state.studentsMap = {};
+      state.conversations = [];
+      state.studentScore = 0;
+      state.roundsCompleted = 0;
+      document.getElementById("headerStudentScore").textContent = "0";
+      document.getElementById("headerRoundsCount").textContent = "0";
+
+      if (state.studentName) {
+        const myKey = getStudentFirebaseKey(state.studentName);
+        state.studentsMap[myKey] = {
+          name: state.studentName,
+          seat: state.studentSeat,
+          chip: state.studentChip,
+          score: 0,
+          rounds: 0,
+          lastAccuracy: 0,
+          lastQ: "",
+          lastA: "",
+          updatedAt: Date.now()
+        };
+        patchStudentToFirebase(myKey, state.studentsMap[myKey]);
+      }
+
+      persistLocalCacheState();
+      renderDashboard();
+      showToast("Classroom ranking & dialogues cleared!", "🧹");
+    }
+
+    // =========================================================================
+    // 10. INITIALIZATION, CROSS-PLATFORM UI & PC KEYBOARD SHORTCUTS
+    // =========================================================================
+    function initApp() {
+      // Multi-tab local sync fallback
+      if ("BroadcastChannel" in window) {
+        try {
+          broadcastChannel = new BroadcastChannel("supermarket_grammar_sync_v1");
+          broadcastChannel.onmessage = (event) => {
+            if (event.data && event.data.type === "SYNC_SUPERMARKET") {
+              state.studentsMap = event.data.studentsMap || {};
+              state.conversations = event.data.conversations || [];
+              renderDashboard();
+            }
+          };
+        } catch (_) {}
+      }
+
+      // Adapt HUD hints for iPad Touch vs. PC Desktop
+      const devicePill = document.getElementById("deviceModePill");
+      if (IS_TOUCH_DEVICE) {
+        if (devicePill) {
+          devicePill.textContent = "📱 iPad Touch: Swipe/Tap Reels & Pull Lever";
+        }
+      } else {
+        document.querySelectorAll(".pc-only-hint").forEach((el) => {
+          el.classList.remove("hidden");
+          el.classList.add("inline-flex");
+        });
+      }
+
+      // Shopping Buddy Avatar Selector in Pre-Game Check-In Modal
+      document.querySelectorAll(".chip-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          state.studentChip = btn.getAttribute("data-chip") || "🛒";
+          document.querySelectorAll(".chip-btn").forEach((b) => {
+            b.className = "chip-btn min-h-[48px] rounded-2xl bg-slate-100 border-2 border-slate-200 hover:border-amber-400 text-2xl flex items-center justify-center cursor-pointer";
+          });
+          btn.className = "chip-btn min-h-[48px] rounded-2xl bg-emerald-100 border-2 border-emerald-500 text-2xl flex items-center justify-center shadow-sm cursor-pointer";
+        });
+      });
+
+      // Pre-Game Check-In Form Submit
+      document.getElementById("startForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const nameInput = document.getElementById("studentNameInput");
+        const seatInput = document.getElementById("studentSeatInput");
+        const errorHint = document.getElementById("nameErrorHint");
+        const cleanName = (nameInput.value || "").trim();
+        const cleanSeat = (seatInput.value || "").trim();
+
+        if (!cleanName) {
+          errorHint.classList.remove("hidden");
+          const card = document.getElementById("startCard");
+          card.classList.remove("animate-shake");
+          void card.offsetWidth;
+          card.classList.add("animate-shake");
+          nameInput.focus();
+          return;
+        }
+
+        errorHint.classList.add("hidden");
+        sfx.unlock();
+
+        state.studentName = cleanName;
+        state.studentSeat = cleanSeat;
+
+        const key = getStudentFirebaseKey(cleanName);
+        const existing = state.studentsMap[key];
+        state.studentScore = existing && typeof existing.score === "number" ? existing.score : 0;
+        state.roundsCompleted = existing && typeof existing.rounds === "number" ? existing.rounds : 0;
+
+        document.getElementById("headerChipIcon").textContent = state.studentChip;
+        document.getElementById("headerStudentName").textContent = state.studentName;
+        document.getElementById("headerStudentScore").textContent = state.studentScore;
+        document.getElementById("headerRoundsCount").textContent = state.roundsCompleted;
+
+        const seatBadge = document.getElementById("headerStudentSeat");
+        if (state.studentSeat) {
+          seatBadge.textContent = state.studentSeat;
+          seatBadge.classList.remove("hidden");
+        } else {
+          seatBadge.classList.add("hidden");
+        }
+
+        const checkInPayload = {
+          name: state.studentName,
+          seat: state.studentSeat,
+          chip: state.studentChip,
+          score: state.studentScore,
+          rounds: state.roundsCompleted,
+          lastAccuracy: existing ? existing.lastAccuracy || 0 : 0,
+          lastQ: existing ? existing.lastQ || "" : "",
+          lastA: existing ? existing.lastA || "" : "",
+          updatedAt: Date.now()
+        };
+
+        state.studentsMap[key] = checkInPayload;
+        persistLocalCacheState();
+        renderDashboard();
+        patchStudentToFirebase(key, checkInPayload);
+
+        document.getElementById("startModal").classList.add("hidden");
+        showToast(`Welcome, ${state.studentName}! Spin Part 2 to begin.`, "🛒");
+      });
+
+      // Header Switch Student, Mute & Reset Spin Controls
+      document.getElementById("switchStudentBtn").addEventListener("click", () => {
+        stopActiveRecording();
+        document.getElementById("startModal").classList.remove("hidden");
+        const nameInput = document.getElementById("studentNameInput");
+        nameInput.value = state.studentName;
+        setTimeout(() => nameInput.focus(), 60);
+      });
+
+      document.getElementById("muteToggleBtn").addEventListener("click", () => {
+        sfx.muted = !sfx.muted;
+        document.getElementById("muteIcon").textContent = sfx.muted ? "🔇" : "🔊";
+        if (sfx.muted && "speechSynthesis" in window) {
+          try {
+            window.speechSynthesis.cancel();
+          } catch (_) {}
+        }
+        showToast(sfx.muted ? "Sound effects muted" : "Sound effects unmuted", sfx.muted ? "🔇" : "🔊");
+      });
+
+      document.getElementById("resetMachineBtn").addEventListener("click", () => {
+        resetSlotMachine();
+        showToast("Slot machine reset! Spin Part 2.", "🔄");
+      });
+
+      // Initialize Supermarket Slot Reels (Part 1 fixed, Part 2 & Part 3 spinning)
+      renderReel(2, 0);
+      renderReel(3, 0);
+      updateReelVisualStates();
+      initSlotMachineInteractions();
+
+      // Stage 1 (Question) Audio, Record & Fallback Listeners
+      document.getElementById("listenQuestionBtn").addEventListener("click", () => {
+        speakModelSentence(state.currentQuestion);
+      });
+      document.getElementById("recordQuestionBtn").addEventListener("click", () => {
+        startRecordingForStep("question");
+      });
+      document.getElementById("doneQuestionRecordingBtn").addEventListener("click", () => {
+        stopActiveRecording();
+      });
+      document.getElementById("toggleQuestionFallbackBtn").addEventListener("click", () => {
+        const panel = document.getElementById("questionFallbackPanel");
+        panel.classList.toggle("hidden");
+        if (!panel.classList.contains("hidden")) {
+          document.getElementById("questionFallbackInput").focus();
+        }
+      });
+      document.getElementById("submitQuestionFallbackBtn").addEventListener("click", () => {
+        evaluateTypedFallback("question", document.getElementById("questionFallbackInput").value);
+      });
+      document.getElementById("questionFallbackInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          evaluateTypedFallback("question", e.target.value);
+        }
+      });
+
+      // Stage 2 (Answer) Audio, Record & Fallback Listeners
+      document.getElementById("listenAnswerBtn").addEventListener("click", () => {
+        speakModelSentence(state.currentAnswer);
+      });
+      document.getElementById("recordAnswerBtn").addEventListener("click", () => {
+        startRecordingForStep("answer");
+      });
+      document.getElementById("doneAnswerRecordingBtn").addEventListener("click", () => {
+        stopActiveRecording();
+      });
+      document.getElementById("toggleAnswerFallbackBtn").addEventListener("click", () => {
+        const panel = document.getElementById("answerFallbackPanel");
+        panel.classList.toggle("hidden");
+        if (!panel.classList.contains("hidden")) {
+          document.getElementById("answerFallbackInput").focus();
+        }
+      });
+      document.getElementById("submitAnswerFallbackBtn").addEventListener("click", () => {
+        evaluateTypedFallback("answer", document.getElementById("answerFallbackInput").value);
+      });
+      document.getElementById("answerFallbackInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          evaluateTypedFallback("answer", e.target.value);
+        }
+      });
+
+      // Recorded Voice Playback Button inside AI Analysis Pop-Up
+      document.getElementById("playRecordedVoiceBtn").addEventListener("click", () => {
+        if (!state.lastRecordingAudioUrl) return;
+        const iconEl = document.getElementById("playRecordedVoiceIcon");
+        const labelEl = document.getElementById("playRecordedVoiceLabel");
+
+        if (activeVoicePlaybackAudio && !activeVoicePlaybackAudio.paused) {
+          activeVoicePlaybackAudio.pause();
+          activeVoicePlaybackAudio.currentTime = 0;
+          iconEl.textContent = "▶️";
+          labelEl.textContent = "Play My Voice";
+          return;
+        }
+
+        try {
+          activeVoicePlaybackAudio = new Audio(state.lastRecordingAudioUrl);
+          iconEl.textContent = "⏹️";
+          labelEl.textContent = "Playing...";
+          activeVoicePlaybackAudio.onended = () => {
+            iconEl.textContent = "▶️";
+            labelEl.textContent = "Play My Voice";
+          };
+          activeVoicePlaybackAudio.onerror = () => {
+            iconEl.textContent = "▶️";
+            labelEl.textContent = "Play My Voice";
+          };
+          activeVoicePlaybackAudio.play().catch(() => {
+            iconEl.textContent = "▶️";
+            labelEl.textContent = "Play My Voice";
+          });
+        } catch (_) {}
+      });
+
+      // Live Dashboard View Tabs (All Live / Ranking / Dialogues)
+      const tabBoth = document.getElementById("dashTabBoth");
+      const tabRank = document.getElementById("dashTabRanking");
+      const tabFeed = document.getElementById("dashTabFeed");
+      const lbSec = document.getElementById("leaderboardSection");
+      const convSec = document.getElementById("conversationSection");
+
+      function setDashboardTab(mode) {
+        const activeCls = "min-h-[40px] rounded-xl bg-emerald-500 text-white shadow-sm transition cursor-pointer";
+        const idleCls = "min-h-[40px] rounded-xl text-slate-600 hover:text-slate-900 transition cursor-pointer";
+
+        tabBoth.className = mode === "both" ? activeCls : idleCls;
+        tabRank.className = mode === "ranking" ? activeCls : idleCls;
+        tabFeed.className = mode === "feed" ? activeCls : idleCls;
+
+        if (mode === "both") {
+          lbSec.classList.remove("hidden");
+          convSec.classList.remove("hidden");
+        } else if (mode === "ranking") {
+          lbSec.classList.remove("hidden");
+          convSec.classList.add("hidden");
+        } else {
+          lbSec.classList.add("hidden");
+          convSec.classList.remove("hidden");
+        }
+      }
+
+      tabBoth.addEventListener("click", () => setDashboardTab("both"));
+      tabRank.addEventListener("click", () => setDashboardTab("ranking"));
+      tabFeed.addEventListener("click", () => setDashboardTab("feed"));
+
+      // Export CSV Ranking List
+      document.getElementById("exportCsvBtn").addEventListener("click", exportClassroomCSV);
+      document.getElementById("downloadRankingBtn").addEventListener("click", exportClassroomCSV);
+
+      // Direct Leaderboard Two-Step Clear All Controls (iPad & PC Safe)
+      const boardClearBtn = document.getElementById("boardClearAllBtn");
+      const boardConfirmBtn = document.getElementById("boardConfirmClearBtn");
+      const boardCancelBtn = document.getElementById("boardCancelClearBtn");
+      let boardClearResetTimer = null;
+
+      const resetBoardClearButtons = () => {
+        clearTimeout(boardClearResetTimer);
+        boardClearBtn.classList.remove("hidden");
+        boardConfirmBtn.classList.add("hidden");
+        boardCancelBtn.classList.add("hidden");
+      };
+
+      boardClearBtn.addEventListener("click", () => {
+        boardClearBtn.classList.add("hidden");
+        boardConfirmBtn.classList.remove("hidden");
+        boardCancelBtn.classList.remove("hidden");
+        showToast("Tap 'Confirm Clear' to erase all rankings.", "⚠️");
+        clearTimeout(boardClearResetTimer);
+        boardClearResetTimer = setTimeout(resetBoardClearButtons, 4500);
+      });
+
+      boardCancelBtn.addEventListener("click", resetBoardClearButtons);
+
+      boardConfirmBtn.addEventListener("click", async () => {
+        resetBoardClearButtons();
+        await clearAllLeaderboardData();
+      });
+
+      // PC Keyboard Shortcuts ([Space] Spin/Record, [Enter] Advance Pop-up)
+      window.addEventListener("keydown", (e) => {
+        const tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : "";
+        if (tag === "INPUT" || tag === "TEXTAREA") return;
+
+        const analysisModal = document.getElementById("analysisModal");
+        const startModal = document.getElementById("startModal");
+        const fbModal = document.getElementById("firebaseModal");
+
+        if (!analysisModal.classList.contains("hidden")) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            const nextStageBtn = document.getElementById("popupNextStageBtn");
+            const nextSpinBtn = document.getElementById("popupNextSpinBtn");
+            if (nextStageBtn) nextStageBtn.click();
+            else if (nextSpinBtn) nextSpinBtn.click();
+          } else if (e.key === "Escape") {
+            analysisModal.classList.add("hidden");
+            analysisModal.classList.remove("flex");
+          }
+          return;
+        }
+
+        if (!fbModal.classList.contains("hidden")) {
+          if (e.key === "Escape") {
+            fbModal.classList.add("hidden");
+            fbModal.classList.remove("flex");
+          }
+          return;
+        }
+
+        if (!startModal.classList.contains("hidden")) return;
+
+        if (e.code === "Space") {
+          e.preventDefault();
+          if (state.unlockedStep === 2 || state.unlockedStep === 3) {
+            spinReelAutoOneSecond(state.unlockedStep);
+          } else {
+            const aCard = document.getElementById("answerSpeakingCard");
+            const qCard = document.getElementById("questionSpeakingCard");
+            if (!aCard.classList.contains("hidden")) {
+              startRecordingForStep("answer");
+            } else if (!qCard.classList.contains("hidden")) {
+              startRecordingForStep("question");
+            }
+          }
+        }
+      });
+
+      // Teacher Firebase Settings & Diagnostics Modal Controls
+      const fbModal = document.getElementById("firebaseModal");
+      const fbInput = document.getElementById("firebaseUrlInput");
+      const fbTestResult = document.getElementById("firebaseTestResult");
+      const armClearBtn = document.getElementById("armClearBoardBtn");
+      const confirmClearBtn = document.getElementById("confirmClearBoardBtn");
+
+      document.getElementById("openFirebaseModalBtn").addEventListener("click", () => {
+        fbInput.value = getActiveFirebaseUrl();
+        fbTestResult.classList.add("hidden");
+        confirmClearBtn.classList.add("hidden");
+        fbModal.classList.remove("hidden");
+        fbModal.classList.add("flex");
+      });
+
+      document.getElementById("closeFirebaseModalBtn").addEventListener("click", () => {
+        fbModal.classList.add("hidden");
+        fbModal.classList.remove("flex");
+      });
+
+      document.getElementById("testFirebaseBtn").addEventListener("click", async () => {
+        const testUrl = (fbInput.value || FIREBASE_DB_URL).trim().replace(/\/+$/, "");
+        fbTestResult.classList.remove("hidden");
+        fbTestResult.textContent = "⏳ Testing connection to Firebase Realtime Database...";
+        try {
+          const res = await fetch(`${testUrl}/supermarket_grammar.json`);
+          if (res.ok) {
+            fbTestResult.textContent = "✅ Connected! Read/Write access to Firebase is active.";
+          } else {
+            fbTestResult.textContent = `⚠️ HTTP ${res.status}: Check Firebase Realtime Database rules.`;
+          }
+        } catch (_) {
+          fbTestResult.textContent = "❌ Network error — using local browser storage fallback.";
+        }
+      });
+
+      document.getElementById("resetDefaultFirebaseBtn").addEventListener("click", () => {
+        fbInput.value = FIREBASE_DB_URL;
+        localStorage.removeItem(STORAGE_KEY_FB_URL);
+        connectRealtimeSync();
+        showToast("Restored default Firebase URL.", "🔌");
+      });
+
+      document.getElementById("saveFirebaseBtn").addEventListener("click", () => {
+        const cleanUrl = (fbInput.value || FIREBASE_DB_URL).trim().replace(/\/+$/, "");
+        localStorage.setItem(STORAGE_KEY_FB_URL, cleanUrl);
+        fbModal.classList.add("hidden");
+        fbModal.classList.remove("flex");
+        connectRealtimeSync();
+        showToast("Firebase URL saved & syncing!", "✅");
+      });
+
+      armClearBtn.addEventListener("click", () => {
+        confirmClearBtn.classList.remove("hidden");
+        showToast("Tap 'Confirm Clear All' to wipe leaderboard & feed.", "⚠️");
+      });
+
+      confirmClearBtn.addEventListener("click", async () => {
+        confirmClearBtn.classList.add("hidden");
+        await clearAllLeaderboardData();
+        fbModal.classList.add("hidden");
+        fbModal.classList.remove("flex");
+      });
+
+      // Start Live Firebase Sync
+      connectRealtimeSync();
+    }
+
+    window.addEventListener("DOMContentLoaded", initApp);
+  </script>
+</body>
+</html>
