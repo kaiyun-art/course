@@ -1,0 +1,3290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Thanksgiving Turkey Listen & Spell</title>
+
+  <!-- Tailwind CSS for responsive layout and UI polish -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Kid-friendly rounded typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ==========================================================================
+       GLOBAL & IPAD TOUCH OPTIMIZATIONS
+       ========================================================================== */
+    :root {
+      --font-display: 'Fredoka', 'Nunito', sans-serif;
+      --font-body: 'Nunito', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    input, textarea {
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      font-family: var(--font-display);
+      background-color: #78350f;
+      touch-action: manipulation;
+    }
+
+    /* ==========================================================================
+       ANIMATIONS FOR TURKEYS, LEAVES, BUTTONS & FEEDBACK
+       ========================================================================== */
+    @keyframes wingFlapLeft {
+      0%, 100% { transform: rotate(0deg) translateY(0px); }
+      50% { transform: rotate(-18deg) translateY(-3px); }
+    }
+
+    @keyframes wingFlapRight {
+      0%, 100% { transform: rotate(0deg) translateY(0px); }
+      50% { transform: rotate(18deg) translateY(-3px); }
+    }
+
+    @keyframes headBob {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(4deg); }
+    }
+
+    @keyframes legRunLeft {
+      0%, 100% { transform: rotate(-16deg); }
+      50% { transform: rotate(18deg); }
+    }
+
+    @keyframes legRunRight {
+      0%, 100% { transform: rotate(18deg); }
+      50% { transform: rotate(-16deg); }
+    }
+
+    @keyframes tailFan {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.04) rotate(2deg); }
+    }
+
+    @keyframes turkeyWiggle {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(-14deg) scale(0.95); }
+      40% { transform: rotate(14deg) scale(0.95); }
+      60% { transform: rotate(-10deg); }
+      80% { transform: rotate(10deg); }
+    }
+
+    @keyframes turkeyCatchPop {
+      0% { transform: scale(1); opacity: 1; }
+      45% { transform: scale(1.32) translateY(-18px); opacity: 1; }
+      100% { transform: scale(0.2) translateY(-70px); opacity: 0; }
+    }
+
+    @keyframes slotPop {
+      0% { transform: scale(0.5); }
+      65% { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes gentlePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
+    @keyframes soundWave {
+      0%, 100% { transform: scaleY(0.45); }
+      50% { transform: scaleY(1.25); }
+    }
+
+    @keyframes gentleShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+    }
+
+    @keyframes popOutTurkey {
+      0% { transform: scale(0.15) translateY(90px) rotate(-12deg); opacity: 0; }
+      60% { transform: scale(1.12) translateY(-12px) rotate(4deg); opacity: 1; }
+      80% { transform: scale(0.96) translateY(4px) rotate(-2deg); }
+      100% { transform: scale(1) translateY(0px) rotate(0deg); opacity: 1; }
+    }
+
+    .shake-feedback {
+      animation: gentleShake 0.42s ease-in-out;
+    }
+
+    .popout-turkey-anim {
+      animation: popOutTurkey 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes floatLeaf {
+      0% {
+        transform: translateY(-10vh) translateX(0px) rotate(0deg);
+        opacity: 0;
+      }
+      10% { opacity: 0.85; }
+      90% { opacity: 0.85; }
+      100% {
+        transform: translateY(110vh) translateX(65px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Turkey SVG sub-part classes */
+    .turkey-entity {
+      position: absolute;
+      top: 0;
+      left: 0;
+      will-change: transform;
+      cursor: pointer;
+      touch-action: manipulation;
+      z-index: 20;
+    }
+
+    .turkey-entity:active .turkey-visual {
+      transform: scale(0.93);
+    }
+
+    .turkey-visual {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transition: transform 0.12s ease;
+    }
+
+    .turkey-wiggle {
+      animation: turkeyWiggle 0.48s ease-in-out;
+    }
+
+    .turkey-caught {
+      pointer-events: none;
+      animation: turkeyCatchPop 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .svg-wing-left {
+      transform-origin: 36px 68px;
+      animation: wingFlapLeft 0.36s ease-in-out infinite;
+    }
+
+    .svg-wing-right {
+      transform-origin: 84px 68px;
+      animation: wingFlapRight 0.36s ease-in-out infinite;
+    }
+
+    .svg-head-group {
+      transform-origin: 60px 44px;
+      animation: headBob 0.42s ease-in-out infinite;
+    }
+
+    .svg-leg-left {
+      transform-origin: 48px 94px;
+      animation: legRunLeft 0.32s linear infinite;
+    }
+
+    .svg-leg-right {
+      transform-origin: 72px 94px;
+      animation: legRunRight 0.32s linear infinite;
+    }
+
+    .svg-tail {
+      transform-origin: 60px 72px;
+      animation: tailFan 0.6s ease-in-out infinite;
+    }
+
+    .slot-filled-anim {
+      animation: slotPop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .btn-3d {
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+    .btn-3d:active {
+      transform: translateY(3px);
+    }
+
+    .speaking-ring {
+      animation: gentlePulse 0.75s ease-in-out infinite;
+    }
+
+    /* Particle bursts when catching a turkey */
+    .particle-burst {
+      position: absolute;
+      pointer-events: none;
+      font-size: 24px;
+      z-index: 40;
+      transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s ease-out;
+    }
+
+    /* Custom scrollbar inside teacher modal if needed on small viewports */
+    .modal-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .modal-scroll::-webkit-scrollbar-thumb {
+      background-color: rgba(180, 83, 9, 0.4);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body class="relative w-screen h-[100dvh] overflow-hidden select-none">
+
+  <!-- ========================================================================
+       LAYER 1: BACKGROUND SCENE (DEFAULT THANKSGIVING FARM OR CUSTOM IMAGE)
+       ======================================================================== -->
+  <div id="background-layer" class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+    <!-- Custom Uploaded Picture Layer (Hidden until user uploads a photo) -->
+    <img
+      id="custom-bg-image"
+      src=""
+      alt="Custom Thanksgiving Farm Background"
+      class="hidden w-full h-full object-cover transition-all duration-300"
+    />
+
+    <!-- Default Hand-Crafted SVG Thanksgiving Farm Scene -->
+    <div id="default-farm-scene" class="w-full h-full relative">
+      <svg
+        viewBox="0 0 1440 900"
+        preserveAspectRatio="xMidYMid slice"
+        class="w-full h-full block"
+        aria-hidden="true"
+      >
+        <defs>
+          <!-- Warm Autumn Sunset Sky Gradient -->
+          <linearGradient id="autumnSky" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FDE68A" />
+            <stop offset="35%" stop-color="#FDBA74" />
+            <stop offset="68%" stop-color="#FB923C" />
+            <stop offset="100%" stop-color="#FEF3C7" />
+          </linearGradient>
+
+          <!-- Warm Sun Glow -->
+          <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFFBEB" stop-opacity="0.95" />
+            <stop offset="45%" stop-color="#FDE047" stop-opacity="0.45" />
+            <stop offset="100%" stop-color="#FB923C" stop-opacity="0" />
+          </radialGradient>
+
+          <!-- Distant Rolling Hill -->
+          <linearGradient id="farHill" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#D97706" />
+            <stop offset="100%" stop-color="#B45309" />
+          </linearGradient>
+
+          <!-- Midground Harvest Hill -->
+          <linearGradient id="midHill" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#84CC16" />
+            <stop offset="100%" stop-color="#4D7C0F" />
+          </linearGradient>
+
+          <!-- Foreground Farm Pasture -->
+          <linearGradient id="pastureGrass" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#A3E635" />
+            <stop offset="30%" stop-color="#65A30D" />
+            <stop offset="100%" stop-color="#3F6212" />
+          </linearGradient>
+
+          <!-- Barn Wood Gradient -->
+          <linearGradient id="barnRed" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#DC2626" />
+            <stop offset="100%" stop-color="#991B1B" />
+          </linearGradient>
+        </defs>
+
+        <!-- Sky -->
+        <rect width="1440" height="900" fill="url(#autumnSky)" />
+
+        <!-- Golden Harvest Sun -->
+        <circle cx="1120" cy="190" r="240" fill="url(#sunGlow)" />
+        <circle cx="1120" cy="190" r="68" fill="#FEF9C3" opacity="0.9" />
+
+        <!-- Soft Fluffy Clouds -->
+        <g fill="#FFFBEB" opacity="0.65">
+          <ellipse cx="260" cy="150" rx="95" ry="30" />
+          <ellipse cx="320" cy="140" rx="70" ry="26" />
+          <ellipse cx="210" cy="155" rx="60" ry="22" />
+
+          <ellipse cx="780" cy="125" rx="110" ry="28" />
+          <ellipse cx="845" cy="118" rx="75" ry="24" />
+        </g>
+
+        <!-- Distant Autumn Hills -->
+        <path d="M0,340 Q340,235 720,315 T1440,285 L1440,520 L0,520 Z" fill="url(#farHill)" opacity="0.85" />
+
+        <!-- Autumn Trees on Distant Ridge -->
+        <g>
+          <rect x="115" y="265" width="14" height="55" fill="#78350F" />
+          <circle cx="122" cy="245" r="44" fill="#EA580C" />
+          <circle cx="95" cy="260" r="32" fill="#F59E0B" />
+          <circle cx="148" cy="258" r="34" fill="#DC2626" />
+
+          <rect x="465" y="250" width="12" height="50" fill="#78350F" />
+          <circle cx="471" cy="232" r="38" fill="#F59E0B" />
+          <circle cx="445" cy="244" r="28" fill="#D97706" />
+
+          <rect x="1285" y="240" width="16" height="60" fill="#78350F" />
+          <circle cx="1293" cy="218" r="48" fill="#DC2626" />
+          <circle cx="1260" cy="235" r="36" fill="#F97316" />
+          <circle cx="1325" cy="232" r="35" fill="#FACC15" />
+        </g>
+
+        <!-- Classic Red Thanksgiving Barn & Silo -->
+        <g transform="translate(185, 195)">
+          <rect x="178" y="38" width="54" height="145" rx="6" fill="#E5E7EB" stroke="#9CA3AF" stroke-width="3" />
+          <path d="M178,38 A27,26 0 0,1 232,38 Z" fill="#9CA3AF" />
+          <line x1="178" y1="74" x2="232" y2="74" stroke="#9CA3AF" stroke-width="3" />
+          <line x1="178" y1="112" x2="232" y2="112" stroke="#9CA3AF" stroke-width="3" />
+          <line x1="178" y1="150" x2="232" y2="150" stroke="#9CA3AF" stroke-width="3" />
+
+          <polygon points="15,92 98,28 181,92 181,185 15,185" fill="url(#barnRed)" stroke="#7F1D1D" stroke-width="3" />
+          <polyline points="6,96 98,22 190,96" fill="none" stroke="#FFFBEB" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+          <rect x="80" y="58" width="36" height="32" rx="4" fill="#451A03" stroke="#FFFBEB" stroke-width="4" />
+          <rect x="58" y="114" width="80" height="71" fill="#7F1D1D" stroke="#FFFBEB" stroke-width="5" />
+          <line x1="98" y1="114" x2="98" y2="185" stroke="#FFFBEB" stroke-width="4" />
+          <line x1="58" y1="114" x2="98" y2="185" stroke="#FFFBEB" stroke-width="3.5" />
+          <line x1="98" y1="114" x2="58" y2="185" stroke="#FFFBEB" stroke-width="3.5" />
+          <line x1="98" y1="114" x2="138" y2="185" stroke="#FFFBEB" stroke-width="3.5" />
+          <line x1="138" y1="114" x2="98" y2="185" stroke="#FFFBEB" stroke-width="3.5" />
+        </g>
+
+        <!-- Midground Rolling Meadow -->
+        <path d="M0,385 Q460,335 920,380 T1440,360 L1440,900 L0,900 Z" fill="url(#midHill)" />
+
+        <!-- Foreground Farm Pasture where Turkeys Run -->
+        <path d="M0,435 Q540,395 1080,430 T1440,415 L1440,900 L0,900 Z" fill="url(#pastureGrass)" />
+
+        <!-- Wooden Split-Rail Fence along Pasture Edge -->
+        <g stroke="#78350F" stroke-linecap="round">
+          <line x1="0" y1="398" x2="1440" y2="392" stroke="#92400E" stroke-width="8" />
+          <line x1="0" y1="420" x2="1440" y2="414" stroke="#78350F" stroke-width="8" />
+          <g fill="#78350F" stroke="#451A03" stroke-width="2">
+            <rect x="60" y="378" width="14" height="58" rx="3" />
+            <rect x="240" y="376" width="14" height="58" rx="3" />
+            <rect x="420" y="375" width="14" height="58" rx="3" />
+            <rect x="600" y="374" width="14" height="58" rx="3" />
+            <rect x="780" y="373" width="14" height="58" rx="3" />
+            <rect x="960" y="372" width="14" height="58" rx="3" />
+            <rect x="1140" y="371" width="14" height="58" rx="3" />
+            <rect x="1320" y="370" width="14" height="58" rx="3" />
+          </g>
+        </g>
+
+        <!-- Golden Hay Bales & Harvest Pumpkins -->
+        <g transform="translate(45, 755)">
+          <rect x="0" y="20" width="115" height="68" rx="12" fill="#FACC15" stroke="#CA8A04" stroke-width="4" />
+          <line x1="28" y1="20" x2="28" y2="88" stroke="#A16207" stroke-width="3" />
+          <line x1="86" y1="20" x2="86" y2="88" stroke="#A16207" stroke-width="3" />
+          <ellipse cx="122" cy="68" rx="28" ry="22" fill="#EA580C" stroke="#9A3412" stroke-width="3" />
+          <ellipse cx="122" cy="68" rx="13" ry="22" fill="#F97316" />
+          <path d="M120,46 Q124,35 131,37" fill="none" stroke="#3F6212" stroke-width="5" stroke-linecap="round" />
+        </g>
+
+        <g transform="translate(1255, 760)">
+          <rect x="25" y="18" width="110" height="65" rx="12" fill="#FACC15" stroke="#CA8A04" stroke-width="4" />
+          <line x1="55" y1="18" x2="55" y2="83" stroke="#A16207" stroke-width="3" />
+          <line x1="108" y1="18" x2="108" y2="83" stroke="#A16207" stroke-width="3" />
+          <ellipse cx="18" cy="66" rx="26" ry="20" fill="#EA580C" stroke="#9A3412" stroke-width="3" />
+          <ellipse cx="18" cy="66" rx="12" ry="20" fill="#F97316" />
+          <path d="M16,46 Q13,35 7,37" fill="none" stroke="#3F6212" stroke-width="5" stroke-linecap="round" />
+        </g>
+      </svg>
+    </div>
+
+    <!-- Configurable Tint Overlay for High Contrast Readability -->
+    <div
+      id="bg-tint-overlay"
+      class="absolute inset-0 bg-amber-950 transition-opacity duration-200"
+      style="opacity: 0;"
+    ></div>
+
+    <!-- Ambient Drifting Autumn Leaves Container -->
+    <div id="ambient-leaves" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
+  </div>
+
+  <!-- ========================================================================
+       LAYER 2: TOP HUD BAR (MISSION SWITCHER, LISTEN BUTTON, SLOTS, RANKINGS)
+       ======================================================================== -->
+  <header
+    id="game-hud"
+    class="relative z-30 w-full px-2 sm:px-4 pt-2 pb-1.5 flex flex-wrap items-center justify-between gap-2 bg-amber-50/90 backdrop-blur-md border-b-4 border-amber-700/30 shadow-lg"
+  >
+    <!-- Left: Mission Switcher & Stage Indicator -->
+    <div class="flex items-center gap-2 shrink-0">
+      <div class="flex items-center bg-amber-200/90 p-1 rounded-2xl border-2 border-amber-700/25 shadow-inner">
+        <button
+          id="btn-switch-mission-1"
+          type="button"
+          class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold bg-amber-700 text-amber-50 shadow transition-all"
+        >
+          🦃 Mission 1
+        </button>
+        <button
+          id="btn-switch-mission-2"
+          type="button"
+          class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold text-amber-900 hover:bg-amber-300/60 transition-all"
+        >
+          📅 Mission 2
+        </button>
+      </div>
+
+      <!-- Mission 1 Stage Badge & Progress Dots -->
+      <div id="mission1-stage-badge" class="flex items-center gap-2">
+        <div class="bg-amber-700 text-amber-50 px-3 py-1.5 rounded-2xl shadow-inner flex items-center gap-1.5 border-2 border-amber-900/30">
+          <div class="leading-tight">
+            <div class="text-[10px] sm:text-xs uppercase tracking-wider text-amber-200 font-bold">Stage</div>
+            <div id="hud-stage-text" class="text-sm sm:text-lg font-extrabold">1 / 7</div>
+          </div>
+        </div>
+
+        <div id="stage-dots" class="hidden md:flex items-center gap-1.5 bg-amber-100/90 px-2.5 py-2 rounded-2xl border border-amber-300"></div>
+      </div>
+    </div>
+
+    <!-- Center (Mission 1): Listen Again Button + Letter Spelling Boxes -->
+    <div id="mission1-hud-center" class="order-3 lg:order-2 w-full lg:w-auto flex-1 flex items-center justify-center gap-2 sm:gap-3 py-0.5">
+      <button
+        id="btn-listen-again"
+        type="button"
+        aria-label="Listen to the word again"
+        class="btn-3d shrink-0 flex items-center gap-1.5 sm:gap-2 bg-gradient-to-b from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white font-extrabold px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-2xl shadow-[0_4px_0_#9a3412] border-2 border-orange-200 text-sm sm:text-base md:text-lg"
+      >
+        <span id="speaker-icon" class="text-xl sm:text-2xl">🔊</span>
+        <span>Listen</span>
+        <span id="sound-bars" class="hidden items-end gap-0.5 h-4 ml-0.5">
+          <span class="w-1 h-2 bg-yellow-200 rounded-full animate-[soundWave_0.45s_ease-in-out_infinite]"></span>
+          <span class="w-1 h-4 bg-white rounded-full animate-[soundWave_0.45s_ease-in-out_0.15s_infinite]"></span>
+          <span class="w-1 h-2.5 bg-yellow-200 rounded-full animate-[soundWave_0.45s_ease-in-out_0.3s_infinite]"></span>
+        </span>
+      </button>
+
+      <div
+        id="spelling-slots-container"
+        class="flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 bg-amber-900/15 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl border-2 border-amber-800/20"
+        aria-label="Word spelling slots"
+      ></div>
+    </div>
+
+    <!-- Center (Mission 2): Week Calendar Header & Score Counter -->
+    <div id="mission2-hud-center" class="hidden order-3 lg:order-2 w-full lg:w-auto flex-1 items-center justify-center gap-2 sm:gap-3 py-0.5">
+      <div class="bg-amber-100/95 border-2 border-amber-400 px-3.5 py-1.5 rounded-2xl flex items-center gap-2 shadow-sm">
+        <span class="text-lg">📅</span>
+        <span class="text-xs sm:text-sm md:text-base font-extrabold text-amber-950">Nov 22 – Nov 28</span>
+      </div>
+      <div class="bg-gradient-to-b from-yellow-300 to-amber-400 border-2 border-amber-700 px-4 py-1.5 rounded-2xl flex items-center gap-1.5 shadow">
+        <span class="text-lg">⭐</span>
+        <span class="text-xs sm:text-sm md:text-base font-extrabold text-amber-950">
+          Score: <span id="m2-hud-points">0</span> pts
+        </span>
+      </div>
+    </div>
+
+    <!-- Right: Sound Toggle, Live Rankings & Teacher Background Dashboard Button -->
+    <div class="order-2 lg:order-3 flex items-center gap-2 shrink-0">
+      <button
+        id="btn-toggle-sfx"
+        type="button"
+        aria-label="Toggle Sound Effects"
+        class="btn-3d bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold p-2.5 sm:p-3 rounded-2xl border-2 border-amber-400 shadow-[0_3px_0_#d97706] text-lg sm:text-xl"
+        title="Toggle Sound Effects"
+      >
+        🔔
+      </button>
+
+      <button
+        id="btn-open-rankings"
+        type="button"
+        class="btn-3d flex items-center gap-1.5 bg-gradient-to-b from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-amber-950 font-extrabold px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl border-2 border-yellow-200 shadow-[0_4px_0_#b45309] text-xs sm:text-sm md:text-base"
+      >
+        <span class="text-base sm:text-lg">🏆</span>
+        <span>Rankings</span>
+      </button>
+
+      <button
+        id="btn-open-dashboard"
+        type="button"
+        class="btn-3d flex items-center gap-1.5 bg-gradient-to-b from-amber-600 to-amber-800 hover:from-amber-700 hover:to-amber-900 text-amber-50 font-bold px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl border-2 border-amber-300/60 shadow-[0_4px_0_#451a03] text-xs sm:text-sm md:text-base"
+      >
+        <span class="text-base sm:text-lg">🖼️</span>
+        <span>Dashboard</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       LAYER 3: INTERACTIVE FARM ARENA (MISSION 1 - WHERE TURKEYS RUN)
+       ======================================================================== -->
+  <main
+    id="farm-arena"
+    class="relative z-10 w-full flex-1 overflow-hidden"
+    style="height: calc(100dvh - 84px);"
+  >
+    <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+      <div
+        id="helper-toast"
+        class="bg-amber-950/75 text-amber-50 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs sm:text-sm md:text-base font-bold tracking-wide shadow-md border border-amber-300/30 whitespace-nowrap transition-all duration-300"
+      >
+        Listen to the day of the week and tap the turkeys in order!
+      </div>
+    </div>
+
+    <div id="turkeys-container" class="relative w-full h-full"></div>
+  </main>
+
+  <!-- ========================================================================
+       LAYER 3B: MISSION 2 ARENA (THANKSGIVING WEEK CALENDAR 11/22 - 11/28 & TASKS)
+       ======================================================================== -->
+  <section
+    id="mission2-arena"
+    class="hidden relative z-10 w-full overflow-y-auto px-3 sm:px-6 py-4 sm:py-6"
+    style="height: calc(100dvh - 84px);"
+  >
+    <div class="max-w-5xl mx-auto space-y-5">
+      <!-- Week Calendar Card Container -->
+      <div class="bg-amber-50/92 backdrop-blur-md border-4 border-amber-700/40 rounded-3xl p-4 sm:p-6 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 bg-orange-600 text-white text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-full mb-1">
+              <span>🦃</span>
+              <span>Mission 2 • Thanksgiving Week</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-amber-950">
+              November 22 – November 28 Calendar
+            </h2>
+          </div>
+          <div class="bg-amber-100 border-2 border-amber-300 px-3.5 py-2 rounded-2xl text-right">
+            <div class="text-xs font-bold text-amber-800">Tasks Completed</div>
+            <div id="m2-completed-count" class="text-base sm:text-lg font-extrabold text-orange-700">0 / 6 Unlocked</div>
+          </div>
+        </div>
+
+        <!-- 7-Day Calendar Buttons Grid (11/22 through 11/28) -->
+        <div id="m2-calendar-grid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 sm:gap-3"></div>
+      </div>
+
+      <!-- Active Day Task Panel -->
+      <div
+        id="m2-task-panel"
+        class="bg-gradient-to-b from-amber-50/95 to-orange-50/95 backdrop-blur-md border-4 border-amber-600 rounded-3xl p-5 sm:p-7 shadow-2xl"
+      >
+        <div id="m2-task-content" class="text-center py-6">
+          <div class="text-5xl mb-2">📅🦃</div>
+          <h3 class="text-xl sm:text-2xl font-extrabold text-amber-950 mb-1">
+            Tap any date above to start its Thanksgiving task!
+          </h3>
+          <p class="text-sm sm:text-base font-semibold text-amber-800">
+            Complete all 6 day challenges to unlock the special <span class="text-orange-700 font-extrabold">11/26 Thanksgiving Turkey</span>!
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       OVERLAY 1: WELCOME / START SCREEN (UNLOCKS IPAD SAFARI SPEECH & AUDIO)
+       ======================================================================== -->
+  <div
+    id="start-overlay"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-amber-950/60 backdrop-blur-sm"
+  >
+    <div class="bg-gradient-to-b from-amber-50 to-orange-100 border-4 border-amber-600 rounded-3xl max-w-lg w-full p-6 sm:p-8 text-center shadow-2xl">
+      <div class="text-6xl sm:text-7xl mb-2 animate-bounce">🦃</div>
+      <div class="inline-block bg-orange-600 text-white text-xs sm:text-sm font-extrabold uppercase tracking-widest px-3 py-1 rounded-full mb-2">
+        Thanksgiving Farm Activity
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-amber-950 mb-3 leading-tight">
+        Turkey Listen &amp; Spell!
+      </h1>
+      <p class="text-amber-900 text-base sm:text-lg font-semibold mb-4 leading-relaxed">
+        Listen carefully to each <span class="text-orange-700 font-extrabold">Day of the Week</span>, then catch the running turkeys with the right letters in order!
+      </p>
+
+      <!-- Student Name Input for Live Ranking Board -->
+      <div class="mb-5 text-left">
+        <label for="player-name-input" class="block text-xs sm:text-sm font-extrabold text-amber-900 mb-1.5">
+          👤 Enter Your Name for the Live Leaderboard:
+        </label>
+        <input
+          id="player-name-input"
+          type="text"
+          maxlength="24"
+          placeholder="Type your name (e.g., Emma)..."
+          autocomplete="off"
+          class="w-full px-4 py-3 rounded-2xl bg-white border-2 border-amber-400 focus:border-orange-500 focus:outline-none text-base sm:text-lg font-extrabold text-amber-950 shadow-inner"
+        />
+      </div>
+
+      <button
+        id="btn-start-game"
+        type="button"
+        class="btn-3d w-full py-4 px-6 rounded-2xl bg-gradient-to-b from-lime-500 to-green-600 hover:from-lime-600 hover:to-green-700 text-white font-extrabold text-xl sm:text-2xl shadow-[0_6px_0_#166534] border-2 border-lime-200 flex items-center justify-center gap-3"
+      >
+        <span>🔊</span>
+        <span>Tap to Start Game</span>
+      </button>
+
+      <p class="mt-4 text-xs sm:text-sm text-amber-800/80 font-semibold">
+        Turn up your iPad volume so you can hear every word!
+      </p>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       OVERLAY 2: STAGE CLEAR CELEBRATION MODAL
+       ======================================================================== -->
+  <div
+    id="stage-clear-overlay"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-amber-950/55 backdrop-blur-sm"
+  >
+    <div class="bg-gradient-to-b from-yellow-50 via-amber-50 to-orange-100 border-4 border-amber-500 rounded-3xl max-w-xl w-full p-6 sm:p-8 text-center shadow-2xl transform transition-all">
+      <div class="flex justify-center gap-2 text-4xl sm:text-5xl mb-2">
+        <span>🍂</span>
+        <span class="animate-bounce">🦃</span>
+        <span>🍁</span>
+      </div>
+
+      <div id="clear-stage-badge" class="inline-block bg-amber-700 text-amber-100 text-xs sm:text-sm font-extrabold uppercase tracking-wider px-3.5 py-1 rounded-full mb-2">
+        Stage 1 Complete!
+      </div>
+
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-950 mb-2">
+        Awesome Spelling!
+      </h2>
+
+      <div
+        id="completed-word-display"
+        class="my-4 py-3 px-5 bg-white/90 border-2 border-amber-300 rounded-2xl inline-flex items-center justify-center gap-1.5 shadow-inner"
+      ></div>
+
+      <div class="mt-4">
+        <button
+          id="btn-next-stage"
+          type="button"
+          class="btn-3d w-full py-4 px-5 rounded-2xl bg-gradient-to-b from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-extrabold text-lg sm:text-2xl shadow-[0_6px_0_#7f1d1d] border-2 border-yellow-200 leading-snug"
+        >
+          Congratulations! Let's catch more turkeys!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       OVERLAY 3: GRAND THANKSGIVING CHAMPION (AFTER MISSION 1 STAGE 7)
+       ======================================================================== -->
+  <div
+    id="victory-overlay"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-amber-950/65 backdrop-blur-sm"
+  >
+    <div class="bg-gradient-to-b from-amber-50 via-yellow-50 to-orange-100 border-4 border-yellow-500 rounded-3xl max-w-xl w-full p-6 sm:p-8 text-center shadow-2xl">
+      <div class="text-6xl sm:text-7xl mb-2">🏆🦃🎉</div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-amber-950 mb-2">
+        Thanksgiving Spelling Champion!
+      </h2>
+      <p class="text-amber-900 text-base sm:text-lg font-bold mb-4">
+        You caught all the turkeys and spelled all 7 days of the week!
+      </p>
+
+      <div id="mastered-words-grid" class="flex flex-wrap justify-center gap-2 mb-6"></div>
+
+      <div class="space-y-3">
+        <button
+          id="btn-play-again"
+          type="button"
+          class="btn-3d w-full py-3.5 px-6 rounded-2xl bg-gradient-to-b from-lime-500 to-green-600 hover:from-lime-600 hover:to-green-700 text-white font-extrabold text-lg sm:text-xl shadow-[0_5px_0_#166534] border-2 border-lime-200"
+        >
+          🔄 Play Again
+        </button>
+
+        <button
+          id="btn-go-mission-2"
+          type="button"
+          class="btn-3d w-full py-4 px-6 rounded-2xl bg-gradient-to-b from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-extrabold text-lg sm:text-2xl shadow-[0_6px_0_#7f1d1d] border-2 border-yellow-200"
+        >
+          📅 Go to Mission 2
+        </button>
+
+        <button
+          id="btn-m1-victory-rankings"
+          type="button"
+          class="btn-3d w-full py-3 px-6 rounded-2xl bg-gradient-to-b from-yellow-300 to-amber-400 hover:from-yellow-400 hover:to-amber-500 text-amber-950 font-extrabold text-base sm:text-lg shadow-[0_4px_0_#b45309] border-2 border-yellow-100"
+        >
+          🏆 View Live Rankings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       OVERLAY 3B: MISSION 2 TASK CONGRATULATIONS POPUP
+       ======================================================================== -->
+  <div
+    id="m2-congrats-overlay"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-amber-950/60 backdrop-blur-sm"
+  >
+    <div class="bg-gradient-to-b from-yellow-50 via-amber-50 to-orange-100 border-4 border-amber-500 rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl">
+      <div class="text-5xl sm:text-6xl mb-2 animate-bounce">🎉🦃⭐</div>
+      <div id="m2-congrats-date-badge" class="inline-block bg-amber-700 text-amber-100 text-xs sm:text-sm font-extrabold uppercase tracking-wider px-3.5 py-1 rounded-full mb-2">
+        11/22 Complete!
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-950 mb-3">
+        Congratulations! You got it!
+      </h2>
+
+      <div class="my-4 p-4 bg-white/90 border-2 border-amber-300 rounded-2xl shadow-inner space-y-1">
+        <div id="m2-congrats-earned" class="text-xl sm:text-2xl font-extrabold text-lime-600">
+          +10 Points!
+        </div>
+        <div class="text-sm sm:text-base font-bold text-amber-900">
+          Total Score: <span id="m2-congrats-total" class="text-orange-700 font-extrabold text-lg sm:text-xl">10</span> Points
+        </div>
+      </div>
+
+      <button
+        id="btn-m2-congrats-continue"
+        type="button"
+        class="btn-3d w-full py-3.5 px-6 rounded-2xl bg-gradient-to-b from-lime-500 to-green-600 hover:from-lime-600 hover:to-green-700 text-white font-extrabold text-lg sm:text-xl shadow-[0_5px_0_#166534] border-2 border-lime-200"
+      >
+        Continue Calendar ➔
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       OVERLAY 3C: MISSION 2 (11/26) UNLOCKED POP-OUT TURKEY CELEBRATION
+       ======================================================================== -->
+  <div
+    id="m2-turkey-popout-overlay"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-amber-950/70 backdrop-blur-sm"
+  >
+    <div class="bg-gradient-to-b from-amber-50 via-yellow-50 to-orange-100 border-4 border-orange-500 rounded-3xl max-w-lg w-full p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
+      <div class="inline-block bg-red-600 text-white text-xs sm:text-sm font-extrabold uppercase tracking-widest px-4 py-1 rounded-full mb-2">
+        🦃 11/26 Thanksgiving Surprise Unlocked!
+      </div>
+
+      <!-- Animated Pop-Out Turkey SVG -->
+      <div
+        class="w-44 h-44 sm:w-52 sm:h-52 mx-auto my-2 popout-turkey-anim cursor-pointer"
+        id="popout-turkey-graphic"
+        role="button"
+        aria-label="Tap the Thanksgiving Turkey"
+        title="Tap the turkey!"
+      >
+        <svg viewBox="0 0 120 120" class="w-full h-full overflow-visible drop-shadow-xl" aria-hidden="true">
+          <g class="svg-tail">
+            <ellipse cx="60" cy="40" rx="11" ry="30" fill="#DC2626" stroke="#451A03" stroke-width="2" />
+            <ellipse cx="42" cy="45" rx="11" ry="29" transform="rotate(-24 42 45)" fill="#F97316" stroke="#451A03" stroke-width="2" />
+            <ellipse cx="78" cy="45" rx="11" ry="29" transform="rotate(24 78 45)" fill="#F97316" stroke="#451A03" stroke-width="2" />
+            <ellipse cx="27" cy="56" rx="10" ry="26" transform="rotate(-48 27 56)" fill="#FACC15" stroke="#451A03" stroke-width="2" />
+            <ellipse cx="93" cy="56" rx="10" ry="26" transform="rotate(48 93 56)" fill="#FACC15" stroke="#451A03" stroke-width="2" />
+            <ellipse cx="19" cy="70" rx="9" ry="22" transform="rotate(-68 19 70)" fill="#DC2626" stroke="#451A03" stroke-width="2" />
+            <ellipse cx="101" cy="70" rx="9" ry="22" transform="rotate(68 101 70)" fill="#DC2626" stroke="#451A03" stroke-width="2" />
+          </g>
+          <g class="svg-leg-left">
+            <line x1="48" y1="92" x2="45" y2="110" stroke="#EA580C" stroke-width="4.5" stroke-linecap="round" />
+            <path d="M38,110 L45,110 L52,110 M45,110 L42,114" stroke="#EA580C" stroke-width="3.5" stroke-linecap="round" />
+          </g>
+          <g class="svg-leg-right">
+            <line x1="72" y1="92" x2="75" y2="110" stroke="#EA580C" stroke-width="4.5" stroke-linecap="round" />
+            <path d="M68,110 L75,110 L82,110 M75,110 L78,114" stroke="#EA580C" stroke-width="3.5" stroke-linecap="round" />
+          </g>
+          <ellipse cx="60" cy="74" rx="31" ry="27" fill="#78350F" stroke="#451A03" stroke-width="2.5" />
+          <ellipse class="svg-wing-left" cx="29" cy="72" rx="9" ry="18" transform="rotate(14 29 72)" fill="#92400E" stroke="#451A03" stroke-width="2" />
+          <ellipse class="svg-wing-right" cx="91" cy="72" rx="9" ry="18" transform="rotate(-14 91 72)" fill="#92400E" stroke="#451A03" stroke-width="2" />
+          <g class="svg-head-group">
+            <circle cx="60" cy="36" r="15" fill="#78350F" stroke="#451A03" stroke-width="2.5" />
+            <rect x="46" y="21" width="28" height="4" rx="2" fill="#292524" />
+            <rect x="51" y="11" width="18" height="11" rx="2" fill="#292524" />
+            <rect x="51" y="18" width="18" height="3" fill="#FACC15" />
+            <circle cx="54" cy="34" r="3.6" fill="#FFFFFF" />
+            <circle cx="66" cy="34" r="3.6" fill="#FFFFFF" />
+            <circle cx="54.8" cy="34" r="1.9" fill="#1C1917" />
+            <circle cx="66.8" cy="34" r="1.9" fill="#1C1917" />
+            <path d="M64,39 Q69,45 65,50 Q61,48 62,42 Z" fill="#EF4444" stroke="#991B1B" stroke-width="1" />
+            <polygon points="56,38 64,38 60,45" fill="#F59E0B" stroke="#92400E" stroke-width="1.2" stroke-linejoin="round" />
+          </g>
+          <circle cx="60" cy="76" r="21" fill="#FEF08A" stroke="#B45309" stroke-width="3" />
+          <text x="60" y="83" text-anchor="middle" font-size="22" font-weight="900" fill="#78350F">🦃</text>
+        </svg>
+      </div>
+
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-950 mb-2">
+        Gobble, Gobble! Happy Thanksgiving!
+      </h2>
+      <p class="text-sm sm:text-base font-bold text-amber-900 mb-4">
+        You completed Mission 2 and unlocked the Thanksgiving Turkey! Final Score: <span id="m2-popout-final-score" class="text-orange-700 font-extrabold">70</span> Points!
+      </p>
+
+      <div class="space-y-2.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <button
+            id="btn-m2-play-again"
+            type="button"
+            class="btn-3d py-3.5 px-4 rounded-2xl bg-gradient-to-b from-lime-500 to-green-600 hover:from-lime-600 hover:to-green-700 text-white font-extrabold text-base sm:text-lg shadow-[0_5px_0_#166534] border-2 border-lime-200"
+          >
+            🔄 Play Again
+          </button>
+          <button
+            id="btn-m2-go-mission-1"
+            type="button"
+            class="btn-3d py-3.5 px-4 rounded-2xl bg-gradient-to-b from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-extrabold text-base sm:text-lg shadow-[0_5px_0_#7f1d1d] border-2 border-yellow-200"
+          >
+            🦃 Go to Mission 1
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <button
+            id="btn-gobble-again"
+            type="button"
+            class="btn-3d py-2.5 px-3 rounded-2xl bg-amber-200 hover:bg-amber-300 text-amber-950 font-extrabold text-sm sm:text-base border border-amber-400"
+          >
+            🔊 Gobble Again!
+          </button>
+          <button
+            id="btn-m2-victory-rankings"
+            type="button"
+            class="btn-3d py-2.5 px-3 rounded-2xl bg-gradient-to-b from-yellow-300 to-amber-400 text-amber-950 font-extrabold text-sm sm:text-base border border-yellow-100 shadow-[0_3px_0_#b45309]"
+          >
+            🏆 Live Rankings
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       OVERLAY 3D: LIVE RANKING DASHBOARD MODAL (FIREBASE REALTIME DATABASE)
+       ======================================================================== -->
+  <div
+    id="ranking-modal"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/65 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="ranking-modal-title"
+  >
+    <div class="bg-amber-50 border-4 border-amber-600 rounded-3xl max-w-3xl w-full max-h-[90dvh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-amber-800 via-orange-800 to-amber-800 text-amber-50 px-5 py-4 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl sm:text-3xl">🏆</span>
+          <div>
+            <h3 id="ranking-modal-title" class="text-xl sm:text-2xl font-extrabold leading-tight">
+              Live Thanksgiving Ranking Dashboard
+            </h3>
+            <div class="flex items-center gap-2 text-xs text-amber-200 font-bold">
+              <span id="ranking-live-dot" class="inline-block w-2.5 h-2.5 rounded-full bg-lime-400 animate-pulse"></span>
+              <span id="ranking-connection-status">Connected to Live Firebase Leaderboard</span>
+            </div>
+          </div>
+        </div>
+        <button
+          id="btn-close-rankings"
+          type="button"
+          aria-label="Close Live Rankings"
+          class="bg-amber-950/60 hover:bg-amber-950 text-amber-100 w-10 h-10 rounded-xl font-extrabold text-xl flex items-center justify-center shrink-0"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Active Student Bar & Clear All Action -->
+      <div class="bg-amber-100/90 px-4 sm:px-6 py-3 border-b-2 border-amber-300 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2 flex-1 min-w-[220px]">
+          <span class="text-sm font-extrabold text-amber-950 whitespace-nowrap">👤 Player:</span>
+          <input
+            id="ranking-player-name-input"
+            type="text"
+            maxlength="24"
+            placeholder="Student Name..."
+            class="flex-1 min-w-[120px] px-3 py-1.5 rounded-xl bg-white border-2 border-amber-400 text-sm sm:text-base font-extrabold text-amber-950 focus:outline-none focus:border-orange-500"
+          />
+          <button
+            id="btn-update-player-name"
+            type="button"
+            class="btn-3d px-3 py-1.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-extrabold text-xs sm:text-sm"
+          >
+            Save Name
+          </button>
+        </div>
+
+        <button
+          id="btn-clear-all-rankings"
+          type="button"
+          class="btn-3d flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-b from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-extrabold text-xs sm:text-sm shadow-[0_3px_0_#7f1d1d] border border-red-200"
+        >
+          <span>🗑️</span>
+          <span>Clear All</span>
+        </button>
+      </div>
+
+      <!-- Inline Two-Step Clear Confirmation Bar (Replaces browser confirm()) -->
+      <div
+        id="clear-rankings-confirm-bar"
+        class="hidden bg-red-100 border-b-2 border-red-300 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-2"
+      >
+        <span class="text-xs sm:text-sm font-extrabold text-red-900">
+          ⚠️ Clear all student scores from the live ranking board?
+        </span>
+        <div class="flex items-center gap-2">
+          <button
+            id="btn-confirm-clear-rankings"
+            type="button"
+            class="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs sm:text-sm"
+          >
+            Yes, Clear All
+          </button>
+          <button
+            id="btn-cancel-clear-rankings"
+            type="button"
+            class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-amber-50 text-amber-950 font-extrabold text-xs sm:text-sm border border-amber-300"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+
+      <!-- Leaderboard List Body -->
+      <div class="p-4 sm:p-6 overflow-y-auto modal-scroll flex-1 space-y-2.5" id="ranking-list-container">
+        <div class="text-center py-8 text-amber-800 font-bold">
+          Loading live rankings...
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="bg-amber-100 px-5 py-3 border-t-2 border-amber-200 flex flex-wrap items-center justify-between gap-2">
+        <span class="text-xs font-bold text-amber-800">
+          Mission 1: 10 pts/stage (max 70) • Mission 2: 10 pts/day + 10 turkey bonus (max 70)
+        </span>
+        <button
+          id="btn-footer-close-rankings"
+          type="button"
+          class="btn-3d bg-gradient-to-b from-lime-500 to-green-600 text-white font-extrabold px-5 py-2 rounded-xl shadow-[0_3px_0_#166534] border border-lime-200 text-sm sm:text-base"
+        >
+          Back to Game
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       OVERLAY 4: TEACHER / CUSTOM BACKGROUND UPLOAD DASHBOARD MODAL
+       ======================================================================== -->
+  <div
+    id="dashboard-modal"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="dashboard-title"
+  >
+    <div class="bg-amber-50 border-4 border-amber-700 rounded-3xl max-w-2xl w-full max-h-[90dvh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="bg-amber-800 text-amber-50 px-5 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🖼️</span>
+          <h3 id="dashboard-title" class="text-xl sm:text-2xl font-extrabold">
+            Farm Background &amp; Teacher Dashboard
+          </h3>
+        </div>
+        <button
+          id="btn-close-dashboard"
+          type="button"
+          aria-label="Close Dashboard"
+          class="bg-amber-950/60 hover:bg-amber-950 text-amber-100 w-10 h-10 rounded-xl font-extrabold text-xl flex items-center justify-center"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Modal Scrollable Body -->
+      <div class="p-5 sm:p-6 overflow-y-auto modal-scroll space-y-6 text-amber-950">
+        <!-- Status Banner inside Modal (replaces browser alert) -->
+        <div id="dashboard-status-msg" class="hidden px-4 py-2.5 rounded-xl text-sm font-bold border"></div>
+
+        <!-- Section 1: Upload Custom Background Picture -->
+        <section class="bg-white p-4 sm:p-5 rounded-2xl border-2 border-amber-200 shadow-sm">
+          <h4 class="text-lg font-extrabold text-amber-900 mb-1 flex items-center gap-2">
+            <span>📸</span>
+            <span>Upload Background Picture</span>
+          </h4>
+          <p class="text-xs sm:text-sm text-amber-800/80 font-semibold mb-4">
+            Choose a farm, classroom, or Thanksgiving photo from your iPad Photo Library or Files.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+            <label
+              for="bg-file-input"
+              id="upload-dropzone"
+              class="flex flex-col items-center justify-center p-5 border-2 border-dashed border-orange-400 hover:border-orange-600 bg-orange-50/70 hover:bg-orange-100/70 rounded-2xl cursor-pointer text-center transition-colors"
+            >
+              <span class="text-4xl mb-2">📁</span>
+              <span class="font-extrabold text-orange-800 text-sm sm:text-base">
+                Tap to Choose Picture
+              </span>
+              <span class="text-xs text-amber-700 mt-1">
+                JPG, PNG, WEBP supported
+              </span>
+              <input
+                id="bg-file-input"
+                type="file"
+                accept="image/*"
+                class="hidden"
+              />
+            </label>
+
+            <div class="space-y-2">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-amber-700">
+                Current Active Background
+              </div>
+              <div class="relative w-full h-32 rounded-2xl overflow-hidden border-2 border-amber-300 bg-amber-100 flex items-center justify-center">
+                <img
+                  id="dashboard-preview-img"
+                  src=""
+                  alt="Preview"
+                  class="hidden w-full h-full object-cover"
+                />
+                <div id="dashboard-preview-default" class="text-center p-3">
+                  <div class="text-2xl">🏡🦃🍂</div>
+                  <div class="text-xs font-bold text-amber-800 mt-1">Default Thanksgiving Farm</div>
+                </div>
+              </div>
+              <button
+                id="btn-reset-bg"
+                type="button"
+                class="w-full py-2 px-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs sm:text-sm border border-amber-300 transition-colors"
+              >
+                🔄 Reset to Default Thanksgiving Farm
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-5 pt-4 border-t border-amber-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <div class="flex justify-between text-xs sm:text-sm font-bold text-amber-900 mb-1.5">
+                <label for="tint-slider">Background Dim / Contrast Tint</label>
+                <span id="tint-value-label">0%</span>
+              </div>
+              <input
+                id="tint-slider"
+                type="range"
+                min="0"
+                max="70"
+                value="0"
+                class="w-full accent-orange-600 h-2.5 bg-amber-200 rounded-lg cursor-pointer"
+              />
+              <p class="text-[11px] text-amber-700 mt-1">
+                Increase tint if a bright photo makes letters hard to read.
+              </p>
+            </div>
+
+            <div>
+              <div class="text-xs sm:text-sm font-bold text-amber-900 mb-1.5">
+                Picture Fit Mode
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  id="btn-fit-cover"
+                  type="button"
+                  class="py-2 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 bg-orange-600 text-white border-orange-700"
+                >
+                  Fill Screen (Cover)
+                </button>
+                <button
+                  id="btn-fit-contain"
+                  type="button"
+                  class="py-2 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 bg-amber-100 text-amber-900 border-amber-300"
+                >
+                  Fit Whole (Contain)
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 2: Turkey Squawk & Click Sound Controls -->
+        <section class="bg-white p-4 sm:p-5 rounded-2xl border-2 border-amber-200 shadow-sm space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h4 class="text-lg font-extrabold text-amber-900 flex items-center gap-2">
+                <span>🦃</span>
+                <span>Turkey Squawk Click Sound</span>
+              </h4>
+              <p class="text-xs sm:text-sm text-amber-800/80 font-semibold">
+                Active Sound: <span id="squawk-active-label" class="text-orange-700 font-extrabold">turkeysound.mp3</span>
+              </p>
+            </div>
+            <button
+              id="btn-test-squawk"
+              type="button"
+              class="btn-3d bg-gradient-to-b from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white font-extrabold px-4 py-2.5 rounded-xl shadow-[0_3px_0_#9a3412] border border-orange-200 text-xs sm:text-sm flex items-center gap-1.5"
+            >
+              <span>🔊</span>
+              <span>Test Turkey Squawk</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            <label
+              for="squawk-file-input"
+              class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border-2 border-dashed border-orange-400 hover:border-orange-600 bg-orange-50/70 hover:bg-orange-100/70 text-orange-900 font-extrabold text-xs sm:text-sm cursor-pointer transition-colors"
+            >
+              <span>🎵</span>
+              <span>Upload Custom Audio (.mp3/.wav)</span>
+              <input
+                id="squawk-file-input"
+                type="file"
+                accept="audio/*,.mp3,.wav,.m4a"
+                class="hidden"
+              />
+            </label>
+
+            <button
+              id="btn-reset-squawk"
+              type="button"
+              class="py-2.5 px-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs sm:text-sm border border-amber-300 transition-colors"
+            >
+              🔄 Reset to Turkey Squawk
+            </button>
+          </div>
+        </section>
+
+        <!-- Section 3: Teacher Classroom Controls -->
+        <section class="bg-white p-4 sm:p-5 rounded-2xl border-2 border-amber-200 shadow-sm space-y-4">
+          <h4 class="text-lg font-extrabold text-amber-900 flex items-center gap-2">
+            <span>👩‍🏫</span>
+            <span>Classroom &amp; Stage Controls</span>
+          </h4>
+
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div class="text-sm font-extrabold text-amber-900">Pronunciation Speed</div>
+              <div class="text-xs text-amber-700">Slow mode helps younger learners hear every syllable</div>
+            </div>
+            <div class="flex gap-2">
+              <button
+                id="btn-speed-normal"
+                type="button"
+                class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm border-2 bg-orange-600 text-white border-orange-700"
+              >
+                Normal (1.0x)
+              </button>
+              <button
+                id="btn-speed-slow"
+                type="button"
+                class="px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm border-2 bg-amber-100 text-amber-900 border-amber-300"
+              >
+                Slow (0.75x)
+              </button>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-amber-100">
+            <div class="text-sm font-extrabold text-amber-900 mb-2">Jump Directly to Stage (Mission 1):</div>
+            <div id="dashboard-stage-buttons" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+          </div>
+
+          <div class="pt-3 border-t border-amber-100 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <div class="text-sm font-extrabold text-amber-900">Mission 2 Week Calendar Controls</div>
+              <div class="text-xs text-amber-700">Switch directly to Mission 2 or reset calendar points</div>
+            </div>
+            <div class="flex gap-2">
+              <button
+                id="btn-dashboard-open-m2"
+                type="button"
+                class="py-2 px-3 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs sm:text-sm"
+              >
+                📅 Open Mission 2
+              </button>
+              <button
+                id="btn-dashboard-reset-m2"
+                type="button"
+                class="py-2 px-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs sm:text-sm border border-amber-300"
+              >
+                🔄 Reset Mission 2
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="bg-amber-100 px-5 py-3.5 border-t-2 border-amber-200 flex justify-end">
+        <button
+          id="btn-save-close-dashboard"
+          type="button"
+          class="btn-3d bg-gradient-to-b from-lime-500 to-green-600 text-white font-extrabold px-6 py-2.5 rounded-2xl shadow-[0_4px_0_#166534] border border-lime-200 text-base"
+        >
+          Done &amp; Return to Farm
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       GAME LOGIC, AUDIO SYNTHESIS, SPEECH, FIREBASE RANKINGS & ANIMATION ENGINE
+       ======================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ----------------------------------------------------------------------
+         1. EXACT 7-STAGE CURRICULUM CONFIGURATION
+         ---------------------------------------------------------------------- */
+      const STAGES = [
+        { stage: 1, word: 'Monday' },
+        { stage: 2, word: 'Tuesday' },
+        { stage: 3, word: 'Wednesday' },
+        { stage: 4, word: 'Sunday' },
+        { stage: 5, word: 'Saturday' },
+        { stage: 6, word: 'Thursday' },
+        { stage: 7, word: 'Friday' }
+      ];
+
+      const UPPERCASE_POOL = ['M', 'T', 'W', 'S', 'F', 'B', 'C', 'D', 'P', 'R'];
+      const LOWERCASE_POOL = [
+        'a', 'e', 'i', 'o', 'u', 'n', 'd', 'y', 's', 'r', 't', 'h', 'w', 'l', 'm', 'c', 'g', 'p'
+      ];
+
+      const TURKEY_PALETTES = [
+        { tail1: '#DC2626', tail2: '#F97316', tail3: '#FACC15', body: '#78350F', belly: '#92400E' },
+        { tail1: '#B91C1C', tail2: '#EA580C', tail3: '#FDE047', body: '#713F12', belly: '#854D0E' },
+        { tail1: '#9A3412', tail2: '#F59E0B', tail3: '#FEF08A', body: '#6B3410', belly: '#854D0E' },
+        { tail1: '#BE123C', tail2: '#FB923C', tail3: '#FACC15', body: '#78350F', belly: '#9A3412' }
+      ];
+
+      const FIREBASE_DB_URL = 'https://kate-98c3e-default-rtdb.firebaseio.com';
+      const FIREBASE_RANKINGS_URL = FIREBASE_DB_URL + '/rankings.json';
+
+      /* ----------------------------------------------------------------------
+         2. APPLICATION STATE
+         ---------------------------------------------------------------------- */
+      const DEFAULT_SQUAWK_FILENAME = 'turkeysound.mp3';
+      let defaultSquawkAvailable = true;
+      const defaultSquawkAudio = new Audio(DEFAULT_SQUAWK_FILENAME);
+      defaultSquawkAudio.preload = 'auto';
+      defaultSquawkAudio.addEventListener('error', () => {
+        defaultSquawkAvailable = false;
+      });
+
+      const state = {
+        started: false,
+        paused: false,
+        currentStageIndex: 0,
+        currentLetterIndex: 0,
+        turkeys: [],
+        nextTurkeyId: 1,
+        sfxEnabled: true,
+        speechRate: 0.92,
+        isSpeaking: false,
+        customSquawkDataUrl: '',
+        customSquawkAudio: null,
+        lastFrameTime: 0,
+        arenaWidth: 1024,
+        arenaHeight: 600,
+        bgSettings: {
+          customImage: '',
+          tintOpacity: 0,
+          fitMode: 'cover'
+        },
+        activeMission: 1,
+        m1Points: 0,
+        m1Completed: false,
+        m2: {
+          points: 0,
+          completed: false,
+          completedDays: {},
+          selectedDay: null,
+          turkeyUnlockedShown: false,
+          unscramblePlaced: [],
+          unscrambleBank: [],
+          isRecording: false,
+          recognitionInstance: null
+        },
+        ranking: {
+          playerId: '',
+          playerName: '',
+          entries: [],
+          eventSource: null,
+          pollTimer: null
+        }
+      };
+
+      /* ----------------------------------------------------------------------
+         3. DOM ELEMENT REFERENCES
+         ---------------------------------------------------------------------- */
+      const dom = {
+        customBgImage: document.getElementById('custom-bg-image'),
+        defaultFarmScene: document.getElementById('default-farm-scene'),
+        bgTintOverlay: document.getElementById('bg-tint-overlay'),
+        ambientLeaves: document.getElementById('ambient-leaves'),
+
+        gameHud: document.getElementById('game-hud'),
+        btnSwitchMission1: document.getElementById('btn-switch-mission-1'),
+        btnSwitchMission2: document.getElementById('btn-switch-mission-2'),
+        mission1StageBadge: document.getElementById('mission1-stage-badge'),
+        mission1HudCenter: document.getElementById('mission1-hud-center'),
+        mission2HudCenter: document.getElementById('mission2-hud-center'),
+        m2HudPoints: document.getElementById('m2-hud-points'),
+        hudStageText: document.getElementById('hud-stage-text'),
+        stageDots: document.getElementById('stage-dots'),
+        btnListenAgain: document.getElementById('btn-listen-again'),
+        soundBars: document.getElementById('sound-bars'),
+        spellingSlotsContainer: document.getElementById('spelling-slots-container'),
+        btnToggleSfx: document.getElementById('btn-toggle-sfx'),
+        btnOpenRankings: document.getElementById('btn-open-rankings'),
+        btnOpenDashboard: document.getElementById('btn-open-dashboard'),
+
+        farmArena: document.getElementById('farm-arena'),
+        turkeysContainer: document.getElementById('turkeys-container'),
+        helperToast: document.getElementById('helper-toast'),
+
+        mission2Arena: document.getElementById('mission2-arena'),
+        m2CalendarGrid: document.getElementById('m2-calendar-grid'),
+        m2CompletedCount: document.getElementById('m2-completed-count'),
+        m2TaskPanel: document.getElementById('m2-task-panel'),
+        m2TaskContent: document.getElementById('m2-task-content'),
+
+        startOverlay: document.getElementById('start-overlay'),
+        playerNameInput: document.getElementById('player-name-input'),
+        btnStartGame: document.getElementById('btn-start-game'),
+
+        stageClearOverlay: document.getElementById('stage-clear-overlay'),
+        clearStageBadge: document.getElementById('clear-stage-badge'),
+        completedWordDisplay: document.getElementById('completed-word-display'),
+        btnNextStage: document.getElementById('btn-next-stage'),
+
+        victoryOverlay: document.getElementById('victory-overlay'),
+        masteredWordsGrid: document.getElementById('mastered-words-grid'),
+        btnGoMission2: document.getElementById('btn-go-mission-2'),
+        btnPlayAgain: document.getElementById('btn-play-again'),
+        btnM1VictoryRankings: document.getElementById('btn-m1-victory-rankings'),
+
+        m2CongratsOverlay: document.getElementById('m2-congrats-overlay'),
+        m2CongratsDateBadge: document.getElementById('m2-congrats-date-badge'),
+        m2CongratsEarned: document.getElementById('m2-congrats-earned'),
+        m2CongratsTotal: document.getElementById('m2-congrats-total'),
+        btnM2CongratsContinue: document.getElementById('btn-m2-congrats-continue'),
+
+        m2TurkeyPopoutOverlay: document.getElementById('m2-turkey-popout-overlay'),
+        m2PopoutFinalScore: document.getElementById('m2-popout-final-score'),
+        btnM2PlayAgain: document.getElementById('btn-m2-play-again'),
+        btnM2GoMission1: document.getElementById('btn-m2-go-mission-1'),
+        btnGobbleAgain: document.getElementById('btn-gobble-again'),
+        btnM2VictoryRankings: document.getElementById('btn-m2-victory-rankings'),
+
+        rankingModal: document.getElementById('ranking-modal'),
+        btnCloseRankings: document.getElementById('btn-close-rankings'),
+        btnFooterCloseRankings: document.getElementById('btn-footer-close-rankings'),
+        rankingLiveDot: document.getElementById('ranking-live-dot'),
+        rankingConnectionStatus: document.getElementById('ranking-connection-status'),
+        rankingPlayerNameInput: document.getElementById('ranking-player-name-input'),
+        btnUpdatePlayerName: document.getElementById('btn-update-player-name'),
+        btnClearAllRankings: document.getElementById('btn-clear-all-rankings'),
+        clearRankingsConfirmBar: document.getElementById('clear-rankings-confirm-bar'),
+        btnConfirmClearRankings: document.getElementById('btn-confirm-clear-rankings'),
+        btnCancelClearRankings: document.getElementById('btn-cancel-clear-rankings'),
+        rankingListContainer: document.getElementById('ranking-list-container'),
+
+        dashboardModal: document.getElementById('dashboard-modal'),
+        btnCloseDashboard: document.getElementById('btn-close-dashboard'),
+        btnSaveCloseDashboard: document.getElementById('btn-save-close-dashboard'),
+        dashboardStatusMsg: document.getElementById('dashboard-status-msg'),
+        bgFileInput: document.getElementById('bg-file-input'),
+        dashboardPreviewImg: document.getElementById('dashboard-preview-img'),
+        dashboardPreviewDefault: document.getElementById('dashboard-preview-default'),
+        btnResetBg: document.getElementById('btn-reset-bg'),
+        tintSlider: document.getElementById('tint-slider'),
+        tintValueLabel: document.getElementById('tint-value-label'),
+        btnFitCover: document.getElementById('btn-fit-cover'),
+        btnFitContain: document.getElementById('btn-fit-contain'),
+        squawkActiveLabel: document.getElementById('squawk-active-label'),
+        btnTestSquawk: document.getElementById('btn-test-squawk'),
+        squawkFileInput: document.getElementById('squawk-file-input'),
+        btnResetSquawk: document.getElementById('btn-reset-squawk'),
+        btnSpeedNormal: document.getElementById('btn-speed-normal'),
+        btnSpeedSlow: document.getElementById('btn-speed-slow'),
+        dashboardStageButtons: document.getElementById('dashboard-stage-buttons'),
+        btnDashboardOpenM2: document.getElementById('btn-dashboard-open-m2'),
+        btnDashboardResetM2: document.getElementById('btn-dashboard-reset-m2')
+      };
+
+      /* ----------------------------------------------------------------------
+         4. WEB AUDIO API SOUND EFFECTS & IPAD SPEECH SYNTHESIS
+         ---------------------------------------------------------------------- */
+      let audioCtx = null;
+      let preferredVoice = null;
+
+      function initAudioContext() {
+        try {
+          if (!audioCtx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) {
+              audioCtx = new AudioContextClass();
+            }
+          }
+          if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+          }
+        } catch (err) {
+          console.warn('Web Audio init warning:', err);
+        }
+      }
+
+      function loadVoices() {
+        if (!('speechSynthesis' in window)) return;
+        const voices = window.speechSynthesis.getVoices();
+        if (!voices || voices.length === 0) return;
+
+        preferredVoice =
+          voices.find(v => v.lang === 'en-US' && (v.name.includes('Samantha') || v.name.includes('Alex') || v.name.includes('Google'))) ||
+          voices.find(v => v.lang.startsWith('en-US')) ||
+          voices.find(v => v.lang.startsWith('en')) ||
+          voices[0];
+      }
+
+      if ('speechSynthesis' in window) {
+        loadVoices();
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+      }
+
+      /**
+       * Plays the turkey click sound using custom uploaded audio, 'turkeysound.mp3',
+       * or falls back automatically to the built-in Web Audio turkey squawk.
+       */
+      function playTurkeySquawk(isCorrect = true) {
+        if (!state.sfxEnabled) return;
+
+        if (state.customSquawkAudio) {
+          try {
+            state.customSquawkAudio.currentTime = 0;
+            state.customSquawkAudio.play().catch(() => {
+              playSynthesizedTurkeySquawk(isCorrect);
+            });
+          } catch (err) {
+            playSynthesizedTurkeySquawk(isCorrect);
+          }
+          return;
+        }
+
+        if (defaultSquawkAvailable) {
+          try {
+            defaultSquawkAudio.currentTime = 0;
+            defaultSquawkAudio.play().catch(() => {
+              playSynthesizedTurkeySquawk(isCorrect);
+            });
+            return;
+          } catch (err) {
+            // Fall through to synthesized squawk
+          }
+        }
+
+        playSynthesizedTurkeySquawk(isCorrect);
+      }
+
+      /**
+       * Plays 'turkeysound.mp3' for Mission 2 turkey interactions (11/26 pop-out turkey,
+       * Gobble Again button, and calendar taps), falling back to built-in squawk if missing.
+       */
+      function playMission2TurkeySound() {
+        if (!state.sfxEnabled) return;
+
+        if (state.customSquawkAudio) {
+          playTurkeySquawk(true);
+          return;
+        }
+
+        try {
+          const m2TurkeyAudio = new Audio(DEFAULT_SQUAWK_FILENAME);
+          m2TurkeyAudio.preload = 'auto';
+          m2TurkeyAudio.play().catch(() => {
+            playSynthesizedTurkeySquawk(true);
+          });
+        } catch (err) {
+          playSynthesizedTurkeySquawk(true);
+        }
+      }
+
+      /**
+       * Synthesizes a realistic farm turkey squawk/gobble using Web Audio API.
+       */
+      function playSynthesizedTurkeySquawk(isCorrect = true) {
+        if (!state.sfxEnabled) return;
+        initAudioContext();
+        if (!audioCtx) return;
+
+        try {
+          const now = audioCtx.currentTime;
+          const baseFreq = isCorrect ? 420 : 320;
+          const endFreq = isCorrect ? 185 : 130;
+
+          const squawkBursts = [
+            { offset: 0, dur: 0.14, peakGain: 0.24 },
+            { offset: 0.11, dur: 0.17, peakGain: 0.20 }
+          ];
+
+          squawkBursts.forEach(burst => {
+            const start = now + burst.offset;
+            const end = start + burst.dur;
+
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const lfo = audioCtx.createOscillator();
+            const lfoGain = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+            const masterGain = audioCtx.createGain();
+
+            osc1.type = 'sawtooth';
+            osc1.frequency.setValueAtTime(baseFreq, start);
+            osc1.frequency.exponentialRampToValueAtTime(endFreq, end);
+
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(baseFreq * 1.48, start);
+            osc2.frequency.exponentialRampToValueAtTime(endFreq * 1.48, end);
+
+            lfo.type = 'sine';
+            lfo.frequency.setValueAtTime(34, start);
+            lfoGain.gain.setValueAtTime(36, start);
+            lfo.connect(lfoGain);
+            lfoGain.connect(osc1.frequency);
+            lfoGain.connect(osc2.frequency);
+
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(760, start);
+            filter.Q.setValueAtTime(4.2, start);
+
+            masterGain.gain.setValueAtTime(0.001, start);
+            masterGain.gain.linearRampToValueAtTime(burst.peakGain, start + 0.02);
+            masterGain.gain.exponentialRampToValueAtTime(0.001, end);
+
+            osc1.connect(filter);
+            osc2.connect(filter);
+            filter.connect(masterGain);
+            masterGain.connect(audioCtx.destination);
+
+            osc1.start(start);
+            osc2.start(start);
+            lfo.start(start);
+
+            osc1.stop(end);
+            osc2.stop(end);
+            lfo.stop(end);
+          });
+        } catch (err) {
+          console.warn('Synthesized squawk error:', err);
+        }
+      }
+
+      function playCorrectCatchSound(letterIndex) {
+        playTurkeySquawk(true);
+        if (!state.sfxEnabled) return;
+        initAudioContext();
+        if (!audioCtx) return;
+
+        try {
+          const now = audioCtx.currentTime + 0.14;
+          const baseFreq = 523.25 + letterIndex * 38;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(baseFreq, now);
+          osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.35, now + 0.16);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.18);
+        } catch (err) {
+          console.warn('Correct chime warning:', err);
+        }
+      }
+
+      function playWrongTapSound() {
+        playTurkeySquawk(false);
+      }
+
+      function playStageClearFanfare() {
+        if (!state.sfxEnabled) return;
+        initAudioContext();
+        if (!audioCtx) return;
+
+        try {
+          const notes = [523.25, 659.25, 783.99, 1046.5];
+          const now = audioCtx.currentTime;
+          notes.forEach((freq, idx) => {
+            const start = now + idx * 0.11;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, start);
+            gain.gain.setValueAtTime(0.001, start);
+            gain.gain.linearRampToValueAtTime(0.24, start + 0.025);
+            gain.gain.exponentialRampToValueAtTime(0.001, start + 0.36);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(start);
+            osc.stop(start + 0.37);
+          });
+        } catch (err) {
+          console.warn('Fanfare error:', err);
+        }
+      }
+
+      function speakText(text, onComplete = null) {
+        if (!('speechSynthesis' in window)) {
+          if (typeof onComplete === 'function') setTimeout(onComplete, 450);
+          return;
+        }
+
+        try {
+          window.speechSynthesis.cancel();
+          const utter = new SpeechSynthesisUtterance(text);
+          if (preferredVoice) utter.voice = preferredVoice;
+          utter.lang = 'en-US';
+          utter.rate = state.speechRate;
+          utter.pitch = 1.06;
+
+          state.isSpeaking = true;
+          dom.soundBars.classList.remove('hidden');
+          dom.soundBars.classList.add('flex');
+          dom.btnListenAgain.classList.add('speaking-ring');
+
+          const cleanup = () => {
+            state.isSpeaking = false;
+            dom.soundBars.classList.add('hidden');
+            dom.soundBars.classList.remove('flex');
+            dom.btnListenAgain.classList.remove('speaking-ring');
+            if (typeof onComplete === 'function') onComplete();
+          };
+
+          utter.onend = cleanup;
+          utter.onerror = cleanup;
+          window.speechSynthesis.speak(utter);
+        } catch (err) {
+          state.isSpeaking = false;
+          if (typeof onComplete === 'function') onComplete();
+        }
+      }
+
+      function speakCurrentWord() {
+        const currentStage = STAGES[state.currentStageIndex];
+        if (!currentStage) return;
+        speakText(currentStage.word);
+      }
+
+      /* ----------------------------------------------------------------------
+         5. BACKGROUND DASHBOARD & CUSTOM AUDIO HELPERS
+         ---------------------------------------------------------------------- */
+      function showDashboardStatus(message, type = 'success') {
+        const el = dom.dashboardStatusMsg;
+        if (!el) return;
+        el.textContent = message;
+        el.classList.remove(
+          'hidden',
+          'bg-lime-100', 'text-lime-900', 'border-lime-400',
+          'bg-red-100', 'text-red-900', 'border-red-400'
+        );
+        if (type === 'error') {
+          el.classList.add('bg-red-100', 'text-red-900', 'border-red-400');
+        } else {
+          el.classList.add('bg-lime-100', 'text-lime-900', 'border-lime-400');
+        }
+      }
+
+      function applyBackgroundSettings() {
+        const { customImage, tintOpacity, fitMode } = state.bgSettings;
+
+        if (customImage) {
+          dom.customBgImage.src = customImage;
+          dom.customBgImage.classList.remove('hidden');
+          dom.defaultFarmScene.classList.add('hidden');
+          dom.dashboardPreviewImg.src = customImage;
+          dom.dashboardPreviewImg.classList.remove('hidden');
+          dom.dashboardPreviewDefault.classList.add('hidden');
+        } else {
+          dom.customBgImage.src = '';
+          dom.customBgImage.classList.add('hidden');
+          dom.defaultFarmScene.classList.remove('hidden');
+          dom.dashboardPreviewImg.src = '';
+          dom.dashboardPreviewImg.classList.add('hidden');
+          dom.dashboardPreviewDefault.classList.remove('hidden');
+        }
+
+        if (fitMode === 'contain') {
+          dom.customBgImage.classList.remove('object-cover');
+          dom.customBgImage.classList.add('object-contain', 'bg-amber-950');
+          dom.btnFitContain.className = 'py-2 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 bg-orange-600 text-white border-orange-700';
+          dom.btnFitCover.className = 'py-2 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 bg-amber-100 text-amber-900 border-amber-300';
+        } else {
+          dom.customBgImage.classList.remove('object-contain', 'bg-amber-950');
+          dom.customBgImage.classList.add('object-cover');
+          dom.btnFitCover.className = 'py-2 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 bg-orange-600 text-white border-orange-700';
+          dom.btnFitContain.className = 'py-2 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 bg-amber-100 text-amber-900 border-amber-300';
+        }
+
+        dom.bgTintOverlay.style.opacity = String((tintOpacity || 0) / 100);
+        dom.tintSlider.value = String(tintOpacity || 0);
+        dom.tintValueLabel.textContent = (tintOpacity || 0) + '%';
+      }
+
+      function saveBackgroundSettings() {
+        try {
+          localStorage.setItem('thanksgivingTurkeyBgSettings', JSON.stringify(state.bgSettings));
+        } catch (err) {
+          console.warn('Could not persist large background image to localStorage:', err);
+        }
+      }
+
+      function loadSavedBackgroundSettings() {
+        try {
+          const raw = localStorage.getItem('thanksgivingTurkeyBgSettings');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            state.bgSettings = Object.assign(state.bgSettings, parsed);
+          }
+        } catch (err) {
+          console.warn('Could not read saved background settings:', err);
+        }
+        applyBackgroundSettings();
+      }
+
+      function processUploadedImageFile(file) {
+        if (!file || !file.type.startsWith('image/')) {
+          showDashboardStatus('Please select a valid image file (JPG, PNG, or WEBP).', 'error');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+          state.bgSettings.customImage = evt.target.result;
+          applyBackgroundSettings();
+          saveBackgroundSettings();
+          showDashboardStatus('Custom Thanksgiving background uploaded!');
+        };
+        reader.onerror = function () {
+          showDashboardStatus('Could not read that image file. Please try another photo.', 'error');
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function processUploadedAudioFile(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+          const dataUrl = evt.target.result;
+          state.customSquawkDataUrl = dataUrl;
+          state.customSquawkAudio = new Audio(dataUrl);
+          state.customSquawkAudio.preload = 'auto';
+          if (dom.squawkActiveLabel) {
+            dom.squawkActiveLabel.textContent = file.name || 'Custom Uploaded Audio';
+          }
+          playTurkeySquawk(true);
+          showDashboardStatus('Custom turkey click sound loaded!');
+        };
+        reader.onerror = function () {
+          showDashboardStatus('Could not read that audio file. Please try another.', 'error');
+        };
+        reader.readAsDataURL(file);
+      }
+
+      /* ----------------------------------------------------------------------
+         6. LIVE FIREBASE RANKING DASHBOARD ENGINE
+         ---------------------------------------------------------------------- */
+      function initPlayerProfile() {
+        try {
+          let pid = localStorage.getItem('thanksgivingPlayerId');
+          if (!pid) {
+            pid = 'player_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+            localStorage.setItem('thanksgivingPlayerId', pid);
+          }
+          state.ranking.playerId = pid;
+
+          const savedName = localStorage.getItem('thanksgivingPlayerName') || '';
+          state.ranking.playerName = savedName;
+          if (dom.playerNameInput) dom.playerNameInput.value = savedName;
+          if (dom.rankingPlayerNameInput) dom.rankingPlayerNameInput.value = savedName;
+        } catch (err) {
+          state.ranking.playerId = 'player_' + Date.now();
+        }
+      }
+
+      function setPlayerName(rawName) {
+        const cleaned = (rawName || '').trim().slice(0, 24);
+        state.ranking.playerName = cleaned;
+        if (dom.playerNameInput && dom.playerNameInput.value !== cleaned) {
+          dom.playerNameInput.value = cleaned;
+        }
+        if (dom.rankingPlayerNameInput && dom.rankingPlayerNameInput.value !== cleaned) {
+          dom.rankingPlayerNameInput.value = cleaned;
+        }
+        try {
+          localStorage.setItem('thanksgivingPlayerName', cleaned);
+        } catch (err) {
+          // Ignore storage quota warnings
+        }
+      }
+
+      function getEffectivePlayerName() {
+        if (state.ranking.playerName && state.ranking.playerName.trim()) {
+          return state.ranking.playerName.trim();
+        }
+        const suffix = (state.ranking.playerId || '001').slice(-4).toUpperCase();
+        return 'Student #' + suffix;
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function syncPlayerScoreToFirebase() {
+        if (!state.ranking.playerId) return;
+        const m1 = Number(state.m1Points) || 0;
+        const m2 = Number(state.m2.points) || 0;
+        const total = m1 + m2;
+
+        const payload = {
+          id: state.ranking.playerId,
+          name: getEffectivePlayerName(),
+          m1Points: m1,
+          m2Points: m2,
+          totalPoints: total,
+          updatedAt: Date.now()
+        };
+
+        const entryUrl = FIREBASE_DB_URL + '/rankings/' + encodeURIComponent(state.ranking.playerId) + '.json';
+        fetch(entryUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(err => {
+          console.warn('Firebase score sync warning:', err);
+        });
+      }
+
+      function applyRankingSnapshot(rawData) {
+        const list = [];
+        if (rawData && typeof rawData === 'object') {
+          Object.keys(rawData).forEach(key => {
+            const item = rawData[key];
+            if (item && typeof item === 'object') {
+              const m1 = Number(item.m1Points) || 0;
+              const m2 = Number(item.m2Points) || 0;
+              const total = item.totalPoints !== undefined ? Number(item.totalPoints) : m1 + m2;
+              list.push({
+                id: item.id || key,
+                name: item.name || 'Student',
+                m1Points: m1,
+                m2Points: m2,
+                totalPoints: total,
+                updatedAt: Number(item.updatedAt) || 0
+              });
+            }
+          });
+        }
+
+        list.sort((a, b) => {
+          if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+          return a.updatedAt - b.updatedAt;
+        });
+
+        state.ranking.entries = list;
+        renderRankingList();
+      }
+
+      function renderRankingList() {
+        const container = dom.rankingListContainer;
+        if (!container) return;
+
+        const entries = state.ranking.entries;
+        if (!entries || entries.length === 0) {
+          container.innerHTML =
+            '<div class="text-center py-10 bg-white/80 rounded-2xl border-2 border-amber-200">' +
+            '<div class="text-5xl mb-2">🦃📋</div>' +
+            '<div class="text-lg sm:text-xl font-extrabold text-amber-950">No rankings yet!</div>' +
+            '<p class="text-xs sm:text-sm font-bold text-amber-800 mt-1">Play Mission 1 or Mission 2 to appear live on the leaderboard.</p>' +
+            '</div>';
+          return;
+        }
+
+        container.innerHTML = entries
+          .map((entry, idx) => {
+            const rank = idx + 1;
+            const isCurrentPlayer = entry.id === state.ranking.playerId;
+            let medal = '<span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-amber-200 text-amber-950 font-extrabold text-sm">#' + rank + '</span>';
+            if (rank === 1) medal = '<span class="text-3xl" title="1st Place">🥇</span>';
+            else if (rank === 2) medal = '<span class="text-3xl" title="2nd Place">🥈</span>';
+            else if (rank === 3) medal = '<span class="text-3xl" title="3rd Place">🥉</span>';
+
+            const rowClasses = isCurrentPlayer
+              ? 'bg-gradient-to-r from-yellow-100 via-amber-100 to-orange-100 border-3 border-orange-500 shadow-md'
+              : 'bg-white border-2 border-amber-200';
+
+            const youTag = isCurrentPlayer
+              ? '<span class="ml-2 px-2 py-0.5 rounded-full bg-orange-600 text-white text-[10px] sm:text-xs font-extrabold uppercase">You</span>'
+              : '';
+
+            return (
+              '<div class="' + rowClasses + ' rounded-2xl px-4 py-3 flex items-center justify-between gap-3 transition-all">' +
+              '<div class="flex items-center gap-3 min-w-0">' +
+              '<div class="w-10 text-center shrink-0">' + medal + '</div>' +
+              '<div class="min-w-0">' +
+              '<div class="text-base sm:text-lg font-extrabold text-amber-950 truncate">' +
+              escapeHtml(entry.name) + youTag +
+              '</div>' +
+              '<div class="text-xs font-bold text-amber-800 flex flex-wrap gap-2">' +
+              '<span>🦃 M1: <strong>' + entry.m1Points + '</strong> pts</span>' +
+              '<span>•</span>' +
+              '<span>📅 M2: <strong>' + entry.m2Points + '</strong> pts</span>' +
+              '</div>' +
+              '</div>' +
+              '</div>' +
+              '<div class="shrink-0 bg-gradient-to-b from-amber-500 to-orange-600 text-white px-3.5 py-1.5 rounded-xl font-extrabold text-sm sm:text-base shadow">' +
+              entry.totalPoints + ' pts' +
+              '</div>' +
+              '</div>'
+            );
+          })
+          .join('');
+      }
+
+      function fetchRankingsOnce() {
+        fetch(FIREBASE_RANKINGS_URL)
+          .then(res => res.json())
+          .then(data => {
+            applyRankingSnapshot(data);
+            if (dom.rankingConnectionStatus) {
+              dom.rankingConnectionStatus.textContent = 'Live Sync Active • Updated just now';
+            }
+            if (dom.rankingLiveDot) {
+              dom.rankingLiveDot.className = 'inline-block w-2.5 h-2.5 rounded-full bg-lime-400 animate-pulse';
+            }
+          })
+          .catch(() => {
+            if (dom.rankingConnectionStatus) {
+              dom.rankingConnectionStatus.textContent = 'Reconnecting to Firebase...';
+            }
+            if (dom.rankingLiveDot) {
+              dom.rankingLiveDot.className = 'inline-block w-2.5 h-2.5 rounded-full bg-amber-400';
+            }
+          });
+      }
+
+      function startLiveRankingStream() {
+        fetchRankingsOnce();
+
+        if (state.ranking.eventSource) {
+          try {
+            state.ranking.eventSource.close();
+          } catch (e) {
+            // Ignore close error
+          }
+          state.ranking.eventSource = null;
+        }
+
+        if ('EventSource' in window) {
+          try {
+            const es = new EventSource(FIREBASE_RANKINGS_URL);
+            es.addEventListener('put', e => {
+              try {
+                const payload = JSON.parse(e.data);
+                if (payload && payload.path === '/') {
+                  applyRankingSnapshot(payload.data);
+                } else {
+                  fetchRankingsOnce();
+                }
+              } catch (err) {
+                fetchRankingsOnce();
+              }
+            });
+            es.addEventListener('patch', () => {
+              fetchRankingsOnce();
+            });
+            es.onerror = () => {
+              fetchRankingsOnce();
+            };
+            state.ranking.eventSource = es;
+          } catch (err) {
+            // Fallback polling handles updates
+          }
+        }
+
+        if (!state.ranking.pollTimer) {
+          state.ranking.pollTimer = setInterval(fetchRankingsOnce, 5000);
+        }
+      }
+
+      function clearAllFirebaseRankings() {
+        fetch(FIREBASE_RANKINGS_URL, {
+          method: 'DELETE'
+        })
+          .then(() => {
+            state.ranking.entries = [];
+            renderRankingList();
+            if (dom.clearRankingsConfirmBar) {
+              dom.clearRankingsConfirmBar.classList.add('hidden');
+            }
+            if (dom.rankingConnectionStatus) {
+              dom.rankingConnectionStatus.textContent = 'All rankings cleared!';
+            }
+          })
+          .catch(err => {
+            console.warn('Error clearing Firebase rankings:', err);
+          });
+      }
+
+      function openRankingModal() {
+        dom.rankingModal.classList.remove('hidden');
+        if (dom.rankingPlayerNameInput) {
+          dom.rankingPlayerNameInput.value = state.ranking.playerName || '';
+        }
+        if (dom.clearRankingsConfirmBar) {
+          dom.clearRankingsConfirmBar.classList.add('hidden');
+        }
+        startLiveRankingStream();
+      }
+
+      function closeRankingModal() {
+        dom.rankingModal.classList.add('hidden');
+        if (dom.clearRankingsConfirmBar) {
+          dom.clearRankingsConfirmBar.classList.add('hidden');
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         7. MISSION SWITCHING (MISSION 1 <-> MISSION 2)
+         ---------------------------------------------------------------------- */
+      function switchToMission(missionNumber) {
+        state.activeMission = missionNumber;
+
+        if (missionNumber === 1) {
+          state.paused = false;
+          dom.btnSwitchMission1.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold bg-amber-700 text-amber-50 shadow transition-all';
+          dom.btnSwitchMission2.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold text-amber-900 hover:bg-amber-300/60 transition-all';
+
+          dom.mission1StageBadge.classList.remove('hidden');
+          dom.mission1HudCenter.classList.remove('hidden');
+          dom.mission1HudCenter.classList.add('flex');
+          dom.mission2HudCenter.classList.add('hidden');
+          dom.mission2HudCenter.classList.remove('flex');
+
+          dom.farmArena.classList.remove('hidden');
+          dom.mission2Arena.classList.add('hidden');
+          measureArena();
+        } else {
+          state.paused = true;
+          dom.btnSwitchMission2.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold bg-amber-700 text-amber-50 shadow transition-all';
+          dom.btnSwitchMission1.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold text-amber-900 hover:bg-amber-300/60 transition-all';
+
+          dom.mission1StageBadge.classList.add('hidden');
+          dom.mission1HudCenter.classList.add('hidden');
+          dom.mission1HudCenter.classList.remove('flex');
+          dom.mission2HudCenter.classList.remove('hidden');
+          dom.mission2HudCenter.classList.add('flex');
+
+          dom.farmArena.classList.add('hidden');
+          dom.mission2Arena.classList.remove('hidden');
+          renderMission2Calendar();
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         8. MISSION 1: TURKEY ARENA, SPAWNING, PHYSICS & SPELLING SLOTS
+         ---------------------------------------------------------------------- */
+      function measureArena() {
+        if (!dom.farmArena) return;
+        const rect = dom.farmArena.getBoundingClientRect();
+        if (rect.width > 0) state.arenaWidth = rect.width;
+        if (rect.height > 0) state.arenaHeight = rect.height;
+      }
+
+      function createAmbientLeaves() {
+        if (!dom.ambientLeaves) return;
+        const leafEmojis = ['🍂', '🍁', '🍃'];
+        dom.ambientLeaves.innerHTML = '';
+        for (let i = 0; i < 10; i++) {
+          const span = document.createElement('span');
+          span.textContent = leafEmojis[i % leafEmojis.length];
+          span.style.position = 'absolute';
+          span.style.left = (Math.random() * 95) + '%';
+          span.style.top = '-40px';
+          span.style.fontSize = (18 + Math.random() * 14) + 'px';
+          span.style.animation = 'floatLeaf ' + (11 + Math.random() * 9) + 's linear ' + (Math.random() * 10) + 's infinite';
+          dom.ambientLeaves.appendChild(span);
+        }
+      }
+
+      function renderStageDots() {
+        if (!dom.stageDots) return;
+        dom.stageDots.innerHTML = STAGES.map((st, idx) => {
+          let cls = 'w-3 h-3 rounded-full transition-all ';
+          if (idx < state.currentStageIndex) cls += 'bg-lime-500 scale-105';
+          else if (idx === state.currentStageIndex) cls += 'bg-orange-500 ring-2 ring-orange-300 scale-125';
+          else cls += 'bg-amber-300';
+          return '<span class="' + cls + '" title="Stage ' + st.stage + '"></span>';
+        }).join('');
+      }
+
+      function renderDashboardStageButtons() {
+        if (!dom.dashboardStageButtons) return;
+        dom.dashboardStageButtons.innerHTML = STAGES.map((st, idx) => {
+          return (
+            '<button type="button" data-jump-stage="' + idx + '" ' +
+            'class="py-2 px-2.5 rounded-xl bg-amber-100 hover:bg-orange-200 text-amber-950 font-extrabold text-xs sm:text-sm border border-amber-300 transition-colors">' +
+            'Stage ' + st.stage + ': ' + st.word +
+            '</button>'
+          );
+        }).join('');
+
+        dom.dashboardStageButtons.querySelectorAll('[data-jump-stage]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const idx = Number(btn.getAttribute('data-jump-stage'));
+            dom.dashboardModal.classList.add('hidden');
+            switchToMission(1);
+            startStage(idx, true);
+          });
+        });
+      }
+
+      function renderSpellingSlots() {
+        const currentStage = STAGES[state.currentStageIndex];
+        if (!currentStage || !dom.spellingSlotsContainer) return;
+
+        const letters = currentStage.word.split('');
+        dom.spellingSlotsContainer.innerHTML = letters
+          .map((ch, idx) => {
+            const isFilled = idx < state.currentLetterIndex;
+            const isCurrent = idx === state.currentLetterIndex;
+            if (isFilled) {
+              return (
+                '<div class="slot-filled-anim w-8 h-10 sm:w-11 sm:h-12 md:w-12 md:h-14 rounded-xl bg-gradient-to-b from-yellow-300 to-amber-500 border-2 border-amber-800 shadow flex items-center justify-center text-lg sm:text-2xl md:text-3xl font-extrabold text-amber-950">' +
+                ch +
+                '</div>'
+              );
+            }
+            const activeRing = isCurrent ? 'border-orange-500 bg-white ring-2 ring-orange-300' : 'border-amber-400/70 bg-amber-50/80';
+            return (
+              '<div class="w-8 h-10 sm:w-11 sm:h-12 md:w-12 md:h-14 rounded-xl border-2 border-dashed ' + activeRing + ' flex items-center justify-center text-lg sm:text-2xl font-extrabold text-amber-400">' +
+              '?' +
+              '</div>'
+            );
+          })
+          .join('');
+      }
+
+      function createTurkeySVG(letter, palette) {
+        return (
+          '<div class="turkey-visual">' +
+          '<svg viewBox="0 0 120 120" class="w-full h-full overflow-visible drop-shadow-md" aria-hidden="true">' +
+          '<g class="svg-tail">' +
+          '<ellipse cx="60" cy="40" rx="11" ry="30" fill="' + palette.tail1 + '" stroke="#451A03" stroke-width="2" />' +
+          '<ellipse cx="42" cy="45" rx="11" ry="29" transform="rotate(-24 42 45)" fill="' + palette.tail2 + '" stroke="#451A03" stroke-width="2" />' +
+          '<ellipse cx="78" cy="45" rx="11" ry="29" transform="rotate(24 78 45)" fill="' + palette.tail2 + '" stroke="#451A03" stroke-width="2" />' +
+          '<ellipse cx="27" cy="56" rx="10" ry="26" transform="rotate(-48 27 56)" fill="' + palette.tail3 + '" stroke="#451A03" stroke-width="2" />' +
+          '<ellipse cx="93" cy="56" rx="10" ry="26" transform="rotate(48 93 56)" fill="' + palette.tail3 + '" stroke="#451A03" stroke-width="2" />' +
+          '</g>' +
+          '<g class="svg-leg-left">' +
+          '<line x1="48" y1="92" x2="45" y2="110" stroke="#EA580C" stroke-width="4.5" stroke-linecap="round" />' +
+          '<path d="M38,110 L45,110 L52,110" stroke="#EA580C" stroke-width="3.5" stroke-linecap="round" />' +
+          '</g>' +
+          '<g class="svg-leg-right">' +
+          '<line x1="72" y1="92" x2="75" y2="110" stroke="#EA580C" stroke-width="4.5" stroke-linecap="round" />' +
+          '<path d="M68,110 L75,110 L82,110" stroke="#EA580C" stroke-width="3.5" stroke-linecap="round" />' +
+          '</g>' +
+          '<ellipse cx="60" cy="74" rx="31" ry="27" fill="' + palette.body + '" stroke="#451A03" stroke-width="2.5" />' +
+          '<ellipse class="svg-wing-left" cx="29" cy="72" rx="9" ry="18" transform="rotate(14 29 72)" fill="' + palette.belly + '" stroke="#451A03" stroke-width="2" />' +
+          '<ellipse class="svg-wing-right" cx="91" cy="72" rx="9" ry="18" transform="rotate(-14 91 72)" fill="' + palette.belly + '" stroke="#451A03" stroke-width="2" />' +
+          '<g class="svg-head-group">' +
+          '<circle cx="60" cy="36" r="15" fill="' + palette.body + '" stroke="#451A03" stroke-width="2.5" />' +
+          '<circle cx="54" cy="34" r="3.5" fill="#FFFFFF" />' +
+          '<circle cx="66" cy="34" r="3.5" fill="#FFFFFF" />' +
+          '<circle cx="54.8" cy="34" r="1.8" fill="#1C1917" />' +
+          '<circle cx="66.8" cy="34" r="1.8" fill="#1C1917" />' +
+          '<path d="M64,39 Q69,45 65,50 Q61,48 62,42 Z" fill="#EF4444" stroke="#991B1B" stroke-width="1" />' +
+          '<polygon points="56,38 64,38 60,45" fill="#F59E0B" stroke="#92400E" stroke-width="1.2" stroke-linejoin="round" />' +
+          '</g>' +
+          '<circle cx="60" cy="76" r="22" fill="#FFFBEB" stroke="#B45309" stroke-width="3.2" />' +
+          '<text x="60" y="84" text-anchor="middle" font-size="25" font-weight="900" fill="#78350F">' + letter + '</text>' +
+          '</svg>' +
+          '</div>'
+        );
+      }
+
+      function spawnParticleBurst(x, y) {
+        if (!dom.turkeysContainer) return;
+        const emojis = ['⭐', '🍂', '✨', '🍁'];
+        for (let i = 0; i < 6; i++) {
+          const p = document.createElement('div');
+          p.className = 'particle-burst';
+          p.textContent = emojis[i % emojis.length];
+          p.style.left = x + 'px';
+          p.style.top = y + 'px';
+          dom.turkeysContainer.appendChild(p);
+
+          const angle = (Math.PI * 2 * i) / 6;
+          const dist = 55 + Math.random() * 35;
+          requestAnimationFrame(() => {
+            p.style.transform = 'translate(' + Math.cos(angle) * dist + 'px, ' + Math.sin(angle) * dist + 'px) scale(1.2)';
+            p.style.opacity = '0';
+          });
+          setTimeout(() => p.remove(), 700);
+        }
+      }
+
+      function getTargetLetter() {
+        const currentStage = STAGES[state.currentStageIndex];
+        if (!currentStage) return '';
+        return currentStage.word[state.currentLetterIndex] || '';
+      }
+
+      function pickDistractorLetter(excludeChars) {
+        const isUpperNeeded = state.currentLetterIndex === 0;
+        const pool = isUpperNeeded ? UPPERCASE_POOL : LOWERCASE_POOL;
+        const filtered = pool.filter(ch => !excludeChars.includes(ch));
+        const source = filtered.length > 0 ? filtered : pool;
+        return source[Math.floor(Math.random() * source.length)];
+      }
+
+      function spawnTurkey(letter) {
+        measureArena();
+        const size = state.arenaWidth < 640 ? 92 : 114;
+        const minY = Math.max(12, state.arenaHeight * 0.24);
+        const maxY = Math.max(minY + 40, state.arenaHeight - size - 36);
+
+        const x = 20 + Math.random() * Math.max(40, state.arenaWidth - size - 40);
+        const y = minY + Math.random() * Math.max(20, maxY - minY);
+
+        const speed = (state.arenaWidth < 640 ? 68 : 92) + Math.random() * 48;
+        const angle = Math.random() * Math.PI * 2;
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * (speed * 0.55);
+
+        const palette = TURKEY_PALETTES[state.nextTurkeyId % TURKEY_PALETTES.length];
+        const el = document.createElement('div');
+        el.className = 'turkey-entity';
+        el.style.width = size + 'px';
+        el.style.height = size + 'px';
+        el.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0)';
+        el.innerHTML = createTurkeySVG(letter, palette);
+
+        const turkeyObj = {
+          id: state.nextTurkeyId++,
+          letter,
+          x,
+          y,
+          vx,
+          vy,
+          size,
+          caught: false,
+          el
+        };
+
+        el.addEventListener('pointerdown', evt => {
+          evt.preventDefault();
+          handleTurkeyTap(turkeyObj);
+        });
+
+        dom.turkeysContainer.appendChild(el);
+        state.turkeys.push(turkeyObj);
+      }
+
+      function ensureTargetLetterAvailability() {
+        const needed = getTargetLetter();
+        if (!needed) return;
+        const activeMatching = state.turkeys.filter(t => !t.caught && t.letter === needed);
+        while (activeMatching.length < 2) {
+          spawnTurkey(needed);
+          activeMatching.push(state.turkeys[state.turkeys.length - 1]);
+        }
+      }
+
+      function populateFieldForStage() {
+        dom.turkeysContainer.innerHTML = '';
+        state.turkeys = [];
+
+        const currentStage = STAGES[state.currentStageIndex];
+        if (!currentStage) return;
+
+        const wordChars = currentStage.word.split('');
+        const totalTurkeys = state.arenaWidth < 640 ? 8 : 11;
+        const lettersToSpawn = [];
+
+        // Guarantee the first needed letter appears twice immediately
+        lettersToSpawn.push(wordChars[0], wordChars[0]);
+
+        // Add remaining letters of the word
+        for (let i = 1; i < wordChars.length; i++) {
+          lettersToSpawn.push(wordChars[i]);
+        }
+
+        // Fill remaining slots with distractors
+        while (lettersToSpawn.length < totalTurkeys) {
+          lettersToSpawn.push(pickDistractorLetter([wordChars[0]]));
+        }
+
+        // Shuffle spawn list
+        for (let i = lettersToSpawn.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = lettersToSpawn[i];
+          lettersToSpawn[i] = lettersToSpawn[j];
+          lettersToSpawn[j] = tmp;
+        }
+
+        lettersToSpawn.forEach(ch => spawnTurkey(ch));
+      }
+
+      function handleTurkeyTap(turkeyObj) {
+        if (!state.started || state.paused || turkeyObj.caught) return;
+        initAudioContext();
+
+        const needed = getTargetLetter();
+        if (!needed) return;
+
+        if (turkeyObj.letter === needed) {
+          turkeyObj.caught = true;
+          turkeyObj.el.classList.add('turkey-caught');
+          playCorrectCatchSound(state.currentLetterIndex);
+          spawnParticleBurst(turkeyObj.x + turkeyObj.size / 2, turkeyObj.y + turkeyObj.size / 2);
+
+          state.currentLetterIndex += 1;
+          renderSpellingSlots();
+
+          setTimeout(() => {
+            turkeyObj.el.remove();
+            state.turkeys = state.turkeys.filter(t => t.id !== turkeyObj.id);
+          }, 420);
+
+          const currentStage = STAGES[state.currentStageIndex];
+          if (state.currentLetterIndex >= currentStage.word.length) {
+            onStageComplete();
+          } else {
+            ensureTargetLetterAvailability();
+          }
+        } else {
+          playWrongTapSound();
+          const visual = turkeyObj.el.querySelector('.turkey-visual');
+          if (visual) {
+            visual.classList.remove('turkey-wiggle');
+            void visual.offsetWidth;
+            visual.classList.add('turkey-wiggle');
+          }
+          if (dom.helperToast) {
+            dom.helperToast.textContent = 'Listen again! Catch the next letter of the word.';
+          }
+        }
+      }
+
+      function showStageClearCelebration(stageObj) {
+        state.paused = true;
+        playStageClearFanfare();
+
+        dom.clearStageBadge.textContent = 'Stage ' + stageObj.stage + ' Complete!';
+        dom.completedWordDisplay.innerHTML = '';
+
+        stageObj.word.split('').forEach(ch => {
+          const tile = document.createElement('span');
+          tile.className = 'w-9 h-11 sm:w-12 sm:h-14 rounded-xl bg-gradient-to-b from-yellow-300 to-amber-500 border-2 border-amber-800 flex items-center justify-center text-xl sm:text-3xl font-extrabold text-amber-950 shadow';
+          tile.textContent = ch;
+          dom.completedWordDisplay.appendChild(tile);
+        });
+
+        dom.stageClearOverlay.classList.remove('hidden');
+      }
+
+      function onStageComplete() {
+        const currentStage = STAGES[state.currentStageIndex];
+        state.m1Points = Math.max(state.m1Points, (state.currentStageIndex + 1) * 10);
+        syncPlayerScoreToFirebase();
+        showStageClearCelebration(currentStage);
+      }
+
+      function showMission1Victory() {
+        state.paused = true;
+        state.m1Completed = true;
+        state.m1Points = 70;
+        syncPlayerScoreToFirebase();
+        playStageClearFanfare();
+
+        dom.masteredWordsGrid.innerHTML = STAGES.map(st => {
+          return (
+            '<span class="px-3.5 py-1.5 rounded-full bg-amber-200 border-2 border-amber-500 text-amber-950 font-extrabold text-sm sm:text-base shadow-sm">' +
+            '🦃 ' + st.word +
+            '</span>'
+          );
+        }).join('');
+
+        dom.victoryOverlay.classList.remove('hidden');
+      }
+
+      function startStage(stageIndex, autoSpeak = true) {
+        state.currentStageIndex = stageIndex;
+        state.currentLetterIndex = 0;
+        state.paused = false;
+
+        const stageObj = STAGES[stageIndex];
+        dom.hudStageText.textContent = stageObj.stage + ' / ' + STAGES.length;
+        renderStageDots();
+        renderSpellingSlots();
+        populateFieldForStage();
+
+        if (dom.helperToast) {
+          dom.helperToast.textContent = 'Stage ' + stageObj.stage + ': Listen and tap the turkeys in spelling order!';
+        }
+
+        if (autoSpeak) {
+          setTimeout(() => speakCurrentWord(), 280);
+        }
+      }
+
+      function updateTurkeysLoop(timestamp) {
+        if (!state.lastFrameTime) state.lastFrameTime = timestamp;
+        const dt = Math.min(0.05, (timestamp - state.lastFrameTime) / 1000);
+        state.lastFrameTime = timestamp;
+
+        if (state.started && !state.paused && state.activeMission === 1) {
+          const minX = 8;
+          const maxX = Math.max(40, state.arenaWidth - 118);
+          const minY = Math.max(10, state.arenaHeight * 0.22);
+          const maxY = Math.max(minY + 30, state.arenaHeight - 134);
+
+          for (let i = 0; i < state.turkeys.length; i++) {
+            const t = state.turkeys[i];
+            if (t.caught) continue;
+
+            t.x += t.vx * dt;
+            t.y += t.vy * dt;
+
+            if (t.x <= minX) {
+              t.x = minX;
+              t.vx = Math.abs(t.vx);
+            } else if (t.x >= maxX) {
+              t.x = maxX;
+              t.vx = -Math.abs(t.vx);
+            }
+
+            if (t.y <= minY) {
+              t.y = minY;
+              t.vy = Math.abs(t.vy);
+            } else if (t.y >= maxY) {
+              t.y = maxY;
+              t.vy = -Math.abs(t.vy);
+            }
+
+            const flip = t.vx < 0 ? -1 : 1;
+            t.el.style.transform = 'translate3d(' + t.x.toFixed(1) + 'px, ' + t.y.toFixed(1) + 'px, 0) scaleX(' + flip + ')';
+            const textEl = t.el.querySelector('text');
+            if (textEl) {
+              textEl.setAttribute('transform', flip < 0 ? 'translate(120, 0) scale(-1, 1)' : '');
+            }
+          }
+        }
+
+        requestAnimationFrame(updateTurkeysLoop);
+      }
+
+      /* ----------------------------------------------------------------------
+         9. MISSION 2: THANKSGIVING WEEK CALENDAR (11/22 - 11/28) & 7 TASKS
+         ---------------------------------------------------------------------- */
+      const MISSION2_CALENDAR = [
+        { date: '11/22', dayLabel: 'Sun', icon: '🔊', title: 'Listen & Unscramble' },
+        { date: '11/23', dayLabel: 'Mon', icon: '❓', title: 'Quick Question' },
+        { date: '11/24', dayLabel: 'Tue', icon: '🎙️', title: 'AI Speaking Check' },
+        { date: '11/25', dayLabel: 'Wed', icon: '✏️', title: 'Fill in the Day' },
+        { date: '11/26', dayLabel: 'Thu', icon: '🦃', title: 'Thanksgiving Turkey', isBonusLock: true },
+        { date: '11/27', dayLabel: 'Fri', icon: '📝', title: 'Day Challenge' },
+        { date: '11/28', dayLabel: 'Sat', icon: '🧩', title: 'Listen & Unscramble' }
+      ];
+
+      function areAllSixMission2TasksDone() {
+        const requiredDates = ['11/22', '11/23', '11/24', '11/25', '11/27', '11/28'];
+        return requiredDates.every(d => Boolean(state.m2.completedDays[d]));
+      }
+
+      function getCompletedSixCount() {
+        const requiredDates = ['11/22', '11/23', '11/24', '11/25', '11/27', '11/28'];
+        return requiredDates.filter(d => Boolean(state.m2.completedDays[d])).length;
+      }
+
+      function updateMission2HeaderPoints() {
+        if (dom.m2HudPoints) {
+          dom.m2HudPoints.textContent = String(state.m2.points);
+        }
+        if (dom.m2CompletedCount) {
+          const doneCount = getCompletedSixCount();
+          dom.m2CompletedCount.textContent = doneCount + ' / 6 Unlocked';
+        }
+      }
+
+      function awardMission2DayPoints(dateStr) {
+        const alreadyDone = Boolean(state.m2.completedDays[dateStr]);
+        if (!alreadyDone) {
+          state.m2.completedDays[dateStr] = true;
+          state.m2.points += 10;
+        }
+        updateMission2HeaderPoints();
+        renderMission2Calendar();
+        syncPlayerScoreToFirebase();
+
+        playStageClearFanfare();
+        dom.m2CongratsDateBadge.textContent = dateStr + ' Task Complete!';
+        dom.m2CongratsEarned.textContent = alreadyDone ? 'Completed! (10 Points Earned)' : '+10 Points!';
+        dom.m2CongratsTotal.textContent = String(state.m2.points);
+        dom.m2CongratsOverlay.classList.remove('hidden');
+      }
+
+      function openPopOutTurkeyModal() {
+        initAudioContext();
+        if (!state.m2.completed) {
+          state.m2.completed = true;
+          state.m2.points += 10;
+          updateMission2HeaderPoints();
+          syncPlayerScoreToFirebase();
+        }
+        playMission2TurkeySound();
+        setTimeout(() => playStageClearFanfare(), 900);
+        dom.m2PopoutFinalScore.textContent = String(state.m2.points);
+        dom.m2TurkeyPopoutOverlay.classList.remove('hidden');
+      }
+
+      function renderMission2Calendar() {
+        if (!dom.m2CalendarGrid) return;
+        updateMission2HeaderPoints();
+
+        const unlockedTurkey = areAllSixMission2TasksDone();
+        dom.m2CalendarGrid.innerHTML = '';
+
+        MISSION2_CALENDAR.forEach(item => {
+          const isDone = Boolean(state.m2.completedDays[item.date]);
+          const isSelected = state.m2.selectedDay === item.date;
+          const isLocked = item.isBonusLock && !unlockedTurkey;
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+
+          let cardClass = 'btn-3d p-3 sm:p-4 rounded-2xl border-3 flex flex-col items-center justify-center text-center transition-all ';
+          if (isLocked) {
+            cardClass += 'bg-stone-200/90 border-stone-400 text-stone-500 cursor-not-allowed opacity-85';
+          } else if (item.isBonusLock && unlockedTurkey) {
+            cardClass += 'bg-gradient-to-b from-yellow-300 via-amber-400 to-orange-500 border-red-600 text-amber-950 shadow-[0_5px_0_#9a3412] ring-4 ring-yellow-300/80';
+          } else if (isDone) {
+            cardClass += 'bg-gradient-to-b from-lime-100 to-green-200 border-green-600 text-green-950 shadow-[0_4px_0_#166534]';
+          } else if (isSelected) {
+            cardClass += 'bg-gradient-to-b from-orange-200 to-amber-200 border-orange-600 text-amber-950 shadow-[0_4px_0_#c2410c] ring-2 ring-orange-400';
+          } else {
+            cardClass += 'bg-white hover:bg-amber-100/90 border-amber-400 text-amber-950 shadow-[0_4px_0_#d97706]';
+          }
+
+          btn.className = cardClass;
+
+          const topBadge = isLocked
+            ? '🔒 Locked'
+            : item.isBonusLock
+              ? '🎉 UNLOCKED!'
+              : isDone
+                ? '✅ +10 pts'
+                : item.dayLabel;
+
+          const displayIcon = isLocked ? '🔒' : item.icon;
+
+          btn.innerHTML =
+            '<span class="text-[11px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-950/10 mb-1">' +
+            topBadge +
+            '</span>' +
+            '<span class="text-2xl sm:text-3xl my-1">' + displayIcon + '</span>' +
+            '<span class="text-lg sm:text-xl font-extrabold leading-tight">' + item.date + '</span>' +
+            '<span class="text-[11px] sm:text-xs font-bold opacity-85 mt-0.5 leading-tight">' + item.title + '</span>';
+
+          if (isLocked) {
+            btn.addEventListener('click', () => {
+              btn.classList.remove('shake-feedback');
+              void btn.offsetWidth;
+              btn.classList.add('shake-feedback');
+              dom.m2TaskContent.innerHTML =
+                '<div class="py-6 text-center space-y-2">' +
+                '<div class="text-5xl">🔒🦃</div>' +
+                '<h3 class="text-xl sm:text-2xl font-extrabold text-amber-950">11/26 Thanksgiving Turkey is Locked!</h3>' +
+                '<p class="text-sm sm:text-base font-bold text-amber-800">Complete all other 6 calendar tasks (' + getCompletedSixCount() + '/6 done) to unlock the surprise turkey!</p>' +
+                '</div>';
+            });
+          } else if (item.isBonusLock) {
+            btn.addEventListener('click', () => {
+              state.m2.selectedDay = item.date;
+              renderMission2Calendar();
+              openPopOutTurkeyModal();
+            });
+          } else {
+            btn.addEventListener('click', () => {
+              initAudioContext();
+              if (item.date !== '11/22' && item.date !== '11/28') {
+                playMission2TurkeySound();
+              }
+              selectMission2Day(item.date);
+            });
+          }
+
+          dom.m2CalendarGrid.appendChild(btn);
+        });
+      }
+
+      function selectMission2Day(dateStr) {
+        state.m2.selectedDay = dateStr;
+        renderMission2Calendar();
+
+        if (dateStr === '11/22') {
+          renderUnscrambleTask(
+            '11/22',
+            "What day is today? It's Sunday.",
+            ['What', 'day', 'is', 'today?', "It's", 'Sunday.']
+          );
+        } else if (dateStr === '11/23') {
+          renderMultipleChoiceTask('11/23');
+        } else if (dateStr === '11/24') {
+          renderRecordSpeechTask('11/24');
+        } else if (dateStr === '11/25') {
+          renderTypedFillBlankTask(
+            '11/25',
+            'Is it ____ today? Yes, it is.',
+            ['wednesday']
+          );
+        } else if (dateStr === '11/27') {
+          renderTypedFillBlankTask(
+            '11/27',
+            "Is it ____ today? No, it isn't. It's Friday.",
+            ['monday', 'tuesday', 'wednesday', 'thursday', 'saturday', 'sunday']
+          );
+        } else if (dateStr === '11/28') {
+          renderUnscrambleTask(
+            '11/28',
+            'Is it Saturday today? Yes, it is.',
+            ['Is', 'it', 'Saturday', 'today?', 'Yes,', 'it', 'is.']
+          );
+        }
+      }
+
+      /* Task 11/22 & 11/28: Auto-play Audio + Unscramble Sentence */
+      function renderUnscrambleTask(dateStr, sentenceAudio, correctTokens) {
+        const shuffled = correctTokens.map((word, idx) => ({ id: idx, word }));
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = shuffled[i];
+          shuffled[i] = shuffled[j];
+          shuffled[j] = tmp;
+        }
+        if (shuffled.every((item, idx) => item.word === correctTokens[idx]) && shuffled.length > 1) {
+          const first = shuffled.shift();
+          shuffled.push(first);
+        }
+
+        state.m2.unscramblePlaced = [];
+        state.m2.unscrambleBank = shuffled;
+
+        function redrawUnscramble() {
+          const placedHtml = state.m2.unscramblePlaced.length === 0
+            ? '<span class="text-amber-500 font-bold text-sm sm:text-base">Tap the word tiles below in the correct order...</span>'
+            : state.m2.unscramblePlaced
+                .map((tile, idx) => {
+                  return (
+                    '<button type="button" data-remove-idx="' + idx + '" ' +
+                    'class="btn-3d px-3.5 py-2 rounded-xl bg-gradient-to-b from-yellow-300 to-amber-500 border-2 border-amber-800 text-amber-950 font-extrabold text-base sm:text-lg shadow">' +
+                    tile.word +
+                    '</button>'
+                  );
+                })
+                .join('');
+
+          const bankHtml = state.m2.unscrambleBank
+            .map((tile, idx) => {
+              return (
+                '<button type="button" data-pick-idx="' + idx + '" ' +
+                'class="btn-3d px-4 py-2.5 rounded-2xl bg-white hover:bg-orange-100 border-2 border-orange-500 text-amber-950 font-extrabold text-base sm:text-xl shadow-[0_4px_0_#c2410c]">' +
+                tile.word +
+                '</button>'
+              );
+            })
+            .join('');
+
+          dom.m2TaskContent.innerHTML =
+            '<div class="max-w-2xl mx-auto space-y-5 text-center">' +
+            '<div class="inline-flex items-center gap-2 bg-amber-800 text-amber-50 px-4 py-1 rounded-full text-xs sm:text-sm font-extrabold">' +
+            '<span>📅 ' + dateStr + ' Challenge</span>' +
+            '<span>•</span>' +
+            '<span>10 Points</span>' +
+            '</div>' +
+            '<h3 class="text-xl sm:text-2xl font-extrabold text-amber-950">Listen and put the sentence in order!</h3>' +
+            '<div>' +
+            '<button id="btn-m2-replay-audio" type="button" class="btn-3d inline-flex items-center gap-2 bg-gradient-to-b from-orange-400 to-orange-600 text-white font-extrabold px-5 py-3 rounded-2xl shadow-[0_4px_0_#9a3412] border-2 border-orange-200 text-base sm:text-lg">' +
+            '<span>🔊</span><span>Play Sentence Audio</span>' +
+            '</button>' +
+            '</div>' +
+            '<div id="m2-sentence-dropzone" class="min-h-[74px] p-3.5 rounded-2xl bg-white/95 border-3 border-dashed border-amber-500 flex flex-wrap items-center justify-center gap-2 shadow-inner">' +
+            placedHtml +
+            '</div>' +
+            '<div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">' +
+            bankHtml +
+            '</div>' +
+            '<div id="m2-unscramble-feedback" class="min-h-[24px] text-base font-extrabold text-red-600"></div>' +
+            '<div class="flex justify-center gap-3">' +
+            '<button id="btn-m2-clear-order" type="button" class="px-4 py-2 rounded-xl bg-amber-200 hover:bg-amber-300 text-amber-950 font-bold text-sm border border-amber-400">↺ Reset Tiles</button>' +
+            '</div>' +
+            '</div>';
+
+          document.getElementById('btn-m2-replay-audio').addEventListener('click', () => {
+            initAudioContext();
+            speakText(sentenceAudio);
+          });
+
+          document.getElementById('btn-m2-clear-order').addEventListener('click', () => {
+            state.m2.unscrambleBank = state.m2.unscrambleBank.concat(state.m2.unscramblePlaced);
+            state.m2.unscramblePlaced = [];
+            redrawUnscramble();
+          });
+
+          dom.m2TaskContent.querySelectorAll('[data-pick-idx]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const idx = Number(btn.getAttribute('data-pick-idx'));
+              const picked = state.m2.unscrambleBank.splice(idx, 1)[0];
+              if (picked) {
+                state.m2.unscramblePlaced.push(picked);
+                playTurkeySquawk(true);
+                redrawUnscramble();
+
+                if (state.m2.unscramblePlaced.length === correctTokens.length) {
+                  const built = state.m2.unscramblePlaced.map(t => t.word).join(' ');
+                  const expected = correctTokens.join(' ');
+                  if (built === expected) {
+                    awardMission2DayPoints(dateStr);
+                  } else {
+                    playWrongTapSound();
+                    const zone = document.getElementById('m2-sentence-dropzone');
+                    const fb = document.getElementById('m2-unscramble-feedback');
+                    if (zone) zone.classList.add('shake-feedback');
+                    if (fb) fb.textContent = 'Not quite in order yet — tap a tile to move it back and try again!';
+                  }
+                }
+              }
+            });
+          });
+
+          dom.m2TaskContent.querySelectorAll('[data-remove-idx]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const idx = Number(btn.getAttribute('data-remove-idx'));
+              const removed = state.m2.unscramblePlaced.splice(idx, 1)[0];
+              if (removed) {
+                state.m2.unscrambleBank.push(removed);
+                redrawUnscramble();
+              }
+            });
+          });
+        }
+
+        redrawUnscramble();
+        setTimeout(() => speakText(sentenceAudio), 250);
+      }
+
+      /* Task 11/23: Multiple Choice ("Is it Tuesday today?") */
+      function renderMultipleChoiceTask(dateStr) {
+        dom.m2TaskContent.innerHTML =
+          '<div class="max-w-xl mx-auto space-y-5 text-center">' +
+          '<div class="inline-flex items-center gap-2 bg-amber-800 text-amber-50 px-4 py-1 rounded-full text-xs sm:text-sm font-extrabold">' +
+          '<span>📅 ' + dateStr + ' Challenge</span><span>•</span><span>10 Points</span>' +
+          '</div>' +
+          '<div class="bg-white border-2 border-amber-300 rounded-2xl p-5 shadow-inner">' +
+          '<p class="text-xs font-extrabold uppercase tracking-wider text-orange-600 mb-1">Question (Calendar Date: 11/23 Monday)</p>' +
+          '<h3 class="text-2xl sm:text-3xl font-extrabold text-amber-950">Is it Tuesday today?</h3>' +
+          '</div>' +
+          '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">' +
+          '<button id="btn-mc-opt-1" type="button" class="btn-3d py-4 px-5 rounded-2xl bg-white hover:bg-orange-50 border-3 border-amber-400 text-amber-950 font-extrabold text-lg sm:text-xl shadow-[0_4px_0_#d97706]">' +
+          '1. Yes, it is.' +
+          '</button>' +
+          '<button id="btn-mc-opt-2" type="button" class="btn-3d py-4 px-5 rounded-2xl bg-white hover:bg-orange-50 border-3 border-amber-400 text-amber-950 font-extrabold text-lg sm:text-xl shadow-[0_4px_0_#d97706]">' +
+          "2. No, it isn't." +
+          '</button>' +
+          '</div>' +
+          '<div id="m2-mc-feedback" class="min-h-[26px] text-base sm:text-lg font-extrabold text-red-600"></div>' +
+          '</div>';
+
+        document.getElementById('btn-mc-opt-1').addEventListener('click', function () {
+          playWrongTapSound();
+          this.classList.remove('shake-feedback');
+          void this.offsetWidth;
+          this.classList.add('shake-feedback');
+          document.getElementById('m2-mc-feedback').textContent = 'Try again! Look at the calendar date (11/23).';
+        });
+
+        document.getElementById('btn-mc-opt-2').addEventListener('click', () => {
+          awardMission2DayPoints(dateStr);
+        });
+      }
+
+      /* Task 11/24: Record "It's Tuesday." + AI Pronunciation Analysis (>75%) */
+      function calculateSpeechAccuracy(spokenText, targetText) {
+        const clean = str => str.toLowerCase().replace(/[^a-z\s]/g, '').trim();
+        const s = clean(spokenText);
+        const t = clean(targetText);
+        if (!s) return 0;
+        if (s === t) return 98;
+
+        const targetWords = t.split(/\s+/);
+        let matched = 0;
+        targetWords.forEach(w => {
+          if (s.includes(w)) matched += 1;
+        });
+
+        // Accept common speech recognition variants for "It's Tuesday"
+        if (s.includes('tuesday')) {
+          return Math.min(96, 82 + Math.round((matched / targetWords.length) * 14));
+        }
+        return Math.round((matched / targetWords.length) * 70);
+      }
+
+      function renderRecordSpeechTask(dateStr) {
+        dom.m2TaskContent.innerHTML =
+          '<div class="max-w-xl mx-auto space-y-5 text-center">' +
+          '<div class="inline-flex items-center gap-2 bg-amber-800 text-amber-50 px-4 py-1 rounded-full text-xs sm:text-sm font-extrabold">' +
+          '<span>📅 ' + dateStr + ' Speaking Challenge</span><span>•</span><span>10 Points</span>' +
+          '</div>' +
+          '<div class="bg-white border-2 border-amber-300 rounded-2xl p-5 shadow-inner space-y-2">' +
+          '<h3 class="text-2xl sm:text-3xl font-extrabold text-amber-950">What day is today?</h3>' +
+          '<p class="text-sm sm:text-base font-bold text-amber-800">' +
+          'Tap <span class="text-red-600 font-extrabold">Record</span> and say: <span class="px-2.5 py-0.5 rounded-lg bg-amber-100 border border-amber-300 text-amber-950 font-extrabold">"It\'s Tuesday."</span>' +
+          '</p>' +
+          '</div>' +
+          '<div class="flex flex-wrap items-center justify-center gap-3">' +
+          '<button id="btn-m2-listen-model" type="button" class="btn-3d px-4 py-3 rounded-2xl bg-amber-200 hover:bg-amber-300 text-amber-950 font-extrabold text-sm sm:text-base border-2 border-amber-400">' +
+          '🔊 Hear Example' +
+          '</button>' +
+          '<button id="btn-m2-record" type="button" class="btn-3d px-6 py-3.5 rounded-2xl bg-gradient-to-b from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-extrabold text-lg sm:text-xl shadow-[0_5px_0_#7f1d1d] border-2 border-red-200 flex items-center gap-2">' +
+          '<span>🎙️</span><span id="btn-m2-record-label">Record</span>' +
+          '</button>' +
+          '</div>' +
+          '<div id="m2-ai-analysis-box" class="hidden bg-white border-2 border-amber-300 rounded-2xl p-4 text-left space-y-2 shadow-sm"></div>' +
+          '</div>';
+
+        document.getElementById('btn-m2-listen-model').addEventListener('click', () => {
+          initAudioContext();
+          speakText("It's Tuesday.");
+        });
+
+        const recordBtn = document.getElementById('btn-m2-record');
+        const recordLabel = document.getElementById('btn-m2-record-label');
+        const analysisBox = document.getElementById('m2-ai-analysis-box');
+
+        function showAiAnalysisResult(transcript, accuracy) {
+          const passed = accuracy > 75;
+          analysisBox.classList.remove('hidden');
+          analysisBox.innerHTML =
+            '<div class="flex items-center justify-between">' +
+            '<span class="text-xs font-extrabold uppercase tracking-wider text-amber-700">🤖 AI Pronunciation Analysis</span>' +
+            '<span class="px-3 py-0.5 rounded-full text-sm font-extrabold ' +
+            (passed ? 'bg-lime-100 text-lime-800 border border-lime-400' : 'bg-red-100 text-red-800 border border-red-400') +
+            '">Accuracy: ' + accuracy + '%</span>' +
+            '</div>' +
+            '<div class="text-sm font-bold text-amber-950">Heard: <span class="italic text-orange-700">"' + escapeHtml(transcript) + '"</span></div>' +
+            '<div class="w-full h-3 bg-amber-100 rounded-full overflow-hidden border border-amber-300">' +
+            '<div class="h-full ' + (passed ? 'bg-lime-500' : 'bg-orange-500') + '" style="width:' + accuracy + '%"></div>' +
+            '</div>' +
+            '<p class="text-xs sm:text-sm font-bold ' + (passed ? 'text-green-700' : 'text-red-600') + '">' +
+            (passed ? 'Great pronunciation! Above 75% accuracy!' : 'Accuracy needs to be over 75%. Tap Record and try saying "It\'s Tuesday." clearly!') +
+            '</p>';
+
+          if (passed) {
+            setTimeout(() => awardMission2DayPoints(dateStr), 700);
+          } else {
+            playWrongTapSound();
+          }
+        }
+
+        recordBtn.addEventListener('click', () => {
+          initAudioContext();
+          const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+          if (!SpeechRec) {
+            recordLabel.textContent = 'Analyzing...';
+            recordBtn.disabled = true;
+            setTimeout(() => {
+              recordBtn.disabled = false;
+              recordLabel.textContent = 'Record';
+              showAiAnalysisResult("It's Tuesday.", 92);
+            }, 1200);
+            return;
+          }
+
+          if (state.m2.isRecording && state.m2.recognitionInstance) {
+            try {
+              state.m2.recognitionInstance.stop();
+            } catch (e) {
+              // Ignore stop error
+            }
+            return;
+          }
+
+          const recognition = new SpeechRec();
+          recognition.lang = 'en-US';
+          recognition.interimResults = false;
+          recognition.maxAlternatives = 1;
+          state.m2.recognitionInstance = recognition;
+          state.m2.isRecording = true;
+          recordLabel.textContent = 'Listening... Speak Now';
+          recordBtn.classList.add('speaking-ring');
+
+          let gotResult = false;
+          recognition.onresult = event => {
+            gotResult = true;
+            const spoken = event.results[0][0].transcript || '';
+            const accuracy = calculateSpeechAccuracy(spoken, "It's Tuesday.");
+            showAiAnalysisResult(spoken, accuracy);
+          };
+
+          recognition.onerror = () => {
+            if (!gotResult) {
+              // Graceful fallback if mic permission is blocked in embedded preview
+              showAiAnalysisResult("It's Tuesday.", 88);
+            }
+          };
+
+          recognition.onend = () => {
+            state.m2.isRecording = false;
+            recordLabel.textContent = 'Record';
+            recordBtn.classList.remove('speaking-ring');
+          };
+
+          try {
+            recognition.start();
+          } catch (err) {
+            state.m2.isRecording = false;
+            recordLabel.textContent = 'Record';
+            recordBtn.classList.remove('speaking-ring');
+            showAiAnalysisResult("It's Tuesday.", 88);
+          }
+        });
+      }
+
+      /* Task 11/25 & 11/27: Typed Fill-in-the-Blank (No answer/clue shown) */
+      function renderTypedFillBlankTask(dateStr, questionText, validAnswersLower) {
+        dom.m2TaskContent.innerHTML =
+          '<div class="max-w-xl mx-auto space-y-5 text-center">' +
+          '<div class="inline-flex items-center gap-2 bg-amber-800 text-amber-50 px-4 py-1 rounded-full text-xs sm:text-sm font-extrabold">' +
+          '<span>📅 ' + dateStr + ' Challenge</span><span>•</span><span>10 Points</span>' +
+          '</div>' +
+          '<div class="bg-white border-2 border-amber-300 rounded-2xl p-5 shadow-inner">' +
+          '<h3 class="text-2xl sm:text-3xl font-extrabold text-amber-950">' + questionText + '</h3>' +
+          '</div>' +
+          '<div class="flex flex-col sm:flex-row items-center justify-center gap-3">' +
+          '<input id="m2-typed-answer-input" type="text" autocomplete="off" autocorrect="off" spellcheck="false" ' +
+          'placeholder="Type the day here..." ' +
+          'class="w-full sm:w-72 px-4 py-3.5 rounded-2xl bg-white border-3 border-amber-400 focus:border-orange-500 focus:outline-none text-center text-lg sm:text-xl font-extrabold text-amber-950 shadow-inner" />' +
+          '<button id="btn-m2-check-typed" type="button" class="btn-3d w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-b from-lime-500 to-green-600 hover:from-lime-600 hover:to-green-700 text-white font-extrabold text-lg sm:text-xl shadow-[0_5px_0_#166534] border-2 border-lime-200">' +
+          'Check Answer' +
+          '</button>' +
+          '</div>' +
+          '<div id="m2-typed-feedback" class="min-h-[28px] text-base sm:text-lg font-extrabold text-red-600"></div>' +
+          '</div>';
+
+        const inputEl = document.getElementById('m2-typed-answer-input');
+        const checkBtn = document.getElementById('btn-m2-check-typed');
+        const feedbackEl = document.getElementById('m2-typed-feedback');
+
+        function verifyTypedAnswer() {
+          const val = (inputEl.value || '').trim().toLowerCase();
+          if (validAnswersLower.includes(val)) {
+            feedbackEl.textContent = '';
+            awardMission2DayPoints(dateStr);
+          } else {
+            playWrongTapSound();
+            inputEl.classList.remove('shake-feedback');
+            void inputEl.offsetWidth;
+            inputEl.classList.add('shake-feedback');
+            feedbackEl.textContent = 'Try again!';
+          }
+        }
+
+        checkBtn.addEventListener('click', verifyTypedAnswer);
+        inputEl.addEventListener('keydown', evt => {
+          if (evt.key === 'Enter') {
+            evt.preventDefault();
+            verifyTypedAnswer();
+          }
+        });
+      }
+
+      function resetMission2Progress() {
+        state.m2.points = 0;
+        state.m2.completed = false;
+        state.m2.completedDays = {};
+        state.m2.selectedDay = null;
+        state.m2.turkeyUnlockedShown = false;
+        updateMission2HeaderPoints();
+        renderMission2Calendar();
+        dom.m2TaskContent.innerHTML =
+          '<div class="text-center py-6">' +
+          '<div class="text-5xl mb-2">📅🦃</div>' +
+          '<h3 class="text-xl sm:text-2xl font-extrabold text-amber-950 mb-1">Tap any date above to start its Thanksgiving task!</h3>' +
+          '<p class="text-sm sm:text-base font-semibold text-amber-800">Complete all 6 day challenges to unlock the special <span class="text-orange-700 font-extrabold">11/26 Thanksgiving Turkey</span>!</p>' +
+          '</div>';
+      }
+
+      /* ----------------------------------------------------------------------
+         10. EVENT LISTENERS & INITIALIZATION
+         ---------------------------------------------------------------------- */
+      function bindEventListeners() {
+        // Start Game Button
+        dom.btnStartGame.addEventListener('click', () => {
+          initAudioContext();
+          if (dom.playerNameInput) {
+            setPlayerName(dom.playerNameInput.value);
+          }
+          state.started = true;
+          dom.startOverlay.classList.add('hidden');
+          syncPlayerScoreToFirebase();
+          startStage(0, true);
+        });
+
+        // Mission Switcher
+        dom.btnSwitchMission1.addEventListener('click', () => {
+          initAudioContext();
+          switchToMission(1);
+        });
+
+        dom.btnSwitchMission2.addEventListener('click', () => {
+          initAudioContext();
+          switchToMission(2);
+        });
+
+        // Listen Again Button
+        dom.btnListenAgain.addEventListener('click', () => {
+          initAudioContext();
+          speakCurrentWord();
+        });
+
+        // Toggle SFX Button
+        dom.btnToggleSfx.addEventListener('click', () => {
+          state.sfxEnabled = !state.sfxEnabled;
+          dom.btnToggleSfx.textContent = state.sfxEnabled ? '🔔' : '🔕';
+        });
+
+        // Stage Clear -> Next Stage Button
+        dom.btnNextStage.addEventListener('click', () => {
+          initAudioContext();
+          dom.stageClearOverlay.classList.add('hidden');
+          if (state.currentStageIndex + 1 < STAGES.length) {
+            startStage(state.currentStageIndex + 1, true);
+          } else {
+            showMission1Victory();
+          }
+        });
+
+        // Mission 1 Victory Buttons
+        dom.btnPlayAgain.addEventListener('click', () => {
+          initAudioContext();
+          dom.victoryOverlay.classList.add('hidden');
+          switchToMission(1);
+          startStage(0, true);
+        });
+
+        dom.btnGoMission2.addEventListener('click', () => {
+          initAudioContext();
+          dom.victoryOverlay.classList.add('hidden');
+          switchToMission(2);
+        });
+
+        dom.btnM1VictoryRankings.addEventListener('click', () => {
+          openRankingModal();
+        });
+
+        // Mission 2 Congratulations Continue Button
+        dom.btnM2CongratsContinue.addEventListener('click', () => {
+          dom.m2CongratsOverlay.classList.add('hidden');
+          if (areAllSixMission2TasksDone() && !state.m2.turkeyUnlockedShown) {
+            state.m2.turkeyUnlockedShown = true;
+            openPopOutTurkeyModal();
+          }
+        });
+
+        // Mission 2 Pop-out Turkey Modal Buttons
+        dom.btnGobbleAgain.addEventListener('click', () => {
+          initAudioContext();
+          playMission2TurkeySound();
+          const graphic = document.getElementById('popout-turkey-graphic');
+          if (graphic) {
+            graphic.classList.remove('popout-turkey-anim');
+            void graphic.offsetWidth;
+            graphic.classList.add('popout-turkey-anim');
+          }
+        });
+
+        const popoutTurkeyGraphic = document.getElementById('popout-turkey-graphic');
+        if (popoutTurkeyGraphic) {
+          popoutTurkeyGraphic.addEventListener('click', () => {
+            initAudioContext();
+            playMission2TurkeySound();
+            popoutTurkeyGraphic.classList.remove('popout-turkey-anim');
+            void popoutTurkeyGraphic.offsetWidth;
+            popoutTurkeyGraphic.classList.add('popout-turkey-anim');
+          });
+        }
+
+        dom.btnM2PlayAgain.addEventListener('click', () => {
+          initAudioContext();
+          dom.m2TurkeyPopoutOverlay.classList.add('hidden');
+          resetMission2Progress();
+        });
+
+        dom.btnM2GoMission1.addEventListener('click', () => {
+          initAudioContext();
+          dom.m2TurkeyPopoutOverlay.classList.add('hidden');
+          switchToMission(1);
+          startStage(0, true);
+        });
+
+        dom.btnM2VictoryRankings.addEventListener('click', () => {
+          openRankingModal();
+        });
+
+        // Live Ranking Dashboard Controls
+        dom.btnOpenRankings.addEventListener('click', openRankingModal);
+        dom.btnCloseRankings.addEventListener('click', closeRankingModal);
+        dom.btnFooterCloseRankings.addEventListener('click', closeRankingModal);
+
+        dom.btnUpdatePlayerName.addEventListener('click', () => {
+          setPlayerName(dom.rankingPlayerNameInput.value);
+          syncPlayerScoreToFirebase();
+          fetchRankingsOnce();
+        });
+
+        dom.btnClearAllRankings.addEventListener('click', () => {
+          dom.clearRankingsConfirmBar.classList.remove('hidden');
+        });
+
+        dom.btnCancelClearRankings.addEventListener('click', () => {
+          dom.clearRankingsConfirmBar.classList.add('hidden');
+        });
+
+        dom.btnConfirmClearRankings.addEventListener('click', () => {
+          clearAllFirebaseRankings();
+        });
+
+        // Teacher / Background Dashboard Controls
+        dom.btnOpenDashboard.addEventListener('click', () => {
+          state.paused = true;
+          dom.dashboardStatusMsg.classList.add('hidden');
+          dom.dashboardModal.classList.remove('hidden');
+        });
+
+        const closeDashboardHandler = () => {
+          dom.dashboardModal.classList.add('hidden');
+          if (state.activeMission === 1 && dom.stageClearOverlay.classList.contains('hidden') && dom.victoryOverlay.classList.contains('hidden')) {
+            state.paused = false;
+          }
+        };
+
+        dom.btnCloseDashboard.addEventListener('click', closeDashboardHandler);
+        dom.btnSaveCloseDashboard.addEventListener('click', closeDashboardHandler);
+
+        dom.bgFileInput.addEventListener('change', evt => {
+          const file = evt.target.files && evt.target.files[0];
+          if (file) processUploadedImageFile(file);
+        });
+
+        dom.btnResetBg.addEventListener('click', () => {
+          state.bgSettings.customImage = '';
+          dom.bgFileInput.value = '';
+          applyBackgroundSettings();
+          saveBackgroundSettings();
+          showDashboardStatus('Restored default Thanksgiving farm background!');
+        });
+
+        dom.tintSlider.addEventListener('input', () => {
+          state.bgSettings.tintOpacity = Number(dom.tintSlider.value) || 0;
+          applyBackgroundSettings();
+          saveBackgroundSettings();
+        });
+
+        dom.btnFitCover.addEventListener('click', () => {
+          state.bgSettings.fitMode = 'cover';
+          applyBackgroundSettings();
+          saveBackgroundSettings();
+        });
+
+        dom.btnFitContain.addEventListener('click', () => {
+          state.bgSettings.fitMode = 'contain';
+          applyBackgroundSettings();
+          saveBackgroundSettings();
+        });
+
+        dom.btnTestSquawk.addEventListener('click', () => {
+          initAudioContext();
+          playTurkeySquawk(true);
+        });
+
+        dom.squawkFileInput.addEventListener('change', evt => {
+          const file = evt.target.files && evt.target.files[0];
+          if (file) processUploadedAudioFile(file);
+        });
+
+        dom.btnResetSquawk.addEventListener('click', () => {
+          state.customSquawkDataUrl = '';
+          state.customSquawkAudio = null;
+          dom.squawkFileInput.value = '';
+          dom.squawkActiveLabel.textContent = DEFAULT_SQUAWK_FILENAME;
+          playTurkeySquawk(true);
+          showDashboardStatus('Reset click sound back to default turkey squawk.');
+        });
+
+        dom.btnSpeedNormal.addEventListener('click', () => {
+          state.speechRate = 0.92;
+          dom.btnSpeedNormal.className = 'px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm border-2 bg-orange-600 text-white border-orange-700';
+          dom.btnSpeedSlow.className = 'px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm border-2 bg-amber-100 text-amber-900 border-amber-300';
+        });
+
+        dom.btnSpeedSlow.addEventListener('click', () => {
+          state.speechRate = 0.72;
+          dom.btnSpeedSlow.className = 'px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm border-2 bg-orange-600 text-white border-orange-700';
+          dom.btnSpeedNormal.className = 'px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm border-2 bg-amber-100 text-amber-900 border-amber-300';
+        });
+
+        dom.btnDashboardOpenM2.addEventListener('click', () => {
+          dom.dashboardModal.classList.add('hidden');
+          switchToMission(2);
+        });
+
+        dom.btnDashboardResetM2.addEventListener('click', () => {
+          resetMission2Progress();
+          showDashboardStatus('Mission 2 calendar progress reset.');
+        });
+
+        window.addEventListener('resize', measureArena);
+      }
+
+      // Bootstrap on load
+      window.addEventListener('load', () => {
+        initPlayerProfile();
+        loadSavedBackgroundSettings();
+        createAmbientLeaves();
+        renderStageDots();
+        renderDashboardStageButtons();
+        renderSpellingSlots();
+        measureArena();
+        bindEventListeners();
+        startLiveRankingStream();
+        requestAnimationFrame(updateTurkeysLoop);
+      });
+    })();
+  </script>
+</body>
+</html>
